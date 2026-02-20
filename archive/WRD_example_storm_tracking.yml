@@ -1,0 +1,815 @@
+# =============================================================================
+# WORKFLOW REPRESENTATION DOCUMENT (WRD)
+# Example: Atmospheric Storm Tracking and Intensity Analysis Pipeline
+# Schema version: 1.0  |  WRD Design version: 2.0
+# =============================================================================
+#
+# DOCUMENT LIFECYCLE NOTE
+# This is a single living document. It is populated in three phases:
+#
+#   Phase 1 — At compilation time (from workflow code + static analysis):
+#             header, task_registry, execution_graph, data_flow.semantic,
+#             execution_profiles, translation_metadata
+#
+#   Phase 2 — At deployment time (from tooling inspecting the input directory):
+#             data_flow.measured.input_data_bytes,
+#             deployment_constraints.agent_filled fields
+#
+#   Phase 3 — After first run (from DPM I/O traces + output measurement):
+#             data_flow.measured.output_data_bytes_per_profile,
+#             data_flow.physical (all fields)
+#
+# Template-level changes (task structure, relationships) increment `version`.
+# Data enrichment (measured sizes, profiling results) updates in place under
+# the same version with timestamps. These are different kinds of change and
+# must not be conflated.
+#
+# This example was compiled from a Nextflow script. Fields marked
+# [AGENT-INFERRED] were populated by AI compilation with confidence scores
+# recorded in translation_metadata. Fields marked [AWAITING-FIRST-RUN] will
+# be populated after the first execution completes.
+# =============================================================================
+
+
+# -----------------------------------------------------------------------------
+# SECTION 1: WORKFLOW HEADER
+# -----------------------------------------------------------------------------
+header:
+  workflow_lineage_id: "f3a9c2e1-847b-4d02-b6f1-2c3d4e5f6a7b"
+  version: "1.0.0"
+  version_notes: "Initial WRD compiled from storm_tracking_pipeline.nf"
+  deprecated: false
+
+  workflow_name: "Atmospheric Storm Tracking and Intensity Analysis Pipeline"
+
+  # Scientist-authored. Quality-validated: 47 words, passes Section 2a standards.
+  workflow_description: >
+    Processes raw ERA5 atmospheric reanalysis data to detect, track, and
+    characterize extratropical storm systems over the North Atlantic basin.
+    Starting from 6-hourly pressure-level netCDF fields, the pipeline identifies
+    cyclone centers, builds storm tracks across timesteps, computes intensity
+    metrics (minimum SLP, maximum wind speed, integrated kinetic energy), and
+    produces a final storm catalog and per-storm trajectory files suitable for
+    climatological analysis. Intended for 40-year reanalysis runs (1980–2019)
+    as well as single-season case studies.
+
+  source_format: "compiled_from_nextflow"
+  source_file: "storm_tracking_pipeline.nf"
+  schema_version: "wrd-2.0"
+  author: "Dr. Elena Vasquez, NCAR Mesoscale Dynamics Group"
+  created_at: "2025-03-12T14:22:00Z"
+  last_modified_at: "2025-03-12T14:22:00Z"
+
+
+# -----------------------------------------------------------------------------
+# SECTION 2: TASK REGISTRY
+# Canonical source of truth for task structure and relationships.
+# The execution_graph is derived from this section — never edited directly.
+# -----------------------------------------------------------------------------
+task_registry:
+
+  - task_id: "preprocess_era5"
+    task_name: "ERA5 Preprocessing and Variable Extraction"
+    # [AGENT-INFERRED, confidence: high — clear from Nextflow process block
+    #  input/output declarations and variable names]
+    semantic_description: >
+      Reads raw ERA5 netCDF files for the requested date range and extracts the
+      variables required for cyclone detection: mean sea-level pressure (MSLP),
+      850 hPa wind components (u, v), and 500 hPa geopotential height. Regrides
+      from the native 0.25° ERA5 grid to a 1° analysis grid to reduce downstream
+      compute cost. Outputs one netCDF file per 6-hourly timestep. Without this
+      task, all downstream tasks receive wrongly-shaped or missing input fields.
+    executable_ref: "scripts/preprocess_era5.py"
+    task_type: "preprocessing"
+    output_class: "intermediate"
+    relationships: []  # No upstream dependencies — this is the entry point
+    loop_annotation:
+      loop_id: "timestep_loop"
+      loop_type: "parameter_sweep"
+      bound_type: "parameter_set_size"
+      parameter_ref: "params.date_range"
+      loop_position: "body"
+
+  - task_id: "detect_cyclones"
+    task_name: "Cyclone Center Detection"
+    # [AGENT-INFERRED, confidence: high]
+    semantic_description: >
+      Identifies candidate cyclone centers in each 6-hourly MSLP field using a
+      local minimum detection algorithm (threshold: MSLP < 1000 hPa, spatial
+      scale > 500 km). For each detected center, records the grid location,
+      central pressure, and timestamp. Outputs a CSV of candidate centers per
+      timestep. This task produces a large number of false positives that are
+      filtered in the subsequent tracking step; the threshold is intentionally
+      permissive to avoid missing weak systems.
+    executable_ref: "scripts/detect_cyclones.py"
+    task_type: "compute"
+    output_class: "intermediate"
+    relationships:
+      - type: "data_dependency"
+        target_task_id: "preprocess_era5"
+        description: "Consumes per-timestep netCDF files produced by preprocessing"
+    loop_annotation:
+      loop_id: "timestep_loop"
+      loop_type: "parameter_sweep"
+      bound_type: "parameter_set_size"
+      parameter_ref: "params.date_range"
+      loop_position: "body"
+
+  - task_id: "build_tracks"
+    task_name: "Storm Track Assembly"
+    # [AGENT-INFERRED, confidence: medium — function logic inferred from script
+    #  name and comments; tracking algorithm details not in Nextflow script itself]
+    semantic_description: >
+      Links candidate cyclone centers across consecutive timesteps to form
+      continuous storm tracks using a nearest-neighbor matching algorithm with
+      a maximum displacement threshold of 800 km per 6 hours. Applies a minimum
+      duration filter (tracks shorter than 48 hours are discarded as spurious).
+      Takes all per-timestep candidate center CSVs and outputs a single
+      storm_tracks.parquet file containing all tracks for the full date range,
+      with each track assigned a unique storm ID. This is the first task whose
+      output is scientifically useful on its own — the track file can be
+      analyzed independently of intensity metrics.
+    executable_ref: "scripts/build_tracks.py"
+    task_type: "compute"
+    output_class: "checkpoint"
+    relationships:
+      - type: "data_dependency"
+        target_task_id: "detect_cyclones"
+        description: "Consumes all per-timestep candidate center CSVs"
+    # No loop annotation — this task collects across all timesteps in one pass
+
+  - task_id: "compute_intensity"
+    task_name: "Storm Intensity Metrics Computation"
+    # [AGENT-INFERRED, confidence: high]
+    semantic_description: >
+      For each storm track, extracts a spatial domain around the track center at
+      each timestep and computes three intensity metrics: minimum sea-level
+      pressure within 500 km of center, maximum 10 m wind speed within 500 km
+      of center, and integrated kinetic energy of the storm-scale circulation.
+      Requires both the track file (for storm IDs and center locations) and the
+      preprocessed wind and MSLP fields (for the actual field values). Outputs
+      an intensity time series netCDF file per storm. Computationally the most
+      expensive task in the pipeline.
+    executable_ref: "scripts/compute_intensity.py"
+    task_type: "compute"
+    output_class: "intermediate"
+    relationships:
+      - type: "data_dependency"
+        target_task_id: "build_tracks"
+        description: "Consumes storm_tracks.parquet for center locations and storm IDs"
+      - type: "data_dependency"
+        target_task_id: "preprocess_era5"
+        description: "Consumes preprocessed wind and MSLP fields for metric extraction"
+    loop_annotation:
+      loop_id: "per_storm_intensity_loop"
+      loop_type: "data_driven"
+      bound_type: "runtime_determined"
+      loop_position: "body"
+
+  - task_id: "filter_significant"
+    task_name: "Significant Storm Filtering"
+    # [AGENT-INFERRED, confidence: medium — threshold values inferred from
+    #  script defaults; may need scientist review]
+    semantic_description: >
+      Applies meteorological significance criteria to retain only storms meeting
+      the definition of an extratropical cyclone: minimum central pressure
+      deepening rate of 1 hPa/hour for at least 24 hours (rapid cyclogenesis
+      criterion), or sustained maximum wind speed exceeding 17.5 m/s for at
+      least 48 hours. Discards weaker or short-lived disturbances. Takes all
+      per-storm intensity netCDF files and the track parquet file; outputs a
+      filtered_tracks.parquet containing only significant storms. This filtering
+      step is what distinguishes a publishable storm catalog from a raw detection
+      list.
+    executable_ref: "scripts/filter_significant.py"
+    task_type: "postprocessing"
+    output_class: "checkpoint"
+    relationships:
+      - type: "data_dependency"
+        target_task_id: "compute_intensity"
+        description: "Consumes per-storm intensity netCDF files"
+      - type: "data_dependency"
+        target_task_id: "build_tracks"
+        description: "Consumes storm_tracks.parquet for track geometry"
+
+  - task_id: "compute_climatology"
+    task_name: "Climatological Statistics Aggregation"
+    # [AGENT-INFERRED, confidence: high]
+    semantic_description: >
+      Aggregates the filtered storm catalog into seasonal and decadal climatology
+      statistics: storm frequency per month and season, mean track density
+      (storms per degree-squared per decade), mean and extreme intensity
+      distributions, and year-on-year trend estimates. Outputs a
+      climatology_summary.nc file containing gridded track density fields and
+      a climatology_stats.csv with basin-wide summary statistics. This task
+      requires the full date range to be meaningful; running it on a single
+      season produces statistically unreliable results.
+    executable_ref: "scripts/compute_climatology.py"
+    task_type: "compute"
+    output_class: "checkpoint"
+    relationships:
+      - type: "data_dependency"
+        target_task_id: "filter_significant"
+        description: "Consumes filtered_tracks.parquet and per-storm intensity files"
+
+  - task_id: "generate_catalog"
+    task_name: "Final Storm Catalog Generation"
+    # [AGENT-INFERRED, confidence: high]
+    semantic_description: >
+      Assembles the final human- and machine-readable storm catalog from all
+      upstream outputs. Produces three artifacts: (1) storm_catalog.csv — one
+      row per storm with track summary, peak intensity, genesis/lysis location
+      and date; (2) storm_catalog.nc — the same data in netCDF format with full
+      per-timestep track and intensity data for each storm; (3) a PDF summary
+      report with track maps and intensity distributions. This is the primary
+      deliverable of the pipeline and the artifact that gets archived and
+      cited in publications.
+    executable_ref: "scripts/generate_catalog.py"
+    task_type: "postprocessing"
+    output_class: "checkpoint"
+    relationships:
+      - type: "data_dependency"
+        target_task_id: "filter_significant"
+        description: "Consumes filtered_tracks.parquet"
+      - type: "data_dependency"
+        target_task_id: "compute_intensity"
+        description: "Consumes per-storm intensity netCDF files"
+      - type: "data_dependency"
+        target_task_id: "compute_climatology"
+        description: "Consumes climatology_summary.nc and climatology_stats.csv"
+
+
+# -----------------------------------------------------------------------------
+# SECTION 3: EXECUTION GRAPH
+# Derived from task_registry relationships. Never edited directly.
+# Regenerated automatically on any task_registry change.
+# -----------------------------------------------------------------------------
+execution_graph:
+  integrity_hash: "sha256:a3f7c19d2e84b056f3a1d72c9e0f4b83c1d5e27a"  # hash of task_registry relationships
+  last_generated: "2025-03-12T14:22:00Z"
+
+  nodes:
+    - "preprocess_era5"
+    - "detect_cyclones"
+    - "build_tracks"
+    - "compute_intensity"
+    - "filter_significant"
+    - "compute_climatology"
+    - "generate_catalog"
+
+  edges:
+    - from: "preprocess_era5"
+      to: "detect_cyclones"
+      type: "data_dependency"
+    - from: "preprocess_era5"
+      to: "compute_intensity"
+      type: "data_dependency"
+    - from: "detect_cyclones"
+      to: "build_tracks"
+      type: "data_dependency"
+    - from: "build_tracks"
+      to: "compute_intensity"
+      type: "data_dependency"
+    - from: "build_tracks"
+      to: "filter_significant"
+      type: "data_dependency"
+    - from: "compute_intensity"
+      to: "filter_significant"
+      type: "data_dependency"
+    - from: "compute_intensity"
+      to: "generate_catalog"
+      type: "data_dependency"
+    - from: "filter_significant"
+      to: "compute_climatology"
+      type: "data_dependency"
+    - from: "filter_significant"
+      to: "generate_catalog"
+      type: "data_dependency"
+    - from: "compute_climatology"
+      to: "generate_catalog"
+      type: "data_dependency"
+
+  loop_groups:
+    - loop_id: "timestep_loop"
+      tasks: ["preprocess_era5", "detect_cyclones"]
+      loop_type: "parameter_sweep"
+      note: >
+        These two tasks iterate together over the date range parameter set.
+        They fan out into independent per-timestep executions that are
+        collected by build_tracks.
+    - loop_id: "per_storm_intensity_loop"
+      tasks: ["compute_intensity"]
+      loop_type: "data_driven"
+      note: >
+        Iterates over storms identified by build_tracks. Count is not known
+        until build_tracks completes.
+
+
+# -----------------------------------------------------------------------------
+# SECTION 4: DATA FLOW LAYER
+# Three levels: semantic (always present), measured (tooling-populated),
+# physical (DPM runtime traces, post-first-run).
+# -----------------------------------------------------------------------------
+data_flow:
+
+  # --- Level 1: Semantic I/O Layer -------------------------------------------
+  # Author-provided descriptions of what data flows between tasks.
+  # Always present from compilation time.
+  semantic:
+
+    - dataset_id: "era5_raw"
+      description: >
+        Raw ERA5 reanalysis netCDF files, one file per 6-hourly timestep,
+        containing MSLP, 850 hPa u/v wind, and 500 hPa geopotential height
+        on a 0.25° global grid. Source data; not produced by any task in
+        this workflow.
+      file_format: "netCDF4"
+      role: "input"
+      producer_task: null  # external input
+      consumer_tasks: ["preprocess_era5"]
+
+    - dataset_id: "preprocessed_fields"
+      description: >
+        Regridded 1° netCDF files, one per 6-hourly timestep, containing the
+        extracted variables needed for detection and intensity computation.
+        Transient; only needed until compute_intensity finishes.
+      file_format: "netCDF4"
+      role: "intermediate"
+      producer_task: "preprocess_era5"
+      consumer_tasks: ["detect_cyclones", "compute_intensity"]
+
+    - dataset_id: "candidate_centers"
+      description: >
+        Per-timestep CSV files listing candidate cyclone center locations,
+        central pressures, and timestamps. High volume, short-lived; consumed
+        immediately by build_tracks.
+      file_format: "CSV"
+      role: "intermediate"
+      producer_task: "detect_cyclones"
+      consumer_tasks: ["build_tracks"]
+
+    - dataset_id: "storm_tracks"
+      description: >
+        All storm tracks for the full date range in a single parquet file.
+        Each row is a track point (storm_id, timestamp, lat, lon, central_pressure).
+        First independently useful output — can be analyzed without intensity data.
+      file_format: "parquet"
+      role: "checkpoint"
+      producer_task: "build_tracks"
+      consumer_tasks: ["compute_intensity", "filter_significant"]
+
+    - dataset_id: "storm_intensity_files"
+      description: >
+        One netCDF file per storm containing the intensity time series:
+        minimum SLP, maximum wind speed, and integrated kinetic energy at
+        each tracked timestep. Large collective size for multi-decadal runs.
+      file_format: "netCDF4"
+      role: "intermediate"
+      producer_task: "compute_intensity"
+      consumer_tasks: ["filter_significant", "generate_catalog"]
+
+    - dataset_id: "filtered_tracks"
+      description: >
+        Parquet file containing only storms that meet the extratropical
+        cyclone significance criteria. Subset of storm_tracks; this is the
+        publishable storm list.
+      file_format: "parquet"
+      role: "checkpoint"
+      producer_task: "filter_significant"
+      consumer_tasks: ["compute_climatology", "generate_catalog"]
+
+    - dataset_id: "climatology_summary"
+      description: >
+        Gridded track density and intensity climatology in netCDF format,
+        plus a CSV of basin-wide summary statistics. Useful for trend analysis
+        and comparison with other reanalysis products.
+      file_format: "netCDF4 + CSV"
+      role: "checkpoint"
+      producer_task: "compute_climatology"
+      consumer_tasks: ["generate_catalog"]
+
+    - dataset_id: "storm_catalog"
+      description: >
+        Final storm catalog in CSV and netCDF formats plus a PDF summary
+        report. Primary deliverable. Archived and cited in publications.
+      file_format: "CSV + netCDF4 + PDF"
+      role: "checkpoint"
+      producer_task: "generate_catalog"
+      consumer_tasks: []  # terminal output
+
+
+  # --- Level 2: Measured I/O Layer -------------------------------------------
+  # Populated by deployment tooling — NOT by the scientist.
+  # Input sizes measured from the input directory at deployment time.
+  # Output sizes measured from prior completed runs.
+  measured:
+
+    - dataset_id: "era5_raw"
+      input_data_bytes: null          # [AWAITING DEPLOYMENT — will be measured
+      measurement_confidence: "unavailable"  # from input directory at deploy time]
+      measurement_run_id: null
+      measurement_timestamp: null
+
+    - dataset_id: "storm_catalog"
+      # Output sizes per profile, measured from completed runs
+      output_data_bytes_per_profile:
+        tracks_only: null             # [AWAITING-FIRST-RUN]
+        tracks_and_intensity: null    # [AWAITING-FIRST-RUN]
+        full: null                    # [AWAITING-FIRST-RUN]
+      measurement_confidence: "unavailable"
+      measurement_run_id: null
+      measurement_timestamp: null
+
+
+  # --- Level 3: Physical I/O Layer -------------------------------------------
+  # Populated by DPM I/O tracing during runtime. All fields null until
+  # first run completes.
+  physical:
+
+    - task_id: "preprocess_era5"
+      bytes_read: null                # [AWAITING-FIRST-RUN]
+      bytes_written: null
+      read_ops: null
+      write_ops: null
+      access_pattern: null           # sequential | random | strided
+      observed_read_bandwidth_mbs: null
+      observed_write_bandwidth_mbs: null
+      posix_open_time_s: null
+      posix_read_time_s: null
+      posix_write_time_s: null
+      posix_close_time_s: null
+      dpm_trace_run_id: null
+      dpm_trace_timestamp: null
+
+    - task_id: "detect_cyclones"
+      bytes_read: null
+      bytes_written: null
+      read_ops: null
+      write_ops: null
+      access_pattern: null
+      observed_read_bandwidth_mbs: null
+      observed_write_bandwidth_mbs: null
+      posix_open_time_s: null
+      posix_read_time_s: null
+      posix_write_time_s: null
+      posix_close_time_s: null
+      dpm_trace_run_id: null
+      dpm_trace_timestamp: null
+
+    - task_id: "build_tracks"
+      bytes_read: null
+      bytes_written: null
+      read_ops: null
+      write_ops: null
+      access_pattern: null
+      observed_read_bandwidth_mbs: null
+      observed_write_bandwidth_mbs: null
+      posix_open_time_s: null
+      posix_read_time_s: null
+      posix_write_time_s: null
+      posix_close_time_s: null
+      dpm_trace_run_id: null
+      dpm_trace_timestamp: null
+
+    - task_id: "compute_intensity"
+      bytes_read: null
+      bytes_written: null
+      read_ops: null
+      write_ops: null
+      access_pattern: null
+      observed_read_bandwidth_mbs: null
+      observed_write_bandwidth_mbs: null
+      posix_open_time_s: null
+      posix_read_time_s: null
+      posix_write_time_s: null
+      posix_close_time_s: null
+      dpm_trace_run_id: null
+      dpm_trace_timestamp: null
+
+    - task_id: "filter_significant"
+      bytes_read: null
+      bytes_written: null
+      read_ops: null
+      write_ops: null
+      access_pattern: null
+      observed_read_bandwidth_mbs: null
+      observed_write_bandwidth_mbs: null
+      posix_open_time_s: null
+      posix_read_time_s: null
+      posix_write_time_s: null
+      posix_close_time_s: null
+      dpm_trace_run_id: null
+      dpm_trace_timestamp: null
+
+    - task_id: "compute_climatology"
+      bytes_read: null
+      bytes_written: null
+      read_ops: null
+      write_ops: null
+      access_pattern: null
+      observed_read_bandwidth_mbs: null
+      observed_write_bandwidth_mbs: null
+      posix_open_time_s: null
+      posix_read_time_s: null
+      posix_write_time_s: null
+      posix_close_time_s: null
+      dpm_trace_run_id: null
+      dpm_trace_timestamp: null
+
+    - task_id: "generate_catalog"
+      bytes_read: null
+      bytes_written: null
+      read_ops: null
+      write_ops: null
+      access_pattern: null
+      observed_read_bandwidth_mbs: null
+      observed_write_bandwidth_mbs: null
+      posix_open_time_s: null
+      posix_read_time_s: null
+      posix_write_time_s: null
+      posix_close_time_s: null
+      dpm_trace_run_id: null
+      dpm_trace_timestamp: null
+
+
+# -----------------------------------------------------------------------------
+# SECTION 5: EXECUTION PROFILES
+# Named, valid partial execution subsets. required_task_set is always
+# auto-derived by backward traversal from terminal_task_id — never manually set.
+# -----------------------------------------------------------------------------
+execution_profiles:
+
+  - profile_name: "tracks_only"
+    terminal_task_id: "build_tracks"
+    description: >
+      Produces storm track files only (storm_tracks.parquet). No intensity
+      metrics or filtering. Useful for quick track climatology studies or
+      as input to external intensity tools. Fastest profile — skips the
+      computationally expensive intensity computation entirely.
+    required_task_set:  # AUTO-DERIVED by backward DAG traversal
+      - "preprocess_era5"
+      - "detect_cyclones"
+      - "build_tracks"
+    output_dataset_ids:
+      - "storm_tracks"
+
+  - profile_name: "tracks_and_intensity"
+    terminal_task_id: "filter_significant"
+    description: >
+      Produces the filtered significant storm catalog (filtered_tracks.parquet)
+      with full per-storm intensity metrics. Suitable for studies focused on
+      individual storm analysis or event attribution. Does not include the
+      climatological aggregation.
+    required_task_set:  # AUTO-DERIVED
+      - "preprocess_era5"
+      - "detect_cyclones"
+      - "build_tracks"
+      - "compute_intensity"
+      - "filter_significant"
+    output_dataset_ids:
+      - "storm_tracks"
+      - "filtered_tracks"
+      - "storm_intensity_files"
+
+  - profile_name: "full"
+    terminal_task_id: "generate_catalog"
+    description: >
+      Complete pipeline. Produces the full storm catalog (CSV + netCDF + PDF),
+      climatological statistics, and all intermediate checkpoints. This is the
+      profile for production 40-year reanalysis runs intended for publication.
+    required_task_set:  # AUTO-DERIVED
+      - "preprocess_era5"
+      - "detect_cyclones"
+      - "build_tracks"
+      - "compute_intensity"
+      - "filter_significant"
+      - "compute_climatology"
+      - "generate_catalog"
+    output_dataset_ids:
+      - "storm_tracks"
+      - "filtered_tracks"
+      - "storm_intensity_files"
+      - "climatology_summary"
+      - "storm_catalog"
+
+
+# -----------------------------------------------------------------------------
+# SECTION 6: (see output_class field per task in task_registry)
+# Checkpoint vs. intermediate classification is recorded per dataset in
+# data_flow.semantic[].role and per task in task_registry[].output_class.
+# -----------------------------------------------------------------------------
+# Summary for quick reference:
+#   intermediate: preprocessed_fields, candidate_centers, storm_intensity_files
+#   checkpoint:   storm_tracks, filtered_tracks, climatology_summary, storm_catalog
+
+
+# -----------------------------------------------------------------------------
+# SECTION 7: DEPLOYMENT CONSTRAINTS
+# -----------------------------------------------------------------------------
+deployment_constraints:
+
+  # Scientist-authored — stable across runs, belongs in WRD template
+  scientist_provided:
+    data_sensitivity: "none"
+    # No export controls, HIPAA, or on-premise requirements for ERA5 data.
+
+  # Agent/system-filled — populated by WIDGET or Jarvis-MCP after compilation.
+  # Each field carries filled_by, timestamp, and confidence.
+  # All null until first deployment planning pass.
+  agent_filled:
+
+    input_data_size:
+      value_bytes: null              # [AWAITING DEPLOYMENT — measured from input dir]
+      filled_by: null
+      timestamp: null
+      confidence_level: null
+
+    parallelism_range_per_task:
+      preprocess_era5:
+        min_ranks: null
+        max_ranks: null
+        filled_by: null
+        timestamp: null
+        confidence_level: null
+      detect_cyclones:
+        min_ranks: null
+        max_ranks: null
+        filled_by: null
+        timestamp: null
+        confidence_level: null
+      build_tracks:
+        min_ranks: null
+        max_ranks: null
+        filled_by: null
+        timestamp: null
+        confidence_level: null
+      compute_intensity:
+        min_ranks: null
+        max_ranks: null
+        filled_by: null
+        timestamp: null
+        confidence_level: null
+      filter_significant:
+        min_ranks: null
+        max_ranks: null
+        filled_by: null
+        timestamp: null
+        confidence_level: null
+      compute_climatology:
+        min_ranks: null
+        max_ranks: null
+        filled_by: null
+        timestamp: null
+        confidence_level: null
+      generate_catalog:
+        min_ranks: null
+        max_ranks: null
+        filled_by: null
+        timestamp: null
+        confidence_level: null
+
+    memory_footprint_per_task:
+      preprocess_era5:   { value_gb: null, filled_by: null, timestamp: null, confidence_level: null }
+      detect_cyclones:   { value_gb: null, filled_by: null, timestamp: null, confidence_level: null }
+      build_tracks:      { value_gb: null, filled_by: null, timestamp: null, confidence_level: null }
+      compute_intensity: { value_gb: null, filled_by: null, timestamp: null, confidence_level: null }
+      filter_significant: { value_gb: null, filled_by: null, timestamp: null, confidence_level: null }
+      compute_climatology: { value_gb: null, filled_by: null, timestamp: null, confidence_level: null }
+      generate_catalog:  { value_gb: null, filled_by: null, timestamp: null, confidence_level: null }
+
+    storage_tier_recommendations:
+      # Logic: intermediate outputs → burst buffer or node-local (temporary).
+      #        checkpoint outputs → parallel filesystem (persistent).
+      # Will be populated by agent after input_data_size is measured.
+      preprocessed_fields:  { tier: null, rationale: null, filled_by: null, timestamp: null, confidence_level: null }
+      candidate_centers:    { tier: null, rationale: null, filled_by: null, timestamp: null, confidence_level: null }
+      storm_tracks:         { tier: null, rationale: null, filled_by: null, timestamp: null, confidence_level: null }
+      storm_intensity_files: { tier: null, rationale: null, filled_by: null, timestamp: null, confidence_level: null }
+      filtered_tracks:      { tier: null, rationale: null, filled_by: null, timestamp: null, confidence_level: null }
+      climatology_summary:  { tier: null, rationale: null, filled_by: null, timestamp: null, confidence_level: null }
+      storm_catalog:        { tier: null, rationale: null, filled_by: null, timestamp: null, confidence_level: null }
+
+    total_storage_budget:
+      value_gb: null
+      filled_by: null
+      timestamp: null
+      confidence_level: null
+
+
+# -----------------------------------------------------------------------------
+# SECTION 8: TRANSLATION METADATA
+# Record of how this WRD was produced and the confidence of every
+# agent-inferred field.
+# -----------------------------------------------------------------------------
+translation_metadata:
+  source_format: "nextflow"
+  source_file: "storm_tracking_pipeline.nf"
+  translation_tool: "wrd-compiler-agent v0.3 (Jarvis-MCP)"
+  translation_timestamp: "2025-03-12T14:22:00Z"
+
+  unmapped_fields:
+    - field_path: "data_flow.measured"
+      reason: "No prior runs exist. Measured I/O layer will be populated at deployment and after first run."
+    - field_path: "data_flow.physical"
+      reason: "Physical I/O characteristics require DPM runtime traces. Will be populated after first run."
+    - field_path: "deployment_constraints.agent_filled"
+      reason: "Deployment constraint filling requires a deployment planning pass by WIDGET or Jarvis-MCP."
+
+  round_trip_gaps:
+    - field_path: "task_registry[*].semantic_description"
+      note: >
+        Semantic descriptions were inferred by AI agent and do not exist in
+        the Nextflow source file. If this WRD is compiled back to Nextflow,
+        these descriptions will be lost unless embedded as comments.
+    - field_path: "execution_profiles"
+      note: >
+        Execution profiles have no direct representation in Nextflow.
+        Round-trip compilation to Nextflow would require generating separate
+        pipeline files or conditional profile parameters.
+
+  quality_warnings:
+    - field_path: "task_registry[filter_significant].semantic_description"
+      warning: >
+        Significance threshold values (1 hPa/hour deepening rate, 17.5 m/s
+        wind speed) were inferred from script default arguments. Scientist
+        should confirm these are the intended criteria for their analysis.
+
+  field_confidence_records:
+
+    - field_path: "task_registry[preprocess_era5].semantic_description"
+      filled_by: "wrd-compiler-agent v0.3"
+      confidence_level: "high"
+      confidence_reason: >
+        Nextflow process block had clear input/output channel declarations
+        (era5_raw → preprocessed_fields), explicit variable name list in
+        script arguments, and a descriptive process name. Regridding step
+        confirmed from --target-resolution argument default.
+      requires_human_review: false
+
+    - field_path: "task_registry[detect_cyclones].semantic_description"
+      filled_by: "wrd-compiler-agent v0.3"
+      confidence_level: "high"
+      confidence_reason: >
+        Detection threshold (1000 hPa, 500 km scale) read directly from
+        script argument defaults. Algorithm class (local minimum detection)
+        inferred from function name and docstring in detect_cyclones.py.
+      requires_human_review: false
+
+    - field_path: "task_registry[build_tracks].semantic_description"
+      filled_by: "wrd-compiler-agent v0.3"
+      confidence_level: "medium"
+      confidence_reason: >
+        Tracking algorithm described at high level from function name and
+        output schema. Displacement threshold (800 km / 6 hrs) and minimum
+        duration (48 hrs) read from script defaults. Nearest-neighbor
+        matching inferred from variable name 'nn_matcher' in script but
+        not explicitly documented.
+      requires_human_review: false
+
+    - field_path: "task_registry[compute_intensity].semantic_description"
+      filled_by: "wrd-compiler-agent v0.3"
+      confidence_level: "high"
+      confidence_reason: >
+        Three intensity metrics (min SLP, max wind, IKE) and 500 km
+        radius read directly from script argument defaults and output
+        variable names. Computational cost assessment inferred from
+        nested loop structure visible in script.
+      requires_human_review: false
+
+    - field_path: "task_registry[filter_significant].semantic_description"
+      filled_by: "wrd-compiler-agent v0.3"
+      confidence_level: "medium"
+      confidence_reason: >
+        Filtering criteria inferred from script argument defaults. The
+        1 hPa/hour deepening rate and 17.5 m/s wind thresholds may be
+        placeholders rather than final scientific choices. See quality_warnings.
+      requires_human_review: true
+
+    - field_path: "task_registry[compute_climatology].semantic_description"
+      filled_by: "wrd-compiler-agent v0.3"
+      confidence_level: "high"
+      confidence_reason: >
+        Output variables (track density, intensity distributions, trends)
+        read directly from output netCDF variable names and CSV column
+        headers in script. Caveat about requiring full date range inferred
+        from comment in script.
+      requires_human_review: false
+
+    - field_path: "task_registry[generate_catalog].semantic_description"
+      filled_by: "wrd-compiler-agent v0.3"
+      confidence_level: "high"
+      confidence_reason: >
+        Three output artifacts (CSV, netCDF, PDF) confirmed from Nextflow
+        output channel declarations. 'Primary deliverable' characterization
+        inferred from process name and output file naming conventions.
+      requires_human_review: false
+
+    - field_path: "execution_profiles"
+      filled_by: "wrd-compiler-agent v0.3"
+      confidence_level: "medium"
+      confidence_reason: >
+        Three profiles (tracks_only, tracks_and_intensity, full) proposed
+        based on checkpoint task outputs. The agent identified three tasks
+        with output_class=checkpoint and created one profile terminating
+        at each. Scientist should confirm these represent meaningful
+        scientific stopping points for their use cases.
+      requires_human_review: true

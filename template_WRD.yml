@@ -1,0 +1,688 @@
+# =============================================================================
+# WIDGET — Workflow Representation Document (WRD) Agent Template
+# Schema: wrd-4.0  |  Architecture Design: v4
+#
+# PURPOSE
+# This file is the schema an AI agent reads before analyzing a workflow
+# repository. The agent fills every field according to its _status annotation.
+# Once all required fields are populated the WRD is valid input for DDD
+# generation.
+#
+# FIELD STATUS LEGEND
+#   required_static       Extract from workflow source code via static analysis.
+#                         If extraction fails, escalate to required_static_ask.
+#
+#   required_static_ask   Cannot be reliably extracted from code.
+#                         Agent MUST prompt the scientist before proceeding.
+#
+#   required_deploy       Leave null at compile time. Deployment tooling
+#                         (Jarvis-MCP) measures from the input data directory
+#                         or from completed run outputs.
+#
+#   optional_enrichment   Leave null at compile time. DPM tracing tools
+#                         populate after first run. Improves diagnosis and
+#                         DDD quality over time but is not required for
+#                         initial deployment.
+#
+# AGENT READINESS GATE
+# Before handing this WRD to the DDD generator, verify:
+#   [ ] All required_static fields are non-null
+#   [ ] All required_static_ask fields are non-null
+#   [ ] execution_graph.integrity_hash matches current task_registry
+#   [ ] All required_task_sets in execution_profiles were AUTO-DERIVED
+#   [ ] translation_metadata.field_confidence_records has one entry per
+#       agent-inferred field
+#   [ ] Any requires_human_review: true field has been reviewed or
+#       explicitly deferred by the scientist
+# Fields that may remain null at handoff:
+#   [ ] required_deploy   — DDD generator / Jarvis-MCP fills these
+#   [ ] optional_enrichment — DPM fills these post-run
+#
+# ID NAMESPACE (shared across all five WIDGET documents)
+#   Tasks:    task:<name>          e.g.  task:contact_map
+#   Datasets: data:<name>          e.g.  data:trajectory_frames
+#   P-C edges: pc:<prod>-><cons>:<pattern>
+# =============================================================================
+
+
+# -----------------------------------------------------------------------------
+# SECTION 1: HEADER
+# -----------------------------------------------------------------------------
+header:
+
+  workflow_lineage_id:
+    _status: required_static
+    _extract: >
+      Generate a new UUID v4 for a new workflow. Preserve existing
+      lineage_id when recompiling an existing WRD.
+    _value: null
+
+  version:
+    _status: required_static
+    _extract: >
+      Set to "1.0.0" for first compilation. Increment on any structural
+      change (task added/removed, relationship changed, loop type changed).
+      Data enrichments (measured sizes, profiling refinements) do NOT
+      increment the version — they update in place.
+    _value: null
+
+  version_notes:
+    _status: required_static
+    _extract: >
+      For first compilation: "Initial WRD compiled from <source_file>".
+      For updates: describe structural changes made.
+    _value: null
+
+  deprecated:
+    _status: required_static
+    _extract: Set to false for all new WRDs.
+    _value: null
+
+  workflow_name:
+    _status: required_static
+    _extract: >
+      Look in: README heading, Nextflow manifest.name, Pegasus workflow
+      name attribute, Snakemake configfile title, script filename.
+    _value: null
+
+  workflow_description:
+    _status: required_static_ask
+    _extract: >
+      Look in: README first paragraph, Nextflow manifest.description,
+      workflow file header comment block. Validate quality: must be >20
+      words and contain domain-specific nouns. If insufficient, ask.
+    _prompt: >
+      Please describe this workflow. Include: what scientific problem it
+      solves, what domain it belongs to, what data it starts from, and
+      what results it ultimately produces. (Minimum 2-3 sentences.)
+    _quality_check: { min_words: 20, must_contain_domain_nouns: true }
+    _value: null
+
+  source_format:
+    _status: required_static
+    _extract: >
+      Detect from file extension and content:
+      native | compiled_from_nextflow | compiled_from_pegasus_dax |
+      compiled_from_parsl | compiled_from_slurm | compiled_from_snakemake |
+      compiled_from_swift_t | other
+    _allowed_values:
+      - native
+      - compiled_from_nextflow
+      - compiled_from_pegasus_dax
+      - compiled_from_parsl
+      - compiled_from_slurm
+      - compiled_from_snakemake
+      - compiled_from_swift_t
+      - other
+    _value: null
+
+  source_file:
+    _status: required_static
+    _extract: Path to the primary workflow definition file in the repository.
+    _value: null
+
+  schema_version:
+    _status: required_static
+    _extract: Always set to "wrd-4.0".
+    _value: "wrd-4.0"
+
+  author:
+    _status: required_static_ask
+    _extract: >
+      Look in: git log --format="%an <%ae>" | head -1, README author
+      field, workflow file header comment.
+    _prompt: What is your name and affiliation? (Used for WRD provenance.)
+    _value: null
+
+  created_at:
+    _status: required_static
+    _extract: ISO 8601 timestamp at WRD compilation time.
+    _value: null
+
+  last_modified_at:
+    _status: required_static
+    _extract: ISO 8601 timestamp. Same as created_at on first compilation.
+    _value: null
+
+  workflow_pattern:
+    _status: required_static
+    _extract: >
+      Derive from DAG topology and loop annotations:
+        pipeline       — linear chain, no fan-out, no loops
+        scatter_gather — fan-out from one task to N parallel instances
+                         followed by fan-in to one aggregation task
+        iterative      — one or more convergence or time-stepping loops
+        cascading      — producer continuously feeds downstream consumers
+                         with partial results (streaming pattern)
+        hybrid         — combines two or more of the above at different stages
+      Examine: node in-degrees, out-degrees, loop_annotations across all
+      tasks. Document evidence in workflow_pattern_evidence in the
+      execution_graph section.
+    _allowed_values:
+      - pipeline
+      - scatter_gather
+      - iterative
+      - cascading
+      - hybrid
+    _value: null
+
+  workflow_pattern_notes:
+    _status: required_static
+    _extract: >
+      Agent-inferred justification. Required when workflow_pattern = hybrid.
+      Describe which sub-patterns appear in which stages.
+    _value: null
+
+
+# -----------------------------------------------------------------------------
+# SECTION 2: TASK REGISTRY
+# Canonical source of truth for all task structure and relationships.
+# The execution_graph is derived from this section — never edited directly.
+# Agent builds this as a YAML list. Schema below applies to each entry.
+# -----------------------------------------------------------------------------
+task_registry:
+  # Agent populates as a list of task objects matching _task_schema.
+  _task_schema:
+
+    task_id:
+      _status: required_static
+      _extract: >
+        Normalize task/process/function name from source code to snake_case.
+        Must be unique within this WRD. Prefix with "task:" in cross-document
+        references (e.g., task:contact_map).
+      _value: null
+
+    task_name:
+      _status: required_static
+      _extract: >
+        Human-readable form of task_id. Convert underscores to spaces and
+        apply title case (e.g., preprocess_era5 → "ERA5 Preprocessing").
+      _value: null
+
+    semantic_description:
+      _status: required_static_ask
+      _extract: >
+        Infer from: process docstring, inline comments, input/output variable
+        names, executable name. Construct a candidate description.
+        Quality check: >20 words, domain-specific nouns present, covers
+        inputs/outputs/purpose. If candidate fails quality check, ask.
+      _prompt: >
+        I could not generate a sufficient description for task '{task_id}'.
+        What does this task do? Please include: what it does in domain terms,
+        what data it reads, what data it produces, and why it exists in the
+        workflow.
+      _quality_check: { min_words: 20, must_contain_domain_nouns: true }
+      _confidence_record:
+        filled_by: null
+        confidence_level: null   # high | medium | low | inferred
+        confidence_reason: null
+        requires_human_review: null
+      _value: null
+
+    functional_role:
+      _status: required_static
+      _extract: >
+        Agent-facing behavioral summary distinct from semantic_description.
+        Focus on computational behavior and I/O characteristics, not domain
+        science. Examples: "pairwise distance computation over trajectory
+        frames; I/O dominant", "serial aggregation; compute-bound, minimal I/O".
+      _value: null
+
+    executable_ref:
+      _status: required_static
+      _extract: >
+        Script or binary called by this task. Look in: process script blocks,
+        subprocess calls, exec() calls, app() decorators, sbatch --wrap.
+      _value: null
+
+    task_type:
+      _status: required_static
+      _extract: >
+        Classify from task position, name, and executable content:
+        preprocessing  — first tasks in DAG, prepare raw inputs
+        compute        — main scientific computation
+        io             — primary purpose is data movement or format conversion
+        postprocessing — final tasks, produce deliverable outputs
+      _allowed_values: [preprocessing, compute, io, postprocessing]
+      _value: null
+
+    io_dominance:
+      _status: required_static
+      _extract: >
+        Infer from: ratio of I/O calls to compute operations in script,
+        explicit comments about performance, task_type.
+        io_bound: task spends most wall time in I/O
+        compute_bound: task spends most wall time in computation
+        balanced: roughly equal I/O and compute time
+        Refine after first run using IODD compute_to_io_ratio.
+      _allowed_values: [compute_bound, io_bound, balanced, unknown]
+      _value: unknown
+
+    output_class:
+      _status: required_static_ask
+      _extract: >
+        Attempt inference: terminal DAG tasks (no downstream consumers) are
+        likely checkpoint. Tasks whose outputs are consumed by many downstream
+        tasks and have no obvious standalone scientific value are likely
+        intermediate. Always validate with scientist — this cannot be reliably
+        inferred from code.
+      _prompt: >
+        Does task '{task_id}' produce outputs that are scientifically
+        valuable to retain after the workflow completes (checkpoint), or are
+        they only needed to pass data to the next task and can be deleted
+        after use (intermediate)?
+      _allowed_values: [intermediate, checkpoint]
+      _value: null
+
+    contention_sensitivity:
+      _status: required_static
+      _extract: >
+        Infer from: io_dominance, access_pattern (random access on shared
+        storage = high sensitivity), task_type (io tasks = high).
+        Refine after first run using IODD contention_events count.
+      _allowed_values: [high, medium, low, unknown]
+      _value: unknown
+
+    relationships:
+      _status: required_static
+      _extract: >
+        Build from workflow source:
+          Nextflow:    channel connections between processes
+          Pegasus DAX: <uses> job dependencies
+          Parsl:       depends_on= arguments
+          Slurm:       #SBATCH --dependency= directives
+          Snakemake:   input/output file matching across rules
+        Each relationship entry:
+          type:              data_dependency | depends_on | optional_after
+          target_task_id:    upstream task_id (no "task:" prefix here)
+          description:       what data or ordering constraint this represents
+          pc_pattern:        [data_dependency only] 1_to_1 | 1_to_n | n_to_1 | n_to_n
+          communication_pattern: shared_file | file_per_producer | in_memory | streaming_channel
+          data_volume_class: small (<1GB) | medium (1-100GB) | large (>100GB)
+          co_scheduling_hint: beneficial | neutral | harmful
+        An empty list [] is valid for entry-point tasks.
+        pc_pattern derivation:
+          1_to_1: single producer → single consumer
+          1_to_n: single producer → loop body or scatter fan-out
+          n_to_1: loop body or parallel tasks → single aggregator
+          n_to_n: loop body → loop body (all-to-all exchange)
+      _value: []
+
+    loop_annotation:
+      _status: required_static
+      _extract: >
+        Detect loop participation from: foreach/for loops in scripts,
+        scatter/gather in Nextflow channels, map() in Parsl, Slurm job arrays,
+        Snakemake expand(). If no loop detected, set to null.
+      _value: null
+      _schema_if_loop_present:
+        loop_id:
+          _extract: >
+            Assign a descriptive ID. All tasks inside the same loop share
+            this loop_id (e.g., "timestep_loop", "ensemble_sweep").
+          _value: null
+        loop_type:
+          _extract: >
+            static:          iteration count fixed in code
+            parameter_sweep: iterates over named parameter list or file set
+            data_driven:     count determined at runtime by input data
+            convergence:     iterates until scientific criterion is met
+          _allowed_values: [static, parameter_sweep, data_driven, convergence]
+          _value: null
+        bound_type:
+          _allowed_values: [fixed_count, parameter_set_size, runtime_determined, convergence_criterion]
+          _value: null
+        fixed_count:
+          _extract: Integer. Only when bound_type = fixed_count.
+          _value: null
+        parameter_ref:
+          _extract: Parameter name determining count. Only when bound_type = parameter_set_size.
+          _value: null
+        convergence_condition:
+          _status: required_static_ask
+          _required_when: loop_type == convergence
+          _prompt: >
+            Task '{task_id}' is in a convergence loop. What is the termination
+            condition? (e.g., "iterate until residual < 1e-6 or 500 iterations
+            are reached")
+          _value: null
+        max_iterations_guard:
+          _status: required_static_ask
+          _required_when: loop_type == convergence
+          _prompt: >
+            What is the maximum number of iterations before this loop stops,
+            even if convergence is not reached? (Prevents runaway execution.)
+          _value: null
+        loop_position:
+          _allowed_values: [body, entry_gate, exit_check]
+          _value: null
+
+    temporal_io_annotation:
+      _status: required_static
+      _extract: >
+        Infer from script structure:
+          upfront:  task reads all inputs before any compute (bulk read pattern)
+          streaming: task interleaves reads/writes with compute (e.g., HDF5
+                     chunk-by-chunk processing)
+          deferred: task writes outputs only after all compute completes
+          mixed:    reads upfront, writes deferred (most common pattern)
+        Refine after first run using IODD temporal_io_behavior section.
+      _io_phase:
+        _allowed_values: [upfront, streaming, deferred, mixed]
+        _value: null
+      _burstiness:
+        _allowed_values: [bursty, sustained, unknown]
+        _value: unknown
+      _overlap_potential:
+        _allowed_values: [high, low, unknown]
+        _value: unknown
+
+
+# -----------------------------------------------------------------------------
+# SECTION 3: EXECUTION GRAPH
+# Derived from task_registry. Never edited directly.
+# -----------------------------------------------------------------------------
+execution_graph:
+
+  integrity_hash:
+    _status: required_static
+    _extract: >
+      Compute SHA-256 of the canonical serialization of all relationships
+      entries across all tasks in task_registry. Any agent reading this
+      graph must verify this hash before use. Hash mismatch = reject and
+      request regeneration.
+    _value: null
+
+  last_generated:
+    _status: required_static
+    _extract: ISO 8601 timestamp of graph generation.
+    _value: null
+
+  nodes:
+    _status: required_static
+    _extract: List of all task_id values from task_registry.
+    _value: []
+
+  edges:
+    _status: required_static
+    _extract: >
+      List of {from, to, type, pc_pattern} objects derived from
+      task_registry[*].relationships. Deduplicated.
+    _value: []
+
+  loop_groups:
+    _status: required_static
+    _extract: >
+      Group tasks by shared loop_id from loop_annotations. For each group
+      record: loop_id, tasks[], loop_type, note describing execution semantics.
+    _value: []
+
+  workflow_pattern_evidence:
+    _status: required_static
+    _extract: >
+      Document the graph features that justify the header.workflow_pattern
+      classification. Examples:
+        scatter_gather: "fan-out from task:preprocess to 64 parallel
+          task:detect instances (out-degree=64, 1_to_n edge), followed by
+          fan-in to task:build_tracks (in-degree=64, n_to_1 edge)"
+        hybrid: "stages 1-3 form a pipeline; stage 4 is a scatter_gather
+          over ensemble members; stages 5-6 return to pipeline"
+    _value: null
+
+
+# -----------------------------------------------------------------------------
+# SECTION 4: DATA FLOW LAYER
+# 4a: Semantic (from code — always required)
+# 4b: Lifecycle (from DAG structure + completed runs)
+# -----------------------------------------------------------------------------
+data_flow:
+
+  # --- 4a: Semantic Dataset Layer -------------------------------------------
+  semantic:
+    _extract: >
+      Build one entry per dataset (file or data artifact) flowing between tasks.
+      Sources:
+        Nextflow:    channel names, input/output declarations per process
+        Pegasus DAX: <uses> file elements on jobs
+        Parsl:       Future objects passed between Apps
+        Slurm:       files referenced in --input/--output or hardcoded paths
+        Snakemake:   input/output file paths across rules
+      Dataset role:
+        input:        no producer_task within this workflow (external data)
+        intermediate: producer task has output_class = intermediate
+        checkpoint:   producer task has output_class = checkpoint
+    _dataset_schema:
+      dataset_id:
+        _status: required_static
+        _extract: >
+          Derive from channel name, file variable name, or output filename
+          pattern. Normalize to snake_case. Prefix with "data:" in
+          cross-document references (e.g., data:trajectory_frames).
+        _value: null
+      description:
+        _status: required_static_ask
+        _extract: >
+          Infer from variable name, file extension, surrounding code context.
+          Quality check: >20 words, domain nouns present.
+        _prompt: >
+          What does dataset '{dataset_id}' represent scientifically?
+          (e.g., "Raw ERA5 netCDF files containing MSLP and wind fields
+          on a 0.25-degree grid, one file per 6-hourly timestep")
+        _value: null
+      file_format:
+        _status: required_static
+        _extract: >
+          Infer from file extension, format flags in script arguments, or
+          explicit format library imports (netCDF4, h5py, pandas, pyarrow).
+        _allowed_values: [netCDF4, HDF5, CSV, parquet, binary, JSON, text, other]
+        _value: null
+      format_internals:
+        _status: required_static
+        _extract: >
+          Inspect the file or code for:
+            chunking_strategy:   HDF5/netCDF chunk dimensions if present
+            compression_codec:   gzip, lz4, zstd, blosc, none
+            variable_length_data: true if variable-length records present
+            typical_request_size_kb: estimated I/O request size
+          These are hints to the IODD and DDD generators — estimates are
+          acceptable. Set unknown fields to null.
+        _chunking_strategy: { _value: null }
+        _compression_codec: { _value: null }
+        _variable_length_data: { _value: null }
+        _typical_request_size_kb: { _value: null }
+      role:
+        _status: required_static
+        _extract: >
+          input:        producer_task is null (external to this workflow)
+          intermediate: derived from producer task output_class = intermediate
+          checkpoint:   derived from producer task output_class = checkpoint
+        _allowed_values: [input, intermediate, checkpoint]
+        _value: null
+      producer_task:
+        _status: required_static
+        _extract: task_id of the writing task, or null for external inputs.
+        _value: null
+      consumer_tasks:
+        _status: required_static
+        _extract: List of task_id values that read this dataset.
+        _value: []
+      pc_pattern:
+        _status: required_static
+        _extract: >
+          Consistent with relationship annotations on consumer tasks.
+          1_to_1: single producer instance, single consumer instance
+          1_to_n: single producer, multiple consumers (fan-out)
+          n_to_1: multiple producers, single consumer (fan-in)
+          n_to_n: multiple producers, multiple consumers
+        _allowed_values: [1_to_1, 1_to_n, n_to_1, n_to_n]
+        _value: null
+
+  # --- 4b: Dataset Lifecycle Layer ------------------------------------------
+  # Logical fields derived from DAG structure. Size fields populated from runs.
+  lifecycle:
+    _dataset_schema:
+      dataset_id:
+        _value: null     # Matches semantic layer dataset_id
+      creation_phase:
+        _status: required_static
+        _extract: >
+          Which task_id completion event creates this dataset. Derived from
+          producer_task in the semantic layer.
+        _value: null
+      last_consumer_phase:
+        _status: required_static
+        _extract: >
+          The task_id of the last consumer to read this dataset (latest in
+          topological order). Derived from consumer_tasks and DAG ordering.
+        _value: null
+      retention_window:
+        _status: required_static
+        _extract: >
+          Topological distance between creation_phase and last_consumer_phase.
+          Used by DDD to schedule cleanup: intermediate datasets can be
+          deleted after last_consumer_phase completes.
+          Express as: "from task:X completion to task:Y completion"
+        _value: null
+      access_frequency_class:
+        _status: required_static
+        _extract: >
+          Derived from consumer_tasks count and loop context:
+          once:        single consumer, no loop
+          few_times:   2-5 consumer accesses total
+          repeatedly:  consumed in a loop or by many consumers
+        _allowed_values: [once, few_times, repeatedly]
+        _value: null
+      consumer_count:
+        _status: required_static
+        _extract: >
+          Number of distinct consumer task instances in a typical run.
+          For loop tasks: multiply instance count by loop iterations
+          (use estimated loop count if parameter_sweep or data_driven).
+        _value: null
+      size_measured_bytes:
+        _status: required_deploy
+        _filled_by: >
+          Measured by deployment tooling from input data directory (for
+          input datasets) or from completed run outputs (for intermediate
+          and checkpoint datasets). Null until first run completes.
+        _value: null
+      size_measurement_run_id:
+        _status: required_deploy
+        _value: null
+      size_measurement_confidence:
+        _status: required_deploy
+        _allowed_values: [high, estimated, unavailable]
+        _value: unavailable
+
+
+# -----------------------------------------------------------------------------
+# SECTION 5: EXECUTION PROFILES
+# Named partial execution subsets. Agent proposes; scientist confirms.
+# -----------------------------------------------------------------------------
+execution_profiles:
+  _extract: >
+    Propose one profile per checkpoint task in topological order.
+    Always include a "full" profile terminating at the last task.
+    Present proposed profiles to scientist:
+    "I found {n} checkpoint tasks, suggesting these stopping points:
+    {proposed_profiles_list}
+    Do these represent meaningful scientific results? Should any be
+    removed or renamed?"
+    required_task_set MUST be auto-derived by backward DAG traversal —
+    never manually specified.
+  _profile_schema:
+    profile_name:
+      _status: required_static_ask
+      _value: null
+    terminal_task_id:
+      _status: required_static
+      _extract: The checkpoint task at which this profile terminates.
+      _value: null
+    description:
+      _status: required_static_ask
+      _prompt: >
+        What scientific results does the '{profile_name}' profile produce?
+      _value: null
+    required_task_set:
+      _status: required_static
+      _extract: >
+        AUTO-DERIVED ONLY by backward DAG traversal from terminal_task_id.
+        Never manually specified. Recompute whenever execution_graph changes.
+      _value: []
+    output_dataset_ids:
+      _status: required_static
+      _extract: >
+        Dataset IDs from data_flow.semantic whose role is checkpoint and
+        whose producer_task is in required_task_set.
+      _value: []
+
+
+# -----------------------------------------------------------------------------
+# SECTION 6: TRANSLATION METADATA
+# Provenance of how this WRD was compiled.
+# -----------------------------------------------------------------------------
+translation_metadata:
+
+  source_format:
+    _status: required_static
+    _value: null
+
+  source_file:
+    _status: required_static
+    _value: null
+
+  translation_tool:
+    _status: required_static
+    _extract: Name and version of the agent or tool performing compilation.
+    _value: null
+
+  translation_timestamp:
+    _status: required_static
+    _value: null
+
+  unmapped_fields:
+    _status: required_static
+    _extract: >
+      List every field that could not be populated from the source, with
+      reason. Empty list is valid if all extractable fields were found.
+    _value: []
+    _entry_schema:
+      field_path: null
+      reason: null
+
+  round_trip_gaps:
+    _status: required_static
+    _extract: >
+      List fields that will be lost if this WRD is compiled back to the
+      source format (e.g., semantic_description has no representation
+      in Pegasus DAX; execution_profiles have no Nextflow equivalent).
+    _value: []
+    _entry_schema:
+      field_path: null
+      note: null
+
+  quality_warnings:
+    _status: required_static
+    _extract: >
+      List semantic_description or workflow_description fields that failed
+      the quality check (< 20 words or no domain nouns). These are flags
+      for human review, not blockers.
+    _value: []
+    _entry_schema:
+      field_path: null
+      warning: null
+
+  field_confidence_records:
+    _status: required_static
+    _extract: >
+      One record for every field filled by the agent through inference.
+      At minimum: all semantic_description fields, functional_role fields,
+      workflow_pattern, all pc_pattern fields, io_dominance fields,
+      temporal_io_annotation fields, and execution_profiles proposals.
+    _value: []
+    _entry_schema:
+      field_path: null
+      filled_by: null
+      confidence_level: null    # high | medium | low | inferred
+      confidence_reason: null
+      requires_human_review: null
