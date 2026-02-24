@@ -1,105 +1,115 @@
-Jarvis WDD Execution Prompt (deepdrivemd)
+TASK: Deploy and Run a Workflow from WDD with Jarvis-MCP
+You are an execution agent. Read a Workflow Definition Document (WDD), create one Jarvis package per workflow task, construct the pipeline deployment, and run it.
 
-You are an execution agent. Read the workflow definition document (WDD), then use Jarvis-MCP to create per-task packages, create a deployment pipeline, and run the workflow.
+Purpose
+Use WDD as the source of truth to build a reproducible Jarvis deployment pipeline without introducing duplicate pipelines or duplicate package instances.
+
+Hard Scope Rules
+- Use Jarvis-MCP tools for Jarvis operations whenever available.
+- Do not run shell discovery commands such as `find`, `which`, or `env | grep` to locate Jarvis binaries.
+- Do not invent workflow tasks or dependencies not present in WDD.
+- If any required value cannot be inferred from WDD, use explicit placeholders and report what is missing.
+- Before destructive actions (destroy pipeline, remove package), print exactly what will be changed and require explicit confirmation.
 
 Inputs
-- WDD path: `workflow_wdd/deepdrivemd-wdd-gemini.yaml`
-- Workflow name: `deepdrivemd`
-- Pipeline ID: `deepdrivemd-workflow`
-- Repository root for generated Jarvis package repo: `/home/mtang11/jarvis-work/repos/deepdrivemd_repo`
-- Repo name (python package root): `deepdrivemd_repo`
-- Run directory base: `/home/mtang11/scripts/workflow-representation-description/workflows_repo/deepdrivemd`
-- Optional hostfile: `null`
+- `WDD_PATH`: `workflow_wdd/deepdrivemd-wdd-gemini.yaml`
+- `WORKFLOW_NAME`: `deepdrivemd`
+- `PIPELINE_ID`: `deepdrivemd-workflow`
+- `REPO_ROOT_PATH`: `/home/mtang11/jarvis-work/repos/deepdrivemd_repo`
+- `REPO_NAME`: `deepdrivemd_repo`
+- `RUN_DIR_BASE`: `/home/mtang11/scripts/workflow-representation-description/workflows_repo/deepdrivemd`
+- `HOSTFILE_OR_NULL`: `null`
 
-Non-negotiable execution rules
-1. Use Jarvis-MCP tools for Jarvis operations whenever available.
-2. Do not run shell discovery commands such as `find`, `which`, `env | grep` to locate Jarvis binaries.
-3. Do not create duplicate pipelines or duplicate package instances.
-4. If target pipeline exists, clean/update it intentionally (do not silently duplicate).
-5. Before destructive actions, print exactly what will be removed/overwritten.
+Output
+Perform deployment actions and return a final execution report. Do not create a new design document. Primary output is deployed pipeline state + run result.
 
-Objective
-From the WDD:
-1. Create one Jarvis package (`pkg_type`) per WDD task.
-2. Create the correct pipeline deployment in Jarvis following WDD task order and dependencies.
-3. Run the workflow with Jarvis.
+Required Deployment Artifacts
+1. A Jarvis repository at `REPO_ROOT_PATH/REPO_NAME`
+2. One package (`pkg_type`) per WDD `task_id`
+3. One pipeline identified by `PIPELINE_ID`
+4. Pipeline package order matching WDD DAG topological order
+5. Built pipeline environment
+6. Run execution result (success/failure with actionable details)
 
-Required workflow
+Required Naming Conventions
+- Derive `pkg_type` from WDD `task_id` by stripping `task:` and normalizing to snake_case.
+- Use deterministic `pkg_id` equal to `pkg_type` unless user requests otherwise.
+- Ensure Python class names generated from `pkg_type` are valid identifiers.
 
-Step A: Parse and validate WDD
-1. Read `workflow_wdd/deepdrivemd-wdd-gemini.yaml`.
-2. Extract at minimum:
-   - `metadata.workflow_name`
-   - `tasks[]` (`task_id`, `name`, `stage`, `executable`, `inputs`, `outputs`)
-   - `pc_edges[]` (`producer`, `consumer`, `data_objects`, `coupling`, `pc_pattern`)
-   - `workflow_graph.stage_execution_order` and `workflow_graph.dag_edges` (if present)
-3. Build an internal task DAG and topological package execution order.
-4. Print a short plan: task count, edge count, package names to create, final pipeline order.
+Required WDD Fields to Read
+At minimum, parse and use:
+- `metadata.workflow_name`
+- `tasks[]` (`task_id`, `name`, `stage`, `executable`, `inputs`, `outputs`)
+- `pc_edges[]` (`producer`, `consumer`, `data_objects`, `coupling`, `pc_pattern`)
+- `workflow_graph.stage_execution_order` and `workflow_graph.dag_edges` when present
 
-Step B: Prepare Jarvis manager state
-1. Load Jarvis configuration.
-2. If needed, initialize config directories.
-3. Hostfile is `null`; skip hostfile setup unless required by runtime environment.
-4. List existing pipelines and repos.
-5. If a pipeline with ID `deepdrivemd-workflow` already exists, ask whether to:
-   - reuse and reconcile, or
-   - destroy and recreate.
-
-Step C: Create repo and per-task packages
-1. Ensure repository structure:
-   - `/home/mtang11/jarvis-work/repos/deepdrivemd_repo/deepdrivemd_repo/__init__.py`
-   - `/home/mtang11/jarvis-work/repos/deepdrivemd_repo/deepdrivemd_repo/<pkg_type>/pkg.py` for each task package
-2. Package naming convention:
-   - derive `pkg_type` from `task_id` (strip `task:` and normalize to snake_case).
-   - ensure valid Python identifiers.
-3. For each task, implement package class with:
-   - `_init`
-   - `_configure_menu`
-   - `configure`
-   - `start`
-   - `stop`
-   - `clean`
-4. In `start`, call the task executable/command inferred from WDD (`tasks[].executable`) with configurable args/paths.
-5. Add repo to Jarvis (or update if already present), then save config.
-
-Step D: Create and configure pipeline
-1. Create pipeline `deepdrivemd-workflow` if absent.
-2. For each task in topological order:
-   - append corresponding `pkg_type` once
-   - set deterministic `pkg_id` (default to same as `pkg_type`)
-   - configure package using WDD-derived defaults and `/home/mtang11/scripts/workflow-representation-description/workflows_repo/deepdrivemd`
-3. Validate no duplicate `pkg_id` entries exist.
-4. Build pipeline environment.
-
-Step E: Run and report
-1. Run pipeline `deepdrivemd-workflow`.
-2. Stream key status updates (start, per-phase progress, completion/failure).
-3. On error:
-   - report failing package/task
-   - show actionable fix
-   - stop without destructive cleanup unless requested.
-
-Tool preference (Jarvis-MCP)
-Prefer this flow (when available):
+Tool Preference (Jarvis-MCP)
+Prefer this flow when available:
 - `jm_load_config`
 - `jm_create_config` (if needed)
+- `jm_set_hostfile` (if `HOSTFILE_OR_NULL` is not null)
 - `jm_list_repos` / `jm_add_repo` / `jm_save_config`
 - `jm_list_pipelines`
 - `create_pipeline` / `destroy_pipeline` (only with confirmation)
-- `append_pkg` / `configure_pkg` / `get_pkg_config`
+- `append_pkg` / `configure_pkg` / `get_pkg_config` / `remove_pkg`
 - `build_pipeline_env`
 - `run_pipeline`
 
-Output contract
-Return:
-1. Summary of what was created:
-   - repo path
-   - package list (`pkg_type -> task_id`)
-   - pipeline id
-2. Deployment mapping:
-   - execution order
-   - package configuration highlights
-3. Run result:
-   - success/failure
-   - key logs/status
-4. Next recommended actions (if failure or partial success).
+Deployment Procedure
+Follow this sequence. Do not skip steps.
+
+Step 1 — Parse and validate WDD
+- Read `WDD_PATH`.
+- Build internal DAG and topological task order from `pc_edges` or `workflow_graph.dag_edges`.
+- Print a short plan: task count, edge count, derived package list, proposed pipeline order.
+
+Step 2 — Prepare Jarvis manager state
+- Load Jarvis configuration.
+- Initialize config dirs if needed.
+- If `HOSTFILE_OR_NULL` is not null, set hostfile.
+- List existing repos and pipelines.
+- If `PIPELINE_ID` exists, ask: reconcile existing vs destroy/recreate.
+
+Step 3 — Create repository and package skeletons
+- Ensure repository structure:
+  - `REPO_ROOT_PATH/REPO_NAME/__init__.py`
+  - `REPO_ROOT_PATH/REPO_NAME/<pkg_type>/pkg.py` for each task
+- For each task package, implement:
+  - `_init`, `_configure_menu`, `configure`, `start`, `stop`, `clean`
+- In `start`, execute the task command based on WDD `tasks[].executable` with configurable arguments and paths.
+
+Step 4 — Register repo and persist config
+- Add or update repository in Jarvis.
+- Save Jarvis config.
+- Verify repo is visible after save.
+
+Step 5 — Create and configure pipeline
+- Create `PIPELINE_ID` if absent.
+- Append each `pkg_type` exactly once in topological order.
+- Configure package defaults using `RUN_DIR_BASE` and WDD task metadata.
+- Validate no duplicate `pkg_id`s in pipeline.
+
+Step 6 — Build and run
+- Build pipeline environment.
+- Run pipeline.
+- Stream key state changes: start, package progression, completion/failure.
+
+Step 7 — Report
+- Provide:
+  - Repo path and package mapping (`pkg_type -> task_id`)
+  - Final pipeline package order
+  - Effective key package configs
+  - Run status and major logs/errors
+  - Next actions if failed
+
+Validation Checklist Before Run
+- Every WDD task has exactly one pipeline package mapping.
+- Package order is consistent with DAG dependencies.
+- No duplicate pipeline IDs created.
+- No duplicate package instances unless explicitly requested.
+- Jarvis repo registration is persisted (`jm_save_config` done).
+
+Failure Handling Rules
+- If parse or config fails, stop and report exact missing field or tool failure.
+- If run fails, identify failing package/task, include error summary, and provide next corrective command(s).
+- Do not destroy pipeline or remove packages unless explicitly approved.
