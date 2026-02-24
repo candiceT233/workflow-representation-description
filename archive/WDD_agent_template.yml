@@ -1,6 +1,6 @@
 # =============================================================================
-# WORKFLOW REPRESENTATION DOCUMENT (WRD) — AGENT TEMPLATE
-# Schema version: 1.0  |  WRD Design version: 2.0
+# WORKFLOW DEFINITION DOCUMENT (WDD) — AGENT TEMPLATE
+# Schema version: 1.0  |  WDD Design version: 2.0
 #
 # PURPOSE
 # This file is the template an AI agent reads from a workflow repository and
@@ -18,7 +18,7 @@
 # 5. For every field marked _status: optional_enrichment — leave null;
 #    filled after first run from DPM traces or profiling tools.
 # 6. Once all required_static and required_static_ask fields are filled,
-#    the WRD is valid for Jarvis-MCP to create a deployment pipeline.
+#    the WDD is valid for Jarvis-MCP to create a deployment pipeline.
 #
 # FIELD STATUS LEGEND
 #   required_static       Needed for deployment. Extract from code analysis.
@@ -50,24 +50,24 @@ header:
 
   workflow_lineage_id:
     _status: required_static
-    _extract: "Generate a new UUID if this is a new WRD. If re-compiling an
-               existing WRD, preserve the existing lineage_id."
+    _extract: "Generate a new UUID if this is a new WDD. If re-compiling an
+               existing WDD, preserve the existing lineage_id."
     _value: null
 
   version:
     _status: required_static
-    _extract: "Set to '1.0.0' for a new WRD. Increment on any template change."
+    _extract: "Set to '1.0.0' for a new WDD. Increment on any template change."
     _value: null
 
   version_notes:
     _status: required_static
-    _extract: "For first compilation: 'Initial WRD compiled from <source_file>'.
+    _extract: "For first compilation: 'Initial WDD compiled from <source_file>'.
                For updates: describe what changed."
     _value: null
 
   deprecated:
     _status: required_static
-    _extract: "Set to false for all new WRDs."
+    _extract: "Set to false for all new WDDs."
     _value: null
 
   workflow_name:
@@ -106,19 +106,19 @@ header:
 
   schema_version:
     _status: required_static
-    _extract: "Set to 'wrd-2.0'."
-    _value: "wrd-2.0"
+    _extract: "Set to 'wdd-2.0'."
+    _value: "wdd-2.0"
 
   author:
     _status: required_static_ask
     _extract: "Look for author in: git log --format='%an <%ae>' | head -1,
                README, workflow file header, config author field."
-    _prompt: "What is your name and affiliation? (Used for WRD provenance.)"
+    _prompt: "What is your name and affiliation? (Used for WDD provenance.)"
     _value: null
 
   created_at:
     _status: required_static
-    _extract: "ISO 8601 timestamp at WRD compilation time."
+    _extract: "ISO 8601 timestamp at WDD compilation time."
     _value: null
 
   last_modified_at:
@@ -142,7 +142,7 @@ task_registry:
       _status: required_static
       _extract: "Unique identifier. Derive from the task/process/function name
                  in the workflow code. Normalize to snake_case. Must be unique
-                 within this WRD."
+                 within this WDD."
       _value: null
 
     task_name:
@@ -390,7 +390,7 @@ data_flow:
     _status: required_deploy
     _filled_by: "Jarvis-MCP at deployment time (input sizes) and after run
                  completion (output sizes). Not from code. Leave all values
-                 null at WRD compilation time."
+                 null at WDD compilation time."
     _dataset_schema:
       dataset_id:
         _value: null   # matches semantic layer dataset_id
@@ -506,7 +506,7 @@ deployment_constraints:
   agent_filled:
     _status: required_deploy
     _filled_by: "WIDGET or Jarvis-MCP during deployment planning. All null
-                 at WRD compilation time. Each field must be populated with
+                 at WDD compilation time. Each field must be populated with
                  value, filled_by, timestamp, and confidence_level before
                  Jarvis-MCP generates the final execution pipeline."
 
@@ -593,7 +593,7 @@ translation_metadata:
 
   round_trip_gaps:
     _status: required_static
-    _extract: "List fields that will be lost if this WRD is compiled back to
+    _extract: "List fields that will be lost if this WDD is compiled back to
                the source format (e.g., semantic descriptions have no
                representation in Pegasus DAX)."
     _schema:
@@ -628,7 +628,7 @@ translation_metadata:
 
 # =============================================================================
 # AGENT EXECUTION CHECKLIST
-# Before passing this WRD to Jarvis-MCP for deployment pipeline creation,
+# Before passing this WDD to Jarvis-MCP for deployment pipeline creation,
 # verify all of the following:
 #
 # [ ] All required_static fields have non-null _value

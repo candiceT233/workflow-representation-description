@@ -1,16 +1,16 @@
-# Workflow Representation Document (WRD) — Core Design
+# Workflow Definition Document (WDD) — Core Design
 
 ## Goal
 
-The Workflow Representation Document (WRD) is a structured, AI-readable format for describing scientific workflows in HPC environments. Its primary goals are:
+The Workflow Definition Document (WDD) is a structured, AI-readable format for describing scientific workflows in HPC environments. Its primary goals are:
 
-1. **Bridge the expertise gap** — Allow domain scientists (physicists, biologists, climate scientists) to describe their workflows without needing knowledge of parallelism, node memory, storage tiers, or HPC system internals. The WRD captures what the scientist *knows* (what the workflow does, what data it needs, what results it produces) and separates it from deployment decisions that require HPC expertise.
+1. **Bridge the expertise gap** — Allow domain scientists (physicists, biologists, climate scientists) to describe their workflows without needing knowledge of parallelism, node memory, storage tiers, or HPC system internals. The WDD captures what the scientist *knows* (what the workflow does, what data it needs, what results it produces) and separates it from deployment decisions that require HPC expertise.
 
 2. **Enable AI-assisted deployment and diagnosis** — Provide AI agents with enough structured, semantic context to autonomously deploy workflows (via tools like Jarvis-MCP), diagnose I/O bottlenecks, and recommend optimizations — even when running on capability-constrained local LLMs in secure HPC environments.
 
-3. **Serve as a universal interchange format** — Allow AI agents to compile WRDs from existing workflow formats (Pegasus DAX, Slurm scripts, XML pipelines, etc.) and to convert WRDs back into those formats. The WRD is the common language between workflow systems.
+3. **Serve as a universal interchange format** — Allow AI agents to compile WDDs from existing workflow formats (Pegasus DAX, Slurm scripts, XML pipelines, etc.) and to convert WDDs back into those formats. The WDD is the common language between workflow systems.
 
-4. **Scale to concurrent multi-agent use** — Support thousands of workflow instances running simultaneously, with many agents reading WRDs concurrently, through a design that is modular, cacheable, and index-friendly.
+4. **Scale to concurrent multi-agent use** — Support thousands of workflow instances running simultaneously, with many agents reading WDDs concurrently, through a design that is modular, cacheable, and index-friendly.
 
 ---
 
@@ -19,7 +19,7 @@ The Workflow Representation Document (WRD) is a structured, AI-readable format f
 | Principle | Description |
 |-----------|-------------|
 | **Scientist-first** | Scientists fill in what they know; HPC-specific fields are optional or agent-filled |
-| **Immutability of template** | The WRD template is read-only once authored; deployment decisions live separately |
+| **Immutability of template** | The WDD template is read-only once authored; deployment decisions live separately |
 | **Separation of concerns** | Workflow definition, I/O characteristics, and deployment constraints are distinct layers |
 | **AI readability** | Every structural component includes a natural language description field |
 | **Portability** | Can be compiled from or exported to Pegasus, Slurm, XML, and other formats |
@@ -93,7 +93,7 @@ Captures observed low-level characteristics from profiling runs (sourced from to
 - Observed bandwidth
 - POSIX timing breakdowns
 
-**Why two levels:** The semantic layer can always be populated — even from a Pegasus DAX or a Slurm script with no profiling data. The physical layer requires an actual profiling run and is optional. This separation means the WRD is useful from day one of workflow authoring, and becomes progressively richer as profiling data is collected. It also directly enables ablation studies in WIDGET — the physical layer can be exposed or hidden independently to test how much AI agents rely on it.
+**Why two levels:** The semantic layer can always be populated — even from a Pegasus DAX or a Slurm script with no profiling data. The physical layer requires an actual profiling run and is optional. This separation means the WDD is useful from day one of workflow authoring, and becomes progressively richer as profiling data is collected. It also directly enables ablation studies in WIDGET — the physical layer can be exposed or hidden independently to test how much AI agents rely on it.
 
 **Why this matters for scientists:** Scientists describe *what* data flows between tasks (the semantic layer) in terms they already understand. They do not need to know anything about POSIX operations or access patterns — that is filled in by profiling tools automatically.
 
@@ -101,7 +101,7 @@ Captures observed low-level characteristics from profiling runs (sourced from to
 
 ### 5. Execution Profiles
 
-**What it is:** Named, valid partial execution subsets of the workflow DAG, declared inside the WRD template.
+**What it is:** Named, valid partial execution subsets of the workflow DAG, declared inside the WDD template.
 
 **Key fields per profile:**
 - Profile name (e.g., `basic_output`, `extended_output`, `full`)
@@ -142,29 +142,29 @@ Captures observed low-level characteristics from profiling runs (sourced from to
 - Storage tier recommendations per task (burst buffer, parallel filesystem, node-local)
 - Total storage budget for the workflow
 
-**Why split scientist vs. agent fields:** This is the core of the scientist-first principle. Scientists should not need to know what a burst buffer is, or what MPI rank counts are appropriate for their data size. The WRD captures what they *do* know (data sizes, sensitivity, profile target) and leaves the HPC-specific fields for agents or HPC staff to fill in — either manually or automatically via tools like WIDGET.
+**Why split scientist vs. agent fields:** This is the core of the scientist-first principle. Scientists should not need to know what a burst buffer is, or what MPI rank counts are appropriate for their data size. The WDD captures what they *do* know (data sizes, sensitivity, profile target) and leaves the HPC-specific fields for agents or HPC staff to fill in — either manually or automatically via tools like WIDGET.
 
 ---
 
 ### 8. Translation Metadata Block
 
-**What it is:** A record of how this WRD was produced and what information could or could not be mapped during compilation.
+**What it is:** A record of how this WDD was produced and what information could or could not be mapped during compilation.
 
 **Key fields:**
 - Source format (Pegasus, Slurm, XML, native, etc.)
-- Translation tool or agent that produced the WRD
+- Translation tool or agent that produced the WDD
 - Timestamp
 - List of fields that could not be mapped and were left empty
 - Confidence annotations if an AI agent performed the compilation
 
-**Why:** This block makes the WRD auditable and trustworthy. If an AI agent compiled a Pegasus DAX into WRD and had to leave the physical I/O layer empty because no profiling data existed, that is recorded explicitly rather than silently omitted. This is especially critical in secure HPC environments where a human operator needs to verify what an agent did before deployment proceeds. It also enables round-trip fidelity checks — when converting a WRD back to Slurm or Pegasus, the agent knows exactly what was lost in the original compilation and can flag gaps.
+**Why:** This block makes the WDD auditable and trustworthy. If an AI agent compiled a Pegasus DAX into WDD and had to leave the physical I/O layer empty because no profiling data existed, that is recorded explicitly rather than silently omitted. This is especially critical in secure HPC environments where a human operator needs to verify what an agent did before deployment proceeds. It also enables round-trip fidelity checks — when converting a WDD back to Slurm or Pegasus, the agent knows exactly what was lost in the original compilation and can flag gaps.
 
 ---
 
 ## Document Structure Summary
 
 ```
-WRD (immutable template)
+WDD (immutable template)
 ├── Workflow Header
 ├── Task Registry
 │   ├── Task (with semantic description, relationships, loop annotations)
@@ -182,8 +182,8 @@ WRD (immutable template)
 │   └── Agent/system-filled fields
 └── Translation Metadata
 
-Deployment Plan Document (mutable, per-run, references WRD by ID)
-├── WRD reference ID
+Deployment Plan Document (mutable, per-run, references WDD by ID)
+├── WDD reference ID
 ├── Execution profile selected
 ├── Concrete parallelism, storage, and input decisions
 └── Run-specific metadata
@@ -193,7 +193,7 @@ Deployment Plan Document (mutable, per-run, references WRD by ID)
 
 ## What Scientists Need to Provide
 
-The WRD is designed so that a domain scientist with no HPC systems knowledge can author a valid and useful WRD by providing only:
+The WDD is designed so that a domain scientist with no HPC systems knowledge can author a valid and useful WDD by providing only:
 
 1. A description of what the workflow does overall
 2. A list of tasks with descriptions of what each task does

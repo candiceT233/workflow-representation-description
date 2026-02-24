@@ -1,11 +1,11 @@
 # =============================================================================
-# WIDGET — Workflow Representation Document (WRD) Agent Template
-# Schema: wrd-4.0  |  Architecture Design: v4
+# WIDGET — Workflow Definition Document (WDD) Agent Template
+# Schema: wdd-4.0  |  Architecture Design: v4
 #
 # PURPOSE
 # This file is the schema an AI agent reads before analyzing a workflow
 # repository. The agent fills every field according to its _status annotation.
-# Once all required fields are populated the WRD is valid input for DDD
+# Once all required fields are populated the WDD is valid input for DDD
 # generation.
 #
 # FIELD STATUS LEGEND
@@ -25,7 +25,7 @@
 #                         initial deployment.
 #
 # AGENT READINESS GATE
-# Before handing this WRD to the DDD generator, verify:
+# Before handing this WDD to the DDD generator, verify:
 #   [ ] All required_static fields are non-null
 #   [ ] All required_static_ask fields are non-null
 #   [ ] execution_graph.integrity_hash matches current task_registry
@@ -54,7 +54,7 @@ header:
     _status: required_static
     _extract: >
       Generate a new UUID v4 for a new workflow. Preserve existing
-      lineage_id when recompiling an existing WRD.
+      lineage_id when recompiling an existing WDD.
     _value: null
 
   version:
@@ -69,13 +69,13 @@ header:
   version_notes:
     _status: required_static
     _extract: >
-      For first compilation: "Initial WRD compiled from <source_file>".
+      For first compilation: "Initial WDD compiled from <source_file>".
       For updates: describe structural changes made.
     _value: null
 
   deprecated:
     _status: required_static
-    _extract: Set to false for all new WRDs.
+    _extract: Set to false for all new WDDs.
     _value: null
 
   workflow_name:
@@ -123,20 +123,20 @@ header:
 
   schema_version:
     _status: required_static
-    _extract: Always set to "wrd-4.0".
-    _value: "wrd-4.0"
+    _extract: Always set to "wdd-4.0".
+    _value: "wdd-4.0"
 
   author:
     _status: required_static_ask
     _extract: >
       Look in: git log --format="%an <%ae>" | head -1, README author
       field, workflow file header comment.
-    _prompt: What is your name and affiliation? (Used for WRD provenance.)
+    _prompt: What is your name and affiliation? (Used for WDD provenance.)
     _value: null
 
   created_at:
     _status: required_static
-    _extract: ISO 8601 timestamp at WRD compilation time.
+    _extract: ISO 8601 timestamp at WDD compilation time.
     _value: null
 
   last_modified_at:
@@ -188,7 +188,7 @@ task_registry:
       _status: required_static
       _extract: >
         Normalize task/process/function name from source code to snake_case.
-        Must be unique within this WRD. Prefix with "task:" in cross-document
+        Must be unique within this WDD. Prefix with "task:" in cross-document
         references (e.g., task:contact_map).
       _value: null
 
@@ -619,7 +619,7 @@ execution_profiles:
 
 # -----------------------------------------------------------------------------
 # SECTION 6: TRANSLATION METADATA
-# Provenance of how this WRD was compiled.
+# Provenance of how this WDD was compiled.
 # -----------------------------------------------------------------------------
 translation_metadata:
 
@@ -653,7 +653,7 @@ translation_metadata:
   round_trip_gaps:
     _status: required_static
     _extract: >
-      List fields that will be lost if this WRD is compiled back to the
+      List fields that will be lost if this WDD is compiled back to the
       source format (e.g., semantic_description has no representation
       in Pegasus DAX; execution_profiles have no Nextflow equivalent).
     _value: []

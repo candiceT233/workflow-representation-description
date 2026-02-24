@@ -1,0 +1,115 @@
+gemini token used for generating both scripts:
+│  Agent powering down. Goodbye!                                                                                       │
+│                                                                                                                      │
+│  Interaction Summary                                                                                                 │
+│  Session ID:                 dc06d657-3365-436c-8574-334aa4b94d74                                                    │
+│  Tool Calls:                 13 ( ✓ 12 x 1 )                                                                         │
+│  Success Rate:               92.3%                                                                                   │
+│  User Agreement:             100.0% (10 reviewed)                                                                    │
+│  Code Changes:               +646 -0                                                                                 │
+│                                                                                                                      │
+│  Performance                                                                                                         │
+│  Wall Time:                  9m 52s                                                                                  │
+│  Agent Active:               2m 35s                                                                                  │
+│    » API Time:               2m 23s (92.1%)                                                                          │
+│    » Tool Time:              12.2s (7.9%)                                                                            │
+│                                                                                                                      │
+│                                                                                                                      │
+│  Model Usage                                                                                                         │
+│  Model                       Reqs   Input Tokens   Cache Reads  Output Tokens                                        │
+│  ────────────────────────────────────────────────────────────────────────────                                        │
+│  gemini-2.5-flash-lite          4         21,089             0            375                                        │
+│  gemini-3-flash-preview        12         27,361        73,870            355                                        │
+│  gemini-2.5-pro                 9        163,782       144,221          8,593                                        │
+│                                                                                                                      │
+│  Savings Highlight: 218,091 (50.7%) of input tokens were served from the cache, reducing costs.     
+---
+claude token used for generating 1000 genome:
+  Session Summary — 1000 Genomes WDD Generation
+● ╔══════════════════════════════════════════════════════════════════╗
+  ║           Session Summary — 1000genome-wdd-claude               ║
+  ╠══════════════════════════════════════════════════════════════════╣
+  ║  Tool Calls:       28  (✓ 27  ✗ 1 — Read on oversized saved     ║
+  ║                         find output, 1 MB > 256 KB limit)        ║
+  ║  Success Rate:     96.4%                                         ║
+  ║  Files Created:    +646 -0  (workflow_wdd/1000genome-wdd-        ║
+  ║                               claude.yaml only; no MEMORY.md)   ║
+  ╠══════════════════════════════════════════════════════════════════╣
+  ║  Tool Call Breakdown                                             ║
+  ║  ─────────────────────────────────────────────────────────────  ║
+  ║  Read             11  (wdd_design, template, README, daxgen,     ║
+  ║                        5 bin scripts, data.csv, prepare_input,  ║
+  ║                        + 1 failed on oversized find output)      ║
+  ║  Bash             15  (ls, find, git, python hash/UUID,          ║
+  ║                        mkdir, yaml validation)                   ║
+  ║  Write             1  (1000genome-wdd-claude.yaml, 646 lines)    ║
+  ║  Task/Explore      0  (no subagents used)                        ║
+  ╠══════════════════════════════════════════════════════════════════╣
+  ║  Model Usage (estimated — Claude does not expose token counts)  ║
+  ║  Model              Reqs  Total Tokens                           ║
+  ║  ─────────────────────────────────────────────────────────────  ║
+  ║  claude-sonnet-4-6   n/a  not exposed for main session           ║
+  ║  Subagents           0    none launched                          ║
+  ╠══════════════════════════════════════════════════════════════════╣
+  ║  Notable: no Task/Explore subagents were launched — all         ║
+  ║  codebase analysis was done inline with Read/Bash/Grep.         ║
+  ║  Main session input/output/cache tokens are not surfaced        ║
+  ║  by Claude Code to the assistant at runtime.                    ║
+  ╚══════════════════════════════════════════════════════════════════╝
+
+  ---
+  Why the one failure: find with no exclusions returned a 1 MB result file. Claude Code saves large Bash outputs to a
+  temp file and I attempted to Read it, but it exceeded the 256 KB read limit. I recovered by re-running find with
+  --grep -v 'data/' to exclude the large data directory.
+
+  vs. DeepDriveMD session: That session used an Explore subagent (which self-reported 73,664 tokens over 23 tool uses).
+  This session did not — all analysis was done directly, which is why there are no subagent token numbers at all.
+  Resume this session with:
+claude --resume 91858416-92fc-4afb-a2ab-51509ff4f6fe
+---
+claude token used for generating deepdrivemd:
+  ---
+  ╔══════════════════════════════════════════════════════════════════╗
+  ║              Session Summary — deepdrivemd-wdd-claude            ║
+  ╠══════════════════════════════════════════════════════════════════╣
+  ║  Tool Calls:       14  (✓ 12  ✗ 2 — two Read calls on missing   ║
+  ║                         MEMORY.md at session start)              ║
+  ║  Success Rate:     85.7%                                         ║
+  ║  Code Changes:     +689 -0  (YAML + MEMORY.md)                   ║
+  ╠══════════════════════════════════════════════════════════════════╣
+  ║  Performance                                                     ║
+  ║  Explore agent wall time:    ~1m 56s  (115,931 ms reported)      ║
+  ║  Explore agent tool uses:    23                                   ║
+  ╠══════════════════════════════════════════════════════════════════╣
+  ║  Model Usage (estimated — Claude does not expose token counts)   ║
+  ║  Model              Reqs  Total Tokens (reported by subagent)    ║
+  ║  ───────────────────────────────────────────────────────────     ║
+  ║  claude-sonnet-4-6   1†   73,664  (Explore subagent only)        ║
+  ║  claude-sonnet-4-6   n/a  not exposed for main session           ║
+  ╠══════════════════════════════════════════════════════════════════╣
+  ║  † Explore agent self-reported via TaskOutput metadata.          ║
+  ║    Main session input/output/cache tokens are not surfaced       ║
+  ║    by Claude Code to the assistant at runtime.                   ║
+  ╚══════════════════════════════════════════════════════════════════╝
+
+  ---
+  Why the gap vs. Gemini's report:
+
+  ┌───────────────────────────────┬──────────────┬───────────────────────────────────────────────────┐
+  │            Feature            │ Gemini agent │                    Claude Code                    │
+  ├───────────────────────────────┼──────────────┼───────────────────────────────────────────────────┤
+  │ Per-model token breakdown     │ Reported     │ Not exposed to assistant                          │
+  ├───────────────────────────────┼──────────────┼───────────────────────────────────────────────────┤
+  │ Cache read tokens             │ Reported     │ Not exposed to assistant                          │
+  ├───────────────────────────────┼──────────────┼───────────────────────────────────────────────────┤
+  │ Wall time / agent active time │ Reported     │ Not exposed to assistant                          │
+  ├───────────────────────────────┼──────────────┼───────────────────────────────────────────────────┤
+  │ Subagent token self-report    │ N/A          │ Available via total_tokens in TaskOutput metadata │
+  └───────────────────────────────┴──────────────┴───────────────────────────────────────────────────┘
+
+  The only hard number available is the Explore subagent's self-reported 73,664 total tokens (input + output combined)
+  over 23 tool uses and 115 seconds. The main session's token counts are not surfaced to the model itself in Claude Code
+   — you would need to check them via the Anthropic Console or API logs for the session.
+
+   Resume this session with:
+claude --resume ce22090d-f6c3-4acc-a9b6-b84077afa849

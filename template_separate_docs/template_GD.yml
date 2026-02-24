@@ -61,18 +61,18 @@ header:
     _format: "gd:<workflow_name>:<context_name>"
     _value: null
 
-  wrd_lineage_id:
+  wdd_lineage_id:
     _status: required_operator
     _prompt: >
-      What is the workflow_lineage_id of the WRD this goal set applies to?
-      (Find it in the WRD header.)
+      What is the workflow_lineage_id of the WDD this goal set applies to?
+      (Find it in the WDD header.)
     _value: null
 
-  wrd_version:
+  wdd_version:
     _status: required_operator
     _prompt: >
-      Which WRD version is this goal set authored against?
-      (e.g., "1.0.0". Find it in the WRD header.)
+      Which WDD version is this goal set authored against?
+      (e.g., "1.0.0". Find it in the WDD header.)
     _value: null
 
   operator:

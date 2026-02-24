@@ -1,16 +1,16 @@
-# Workflow Representation Document (WRD) — Core Design v2
+# Workflow Definition Document (WDD) — Core Design v2
 
 ## Goal
 
-The Workflow Representation Document (WRD) is a structured, AI-readable format for describing scientific workflows in HPC environments. Its primary goals are:
+The Workflow Definition Document (WDD) is a structured, AI-readable format for describing scientific workflows in HPC environments. Its primary goals are:
 
-1. **Bridge the expertise gap** — Allow domain scientists (physicists, biologists, climate scientists) to describe their workflows without needing knowledge of parallelism, node memory, storage tiers, or HPC system internals. The WRD captures what the scientist *knows* and separates it from deployment decisions that require HPC expertise.
+1. **Bridge the expertise gap** — Allow domain scientists (physicists, biologists, climate scientists) to describe their workflows without needing knowledge of parallelism, node memory, storage tiers, or HPC system internals. The WDD captures what the scientist *knows* and separates it from deployment decisions that require HPC expertise.
 
 2. **Enable AI-assisted deployment and diagnosis** — Provide AI agents with enough structured, semantic context to autonomously deploy workflows (via tools like Jarvis-MCP), diagnose I/O bottlenecks, and recommend optimizations — even when running on capability-constrained local LLMs in secure HPC environments.
 
-3. **Serve as a universal interchange format** — Allow AI agents to compile WRDs from existing workflow formats (Pegasus DAX, Slurm scripts, XML pipelines, etc.) and to convert WRDs back into those formats. The WRD is the common language between workflow systems.
+3. **Serve as a universal interchange format** — Allow AI agents to compile WDDs from existing workflow formats (Pegasus DAX, Slurm scripts, XML pipelines, etc.) and to convert WDDs back into those formats. The WDD is the common language between workflow systems.
 
-4. **Scale to concurrent multi-agent use** — Support thousands of workflow instances running simultaneously, with many agents reading and writing WRDs concurrently, through a design that is modular, cacheable, index-friendly, and consistency-safe.
+4. **Scale to concurrent multi-agent use** — Support thousands of workflow instances running simultaneously, with many agents reading and writing WDDs concurrently, through a design that is modular, cacheable, index-friendly, and consistency-safe.
 
 ---
 
@@ -19,7 +19,7 @@ The Workflow Representation Document (WRD) is a structured, AI-readable format f
 | Principle | Description |
 |-----------|-------------|
 | **Scientist-first** | Scientists fill in what they know; HPC-specific fields are optional or agent-filled. Data sizes are never manually entered — they are measured automatically by tooling. |
-| **Versioned immutability** | The WRD template is semantically immutable at a given version. Changes produce new versions under the same workflow lineage ID. Deployment plans pin to a specific version. |
+| **Versioned immutability** | The WDD template is semantically immutable at a given version. Changes produce new versions under the same workflow lineage ID. Deployment plans pin to a specific version. |
 | **Separation of concerns** | Workflow definition, I/O characteristics, deployment constraints, and run-time state are distinct layers that can be read and written independently. |
 | **AI readability** | Every structural component includes a natural language description field with defined quality standards. Vague descriptions are flagged at authoring time. |
 | **Portability** | Can be compiled from or exported to Pegasus, Slurm, XML, and other formats. Translation gaps are recorded explicitly with field-level confidence scores. |
@@ -43,21 +43,21 @@ The Workflow Representation Document (WRD) is a structured, AI-readable format f
 - `deprecated` — Boolean. If true, agents must not use this version for new deployments.
 - `workflow_name` — Human-readable name.
 - `workflow_description` — Scientist-authored description of what this workflow does. See Section 2a for quality standards.
-- `source_format` — How this WRD was produced: `native`, `compiled_from_pegasus`, `compiled_from_slurm`, etc.
-- `schema_version` — WRD schema version this document conforms to.
+- `source_format` — How this WDD was produced: `native`, `compiled_from_pegasus`, `compiled_from_slurm`, etc.
+- `schema_version` — WDD schema version this document conforms to.
 - `author`, `created_at`, `last_modified_at`
 
 **Why versioning belongs here:** Scientific workflows evolve. A design that treats the template as simply "immutable" will either be routinely violated in practice or create friction that causes scientists to work around the format entirely. The versioning model resolves this by distinguishing between the *workflow lineage* (what the workflow is, identified by `workflow_lineage_id`) and a *specific snapshot* of it (identified by `workflow_lineage_id` + `version`).
 
-A deployment plan that pins to lineage `abc123` at version `2.1.0` continues to work correctly even after the scientist publishes `2.2.0`. Agents reading the WRD for a running deployment are always reading a specific, frozen snapshot. The `deprecated` flag allows old versions to be cleanly retired without breaking in-flight runs.
+A deployment plan that pins to lineage `abc123` at version `2.1.0` continues to work correctly even after the scientist publishes `2.2.0`. Agents reading the WDD for a running deployment are always reading a specific, frozen snapshot. The `deprecated` flag allows old versions to be cleanly retired without breaking in-flight runs.
 
 ---
 
 ### 2a. Semantic Description Quality Standards
 
-**What it is:** Authoring-time standards that apply to every natural language description field in the WRD — both at the workflow level and the task level.
+**What it is:** Authoring-time standards that apply to every natural language description field in the WDD — both at the workflow level and the task level.
 
-These descriptions are the most load-bearing fields in the WRD. The quality of these fields directly determines how useful agents can be. A description like "runs the simulation" gives an agent almost nothing to work with, and there is no profiling data or graph structure that can substitute for missing semantic context.
+These descriptions are the most load-bearing fields in the WDD. The quality of these fields directly determines how useful agents can be. A description like "runs the simulation" gives an agent almost nothing to work with, and there is no profiling data or graph structure that can substitute for missing semantic context.
 
 **Minimum required content:**
 - For workflow-level descriptions: what scientific problem is being solved, what domain it belongs to, what inputs it starts from, and what outputs it ultimately produces.
@@ -66,7 +66,7 @@ These descriptions are the most load-bearing fields in the WRD. The quality of t
 **Authoring-time validation:**
 - Descriptions shorter than 20 words are flagged as likely insufficient.
 - Descriptions containing only generic verbs with no domain nouns (e.g., "processes data", "runs computation") are flagged as non-informative.
-- Flagged descriptions do not block WRD creation but are recorded in the Translation Metadata Block as quality warnings that agents and operators can inspect.
+- Flagged descriptions do not block WDD creation but are recorded in the Translation Metadata Block as quality warnings that agents and operators can inspect.
 
 **Example:**
 
@@ -81,7 +81,7 @@ These descriptions are the most load-bearing fields in the WRD. The quality of t
 **What it is:** The catalog of all tasks in the workflow. Each task entry is a self-contained unit of semantic meaning. Structural relationships are also represented in the Execution Graph (Section 3); the two are intentionally redundant, with the Task Registry as the canonical source of truth.
 
 **Key fields per task:**
-- `task_id` — Unique identifier within this WRD version.
+- `task_id` — Unique identifier within this WDD version.
 - `task_name` — Human-readable name.
 - `semantic_description` — Natural language description meeting the quality standards in Section 2a. Author-provided.
 - `executable_ref` — Script or executable reference.
@@ -137,7 +137,7 @@ Convergence loops are the most hazardous case. Without a `max_iterations_guard`,
 
 **Consistency model:** The Task Registry is the canonical source of truth for relationships. The Execution Graph is a derived projection and must never be edited directly. It is regenerated automatically whenever the Task Registry is modified, as part of the version-increment process.
 
-To enforce this, the Execution Graph carries an **integrity hash** of the Task Registry's relationship section. Any agent that reads the Execution Graph and detects a hash mismatch must refuse to use it and must alert the author that re-generation is required. When a WRD is compiled from an external format, the compiler populates both sections in a single atomic operation.
+To enforce this, the Execution Graph carries an **integrity hash** of the Task Registry's relationship section. Any agent that reads the Execution Graph and detects a hash mismatch must refuse to use it and must alert the author that re-generation is required. When a WDD is compiled from an external format, the compiler populates both sections in a single atomic operation.
 
 This resolves a gap in v1, which described redundancy as desirable but provided no resolution strategy when the two sections diverge.
 
@@ -185,7 +185,7 @@ This layer requires an actual profiling run and is optional. It also directly en
 
 ### 5. Execution Profiles
 
-**What it is:** Named, valid partial execution subsets of the workflow DAG, declared inside the WRD template.
+**What it is:** Named, valid partial execution subsets of the workflow DAG, declared inside the WDD template.
 
 **Key fields per profile:**
 - `profile_name` — e.g., `basic_output`, `extended_output`, `full`
@@ -215,7 +215,7 @@ This layer requires an actual profiling run and is optional. It also directly en
 
 **What it is:** Resource boundary declarations split between what the scientist can reliably provide and what must come from agents or tooling. Note that the scientist's *run configuration* (scope, scale, input subset) lives in the Deployment Plan Document, not here — this block captures workflow-level constraints that are stable across runs.
 
-**Scientist-authored fields (stable across runs, belong in the WRD template):**
+**Scientist-authored fields (stable across runs, belong in the WDD template):**
 - `data_sensitivity` — Any known constraints on where data may reside (e.g., cannot leave on-premise, HIPAA-regulated, export-controlled). Stable — does not change run to run.
 
 Note: `estimated input data size` and `estimated output data size` from v1 are **removed**. Scientists are never asked to estimate data sizes. These are handled by the Measured I/O Layer (Section 4, Level 2). `prior_run_exists` is also removed — the Measured I/O Layer's `measurement_confidence` field conveys this information directly.
@@ -232,27 +232,27 @@ Each of these fields carries a `filled_by`, `timestamp`, and `confidence` record
 
 **Run configuration (per-run, lives in the Deployment Plan Document — not here):**
 
-The scientist's run-specific choices are not workflow properties and do not belong in the WRD template. They are recorded in the Deployment Plan Document for each submission:
+The scientist's run-specific choices are not workflow properties and do not belong in the WDD template. They are recorded in the Deployment Plan Document for each submission:
 - `input_data_path` — the filesystem path to the input data directory for this run
 - `execution_profile` — which profile to run (e.g., `basic_output`, `full`)
 - `input_subset` — if not using the full input dataset, a description of the subset (e.g., "ensemble members 1–5 only", "10% random sample of input files")
 - `scale_override` — if running at reduced parallelism or node count relative to the workflow's recommended range (e.g., single-node correctness check)
 - `parameter_overrides` — any parameter values that differ from the workflow's defaults for this run
 
-**Why run configuration belongs in the Deployment Plan, not the WRD template:** The WRD template describes what the workflow *is*. The Deployment Plan describes how a particular execution of it should be run. A scientist may submit the same workflow dozens of times — once at small scale to verify correctness, once at full scale for production, once on a subset of data for a quick result — and each of those is a different Deployment Plan referencing the same WRD version.
+**Why run configuration belongs in the Deployment Plan, not the WDD template:** The WDD template describes what the workflow *is*. The Deployment Plan describes how a particular execution of it should be run. A scientist may submit the same workflow dozens of times — once at small scale to verify correctness, once at full scale for production, once on a subset of data for a quick result — and each of those is a different Deployment Plan referencing the same WDD version.
 
 ---
 
 ### 8. Translation Metadata Block
 
-**What it is:** A complete record of how this WRD was produced, what information could or could not be mapped, and the confidence of every field that was filled in by an AI agent or automated tool rather than a human author.
+**What it is:** A complete record of how this WDD was produced, what information could or could not be mapped, and the confidence of every field that was filled in by an AI agent or automated tool rather than a human author.
 
 **Top-level fields:**
 - `source_format` — Pegasus, Slurm, XML, native, other
-- `translation_tool` — tool or agent that produced this WRD
+- `translation_tool` — tool or agent that produced this WDD
 - `translation_timestamp` — ISO 8601
 - `unmapped_fields` — list of field paths that could not be populated from the source, each with the reason it was unmapped
-- `round_trip_gaps` — fields that will be lost or degraded if this WRD is compiled back to the source format
+- `round_trip_gaps` — fields that will be lost or degraded if this WDD is compiled back to the source format
 - `quality_warnings` — descriptions flagged by the authoring-time validation in Section 2a
 
 **Field-level confidence records:**
@@ -266,15 +266,15 @@ Each record contains:
 - `confidence_reason` — human-readable explanation (e.g., "semantic description inferred from task executable name only; no docstring or comment was present in the source DAX")
 - `requires_human_review` — boolean, set to `true` when `confidence_level` is `low` or `inferred`
 
-**Why field-level confidence is required:** A human operator reviewing an AI-compiled WRD before approving deployment in a secure HPC environment needs to know exactly where to focus their review — not just that "the agent had some uncertainty somewhere." A single document-level confidence score is nearly useless for this purpose.
+**Why field-level confidence is required:** A human operator reviewing an AI-compiled WDD before approving deployment in a secure HPC environment needs to know exactly where to focus their review — not just that "the agent had some uncertainty somewhere." A single document-level confidence score is nearly useless for this purpose.
 
-When a Pegasus DAX is compiled into a WRD, task dependencies can typically be derived with high confidence from the DAX structure. Semantic descriptions, however, often have to be inferred from executable names or parameter labels — which may be meaningful (`run_quality_filter.py`) or opaque (`step_04.py`). An operator needs to see exactly which semantic descriptions are marked `requires_human_review = true` so they can correct them before the workflow is approved for deployment.
+When a Pegasus DAX is compiled into a WDD, task dependencies can typically be derived with high confidence from the DAX structure. Semantic descriptions, however, often have to be inferred from executable names or parameter labels — which may be meaningful (`run_quality_filter.py`) or opaque (`step_04.py`). An operator needs to see exactly which semantic descriptions are marked `requires_human_review = true` so they can correct them before the workflow is approved for deployment.
 
 ---
 
 ### 9. Concurrent Access and Write Consistency Model
 
-**What it is:** The rules governing how multiple agents reading and writing different sections of a WRD simultaneously do so safely. This was absent in v1 despite concurrent multi-agent use being a stated goal.
+**What it is:** The rules governing how multiple agents reading and writing different sections of a WDD simultaneously do so safely. This was absent in v1 despite concurrent multi-agent use being a stated goal.
 
 **Read access:** Any number of agents may read any section simultaneously with no locking required. The template sections are effectively read-only once a version is published.
 
@@ -294,7 +294,7 @@ When a Pegasus DAX is compiled into a WRD, task dependencies can typically be de
 ## Document Structure Summary
 
 ```
-WRD (versioned — changes increment version, stable across versions via lineage ID)
+WDD (versioned — changes increment version, stable across versions via lineage ID)
 ├── Workflow Header
 │   ├── workflow_lineage_id (stable forever), version, version_notes, deprecated
 │   └── workflow_description  [quality-validated, author-provided]
@@ -323,8 +323,8 @@ WRD (versioned — changes increment version, stable across versions via lineage
     └── field_confidence_records[]
         └── {field_path, filled_by, confidence_level, confidence_reason, requires_human_review}
 
-Deployment Plan Document (mutable, per-run, references WRD by ID + version)
-├── wrd_lineage_id + wrd_version  [pins to a specific frozen snapshot]
+Deployment Plan Document (mutable, per-run, references WDD by ID + version)
+├── wdd_lineage_id + wdd_version  [pins to a specific frozen snapshot]
 ├── input_data_path  [filesystem path to input data for this run]
 ├── execution_profile  [which profile to run]
 ├── input_subset  [if not using the full input dataset]
@@ -337,9 +337,9 @@ Deployment Plan Document (mutable, per-run, references WRD by ID + version)
 
 ## What Scientists Need to Provide
 
-A scientist does not author a WRD by filling in fields manually. The WRD is compiled from artifacts the scientist already has or can trivially specify. The scientist's complete input is three things:
+A scientist does not author a WDD by filling in fields manually. The WDD is compiled from artifacts the scientist already has or can trivially specify. The scientist's complete input is three things:
 
-**1. A workflow code file** in whatever format they already use — a Pegasus DAX, a Nextflow script, a Parsl Python file, a Swift/T script, a shell script that submits Slurm jobs, or any other workflow description format. This is the artifact the scientist already wrote to describe and run their workflow. An AI agent or static analysis tool compiles it into a WRD, extracting task structure, dependencies, loop patterns, and data flow as far as the source format allows.
+**1. A workflow code file** in whatever format they already use — a Pegasus DAX, a Nextflow script, a Parsl Python file, a Swift/T script, a shell script that submits Slurm jobs, or any other workflow description format. This is the artifact the scientist already wrote to describe and run their workflow. An AI agent or static analysis tool compiles it into a WDD, extracting task structure, dependencies, loop patterns, and data flow as far as the source format allows.
 
 **2. The path to the input data directory** on the HPC filesystem. The deployment tooling (e.g., Jarvis-MCP) inspects this directory to measure actual input data sizes, file formats present, and dataset structure. The scientist does not describe or estimate the data — they point to where it lives.
 
@@ -349,15 +349,15 @@ A scientist does not author a WRD by filling in fields manually. The WRD is comp
 - Whether to run at reduced parallelism (e.g., a single-node run to verify correctness before full-scale submission)
 - Any parameter overrides relative to the workflow's defaults
 
-This run configuration lives in the Deployment Plan Document, not in the WRD template itself — it is per-run, not a property of the workflow definition.
+This run configuration lives in the Deployment Plan Document, not in the WDD template itself — it is per-run, not a property of the workflow definition.
 
 ---
 
-### How Each WRD Field Gets Populated
+### How Each WDD Field Gets Populated
 
-This table maps every category of WRD content to its actual source. Nothing requires the scientist to manually describe structure that already exists in their code.
+This table maps every category of WDD content to its actual source. Nothing requires the scientist to manually describe structure that already exists in their code.
 
-| WRD Content | Source |
+| WDD Content | Source |
 |-------------|--------|
 | Task list and names | Static analysis or AI compilation of the workflow code file |
 | Task dependency graph | Static analysis of the workflow code (Pegasus DAX edges, Nextflow channel declarations, Parsl `depends_on`, Slurm `#SBATCH --dependency`, etc.) |
@@ -370,16 +370,16 @@ This table maps every category of WRD content to its actual source. Nothing requ
 | Task dependency graph (runtime-confirmed) | Derived from DPM I/O traces: tasks that write a file that another task reads are connected by a `data_dependency` edge, confirming or supplementing the statically-derived graph |
 | Checkpoint vs. intermediate classification | Cannot be reliably inferred — this is the one field the scientist must explicitly provide, because only the scientist knows which outputs are scientifically valuable to retain |
 | Execution profiles | Scientist specifies which intermediate stages produce independently useful results; required task sets are always auto-derived |
-| Parallelism, memory, storage tiers | Filled by WIDGET, Jarvis-MCP, or HPC staff after WRD compilation |
+| Parallelism, memory, storage tiers | Filled by WIDGET, Jarvis-MCP, or HPC staff after WDD compilation |
 | Data sensitivity constraints | Scientist-provided if applicable; otherwise absent |
 
 **The one field that cannot be extracted or measured:** The checkpoint vs. intermediate classification of output datasets. Static analysis can identify which files are written by which tasks, but it cannot determine which of those outputs the scientist considers scientifically valuable to retain after the run. This distinction lives in the scientist's domain knowledge, not in the code. It is the only structural field that requires explicit scientist input beyond the three items listed above.
 
 ---
 
-### WRD Compilation Pipeline
+### WDD Compilation Pipeline
 
-The process of producing a WRD from scientist inputs follows this sequence:
+The process of producing a WDD from scientist inputs follows this sequence:
 
 ```
 Scientist provides:
@@ -392,7 +392,7 @@ Scientist provides:
   of code file               data directory
         │                          │
         ▼                          ▼
-  WRD Template populated:    Measured I/O Layer
+  WDD Template populated:    Measured I/O Layer
   - Task Registry            populated with
   - Execution Graph          actual input sizes
   - Semantic I/O Layer
@@ -423,7 +423,7 @@ Scientist provides:
              (output_data_bytes_per_profile populated)
 ```
 
-After the first run, the WRD is substantially complete. Subsequent runs have fully populated Measured I/O and Physical I/O layers, giving agents rich data for storage planning and optimization.
+After the first run, the WDD is substantially complete. Subsequent runs have fully populated Measured I/O and Physical I/O layers, giving agents rich data for storage planning and optimization.
 
 ---
 
@@ -440,4 +440,4 @@ After the first run, the WRD is substantially complete. Subsequent runs have ful
 | Semantic description quality unenforceable | Quality standards defined in Section 2a with authoring-time validation rules. Failures recorded as quality warnings in Translation Metadata. |
 | Scientists asked to manually describe workflow structure | Scientists provide a workflow code file (Pegasus, Nextflow, Parsl, Slurm, etc.); task structure, dependencies, and data flow are extracted by static analysis and AI compilation. Scientists do not re-describe what is already in their code. |
 | No model for runtime I/O trace integration | DPM I/O traces (task name + PID per I/O operation) populate the Physical I/O Layer and can independently confirm or supplement the statically-derived dependency graph. |
-| Run configuration had no defined home | Run configuration (input data path, execution profile, input subset, scale override, parameter overrides) is now explicitly part of the Deployment Plan Document, not the WRD template. The WRD describes what the workflow is; the Deployment Plan describes how a particular run should execute. |
+| Run configuration had no defined home | Run configuration (input data path, execution profile, input subset, scale override, parameter overrides) is now explicitly part of the Deployment Plan Document, not the WDD template. The WDD describes what the workflow is; the Deployment Plan describes how a particular run should execute. |

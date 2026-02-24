@@ -46,5 +46,5 @@ The following fields have unresolved trade-offs. Current schema implements the p
 | Field | Current default | Alternative | Trade-off summary |
 |-------|-----------------|-------------|-------------------|
 | Loop annotation | Prose `iteration_description` in `control_flow` | Structured schema: `loop_type`, `bound_type`, `convergence_condition`, `max_iterations_guard` | Prose is more accurate in practice; structured enables IODD machine-comparison and DDD safety guards |
-| Temporal I/O annotation | Prose `behavioral_notes` per task | Structured `io_phase`, `burstiness`, `overlap_potential` per task | Prose is more accurate; structured enables `match_wrd_io_phase` in IODD |
+| Temporal I/O annotation | Prose `behavioral_notes` per task | Structured `io_phase`, `burstiness`, `overlap_potential` per task | Prose is more accurate; structured enables `match_wdd_io_phase` in IODD |
 | `contention_sensitivity` per task | Omitted | `high \| medium \| low \| unknown` | Nearly always `unknown` before profiling; DDD can derive from `io_dominance` + `pc_pattern` |

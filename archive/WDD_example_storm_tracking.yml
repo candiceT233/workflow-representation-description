@@ -1,7 +1,7 @@
 # =============================================================================
-# WORKFLOW REPRESENTATION DOCUMENT (WRD)
+# WORKFLOW DEFINITION DOCUMENT (WDD)
 # Example: Atmospheric Storm Tracking and Intensity Analysis Pipeline
-# Schema version: 1.0  |  WRD Design version: 2.0
+# Schema version: 1.0  |  WDD Design version: 2.0
 # =============================================================================
 #
 # DOCUMENT LIFECYCLE NOTE
@@ -37,7 +37,7 @@
 header:
   workflow_lineage_id: "f3a9c2e1-847b-4d02-b6f1-2c3d4e5f6a7b"
   version: "1.0.0"
-  version_notes: "Initial WRD compiled from storm_tracking_pipeline.nf"
+  version_notes: "Initial WDD compiled from storm_tracking_pipeline.nf"
   deprecated: false
 
   workflow_name: "Atmospheric Storm Tracking and Intensity Analysis Pipeline"
@@ -55,7 +55,7 @@ header:
 
   source_format: "compiled_from_nextflow"
   source_file: "storm_tracking_pipeline.nf"
-  schema_version: "wrd-2.0"
+  schema_version: "wdd-2.0"
   author: "Dr. Elena Vasquez, NCAR Mesoscale Dynamics Group"
   created_at: "2025-03-12T14:22:00Z"
   last_modified_at: "2025-03-12T14:22:00Z"
@@ -607,7 +607,7 @@ execution_profiles:
 # -----------------------------------------------------------------------------
 deployment_constraints:
 
-  # Scientist-authored — stable across runs, belongs in WRD template
+  # Scientist-authored — stable across runs, belongs in WDD template
   scientist_provided:
     data_sensitivity: "none"
     # No export controls, HIPAA, or on-premise requirements for ERA5 data.
@@ -697,13 +697,13 @@ deployment_constraints:
 
 # -----------------------------------------------------------------------------
 # SECTION 8: TRANSLATION METADATA
-# Record of how this WRD was produced and the confidence of every
+# Record of how this WDD was produced and the confidence of every
 # agent-inferred field.
 # -----------------------------------------------------------------------------
 translation_metadata:
   source_format: "nextflow"
   source_file: "storm_tracking_pipeline.nf"
-  translation_tool: "wrd-compiler-agent v0.3 (Jarvis-MCP)"
+  translation_tool: "wdd-compiler-agent v0.3 (Jarvis-MCP)"
   translation_timestamp: "2025-03-12T14:22:00Z"
 
   unmapped_fields:
@@ -718,7 +718,7 @@ translation_metadata:
     - field_path: "task_registry[*].semantic_description"
       note: >
         Semantic descriptions were inferred by AI agent and do not exist in
-        the Nextflow source file. If this WRD is compiled back to Nextflow,
+        the Nextflow source file. If this WDD is compiled back to Nextflow,
         these descriptions will be lost unless embedded as comments.
     - field_path: "execution_profiles"
       note: >
@@ -736,7 +736,7 @@ translation_metadata:
   field_confidence_records:
 
     - field_path: "task_registry[preprocess_era5].semantic_description"
-      filled_by: "wrd-compiler-agent v0.3"
+      filled_by: "wdd-compiler-agent v0.3"
       confidence_level: "high"
       confidence_reason: >
         Nextflow process block had clear input/output channel declarations
@@ -746,7 +746,7 @@ translation_metadata:
       requires_human_review: false
 
     - field_path: "task_registry[detect_cyclones].semantic_description"
-      filled_by: "wrd-compiler-agent v0.3"
+      filled_by: "wdd-compiler-agent v0.3"
       confidence_level: "high"
       confidence_reason: >
         Detection threshold (1000 hPa, 500 km scale) read directly from
@@ -755,7 +755,7 @@ translation_metadata:
       requires_human_review: false
 
     - field_path: "task_registry[build_tracks].semantic_description"
-      filled_by: "wrd-compiler-agent v0.3"
+      filled_by: "wdd-compiler-agent v0.3"
       confidence_level: "medium"
       confidence_reason: >
         Tracking algorithm described at high level from function name and
@@ -766,7 +766,7 @@ translation_metadata:
       requires_human_review: false
 
     - field_path: "task_registry[compute_intensity].semantic_description"
-      filled_by: "wrd-compiler-agent v0.3"
+      filled_by: "wdd-compiler-agent v0.3"
       confidence_level: "high"
       confidence_reason: >
         Three intensity metrics (min SLP, max wind, IKE) and 500 km
@@ -776,7 +776,7 @@ translation_metadata:
       requires_human_review: false
 
     - field_path: "task_registry[filter_significant].semantic_description"
-      filled_by: "wrd-compiler-agent v0.3"
+      filled_by: "wdd-compiler-agent v0.3"
       confidence_level: "medium"
       confidence_reason: >
         Filtering criteria inferred from script argument defaults. The
@@ -785,7 +785,7 @@ translation_metadata:
       requires_human_review: true
 
     - field_path: "task_registry[compute_climatology].semantic_description"
-      filled_by: "wrd-compiler-agent v0.3"
+      filled_by: "wdd-compiler-agent v0.3"
       confidence_level: "high"
       confidence_reason: >
         Output variables (track density, intensity distributions, trends)
@@ -795,7 +795,7 @@ translation_metadata:
       requires_human_review: false
 
     - field_path: "task_registry[generate_catalog].semantic_description"
-      filled_by: "wrd-compiler-agent v0.3"
+      filled_by: "wdd-compiler-agent v0.3"
       confidence_level: "high"
       confidence_reason: >
         Three output artifacts (CSV, netCDF, PDF) confirmed from Nextflow
@@ -804,7 +804,7 @@ translation_metadata:
       requires_human_review: false
 
     - field_path: "execution_profiles"
-      filled_by: "wrd-compiler-agent v0.3"
+      filled_by: "wdd-compiler-agent v0.3"
       confidence_level: "medium"
       confidence_reason: >
         Three profiles (tracks_only, tracks_and_intensity, full) proposed

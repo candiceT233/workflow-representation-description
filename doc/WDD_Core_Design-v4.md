@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document defines the full five-document knowledge architecture that feeds AI agents operating within the WIDGET workflow I/O characterization and optimization system. It is temporarily titled "WRD Core Design" but describes all five documents in the architecture, not only the WRD.
+This document defines the full five-document knowledge architecture that feeds AI agents operating within the WIDGET workflow I/O characterization and optimization system. It is temporarily titled "WDD Core Design" but describes all five documents in the architecture, not only the WDD.
 
 The core insight is that a single workflow can be deployed many ways depending on performance goals, and a single deployment can exhibit different I/O behavior depending on the hardware it runs on. The document architecture mirrors this factorization precisely, giving agents the right scope of context for each tier of reasoning — neither too little to make good decisions, nor so much that capability-constrained local LLMs are overwhelmed.
 
@@ -12,7 +12,7 @@ The core insight is that a single workflow can be deployed many ways depending o
 
 | Document | Abbreviation | Describes | Changes when |
 |----------|--------------|-----------|--------------|
-| Workflow Representation Document | WRD | What the workflow *is* | Workflow code changes |
+| Workflow Definition Document | WDD | What the workflow *is* | Workflow code changes |
 | Goal Document | GD | What the operator *wants* | Performance objectives change |
 | Hardware Resource Document | HRD | What the hardware *provides* | Target system changes |
 | Deployment Definition Document | DDD | How the workflow is *deployed* | Deployment strategy or goals change |
@@ -28,7 +28,7 @@ The core insight is that a single workflow can be deployed many ways depending o
                        │ side input (motivates deployment choices)
                        ▼
  ┌──────────┐    ┌──────────┐    ┌──────────┐
- │   WRD    │───▶│   DDD    │───▶│   IODD   │
+ │   WDD    │───▶│   DDD    │───▶│   IODD   │
  │(Workflow)│ 1:N│(Deploy)  │ 1:N│  (I/O)   │
  └──────────┘    └──────────┘    └──────────┘
                        ▲
@@ -39,14 +39,14 @@ The core insight is that a single workflow can be deployed many ways depending o
                   └──────────┘
 ```
 
-- **WRD → DDD** is one-to-many: one workflow definition, multiple deployment strategies (throughput-optimized, cost-optimized, latency-optimized, etc.).
+- **WDD → DDD** is one-to-many: one workflow definition, multiple deployment strategies (throughput-optimized, cost-optimized, latency-optimized, etc.).
 - **DDD → IODD** is one-to-many: one deployment strategy can produce different I/O realizations on different hardware, or multiple profiling runs on the same hardware.
-- **GD** is a side input to the WRD → DDD step. It encodes *why* the operator chose a particular deployment strategy. Every decision in the DDD back-references a GD goal ID.
+- **GD** is a side input to the WDD → DDD step. It encodes *why* the operator chose a particular deployment strategy. Every decision in the DDD back-references a GD goal ID.
 - **HRD** is a side input to the DDD → IODD step. It defines the physical constraints within which I/O behavior materializes.
 
 ### Stability Ordering
 
-The WRD is the most stable document — it changes only when the workflow code changes. The GD and HRD are moderately stable, changing only when operator objectives or hardware change. The DDD changes whenever strategy changes. The IODD is the least stable — produced by every run on every system.
+The WDD is the most stable document — it changes only when the workflow code changes. The GD and HRD are moderately stable, changing only when operator objectives or hardware change. The DDD changes whenever strategy changes. The IODD is the least stable — produced by every run on every system.
 
 ---
 
@@ -56,14 +56,14 @@ All five documents share a common identifier scheme enabling unambiguous machine
 
 | Entity | ID Format | Example | Defined In |
 |--------|-----------|---------|------------|
-| Task | `task:<name>` | `task:contact_map` | WRD Task Registry |
-| Dataset | `data:<name>` | `data:trajectory_frames` | WRD Data Flow Layer |
-| P-C Edge | `pc:<producer>-><consumer>:<pattern>` | `pc:contact_map->aggregate:n_to_1` | WRD Execution Graph |
-| Execution Profile | `profile:<name>` | `profile:tracks_only` | WRD Execution Profiles |
+| Task | `task:<name>` | `task:contact_map` | WDD Task Registry |
+| Dataset | `data:<name>` | `data:trajectory_frames` | WDD Data Flow Layer |
+| P-C Edge | `pc:<producer>-><consumer>:<pattern>` | `pc:contact_map->aggregate:n_to_1` | WDD Execution Graph |
+| Execution Profile | `profile:<name>` | `profile:tracks_only` | WDD Execution Profiles |
 | Goal | `goal:<name>` | `goal:throughput_10gbs` | GD Goals |
 | Hardware Tier | `tier:<name>` | `tier:burst_buffer` | HRD Storage Hierarchy |
 | Compute Resource Class | `compute:<name>` | `compute:gpu_node` | HRD Compute Topology |
-| DDD Strategy | `deploy:<wrd_id>:<strategy>` | `deploy:f3a9c2e1:throughput` | DDD Header |
+| DDD Strategy | `deploy:<wdd_id>:<strategy>` | `deploy:f3a9c2e1:throughput` | DDD Header |
 | IODD Run | `iodd:<ddd_id>:<run_id>` | `iodd:deploy:f3a9c2e1:throughput:run_042` | IODD Header |
 
 This convention ensures any entity mentioned in one document can be traced to its definition in another, making the full document set navigable by agents without requiring document-aware retrieval infrastructure.
@@ -76,11 +76,11 @@ Different agent tiers in WIDGET consume different subsets of the document stack.
 
 | Agent Tier | Primary Documents | Role |
 |------------|-------------------|------|
-| **Tier 1: Diagnosis (offline)** | WRD + IODD | Match observed I/O patterns to the IPDPS '26 taxonomy. The WRD provides structural context (what the workflow is, what P-C patterns it has); the IODD provides empirical evidence (what I/O actually happened). |
-| **Tier 2: Prescription (advisory)** | WRD + GD + DDD + IODD | Recommend optimizations. Needs the full picture: what the workflow is (WRD), what the operator wants (GD), how it is deployed (DDD), and what I/O emerged (IODD) — to ensure recommendations are compatible with both goals and deployment constraints. |
+| **Tier 1: Diagnosis (offline)** | WDD + IODD | Match observed I/O patterns to the IPDPS '26 taxonomy. The WDD provides structural context (what the workflow is, what P-C patterns it has); the IODD provides empirical evidence (what I/O actually happened). |
+| **Tier 2: Prescription (advisory)** | WDD + GD + DDD + IODD | Recommend optimizations. Needs the full picture: what the workflow is (WDD), what the operator wants (GD), how it is deployed (DDD), and what I/O emerged (IODD) — to ensure recommendations are compatible with both goals and deployment constraints. |
 | **Tier 3: Runtime Orchestration (online)** | DDD + IODD + HRD | Act on live telemetry within deployment constraints. The DDD defines what is allowed; the IODD defines current observed state; the HRD defines what is physically possible. |
 
-The HRD is never needed by Tier 1 diagnosis because diagnosis reasons about workflow structure and observed I/O, not about hardware constraints. The WRD is never the primary document for Tier 3 orchestration because runtime decisions are scoped to the current deployment, not the abstract workflow.
+The HRD is never needed by Tier 1 diagnosis because diagnosis reasons about workflow structure and observed I/O, not about hardware constraints. The WDD is never the primary document for Tier 3 orchestration because runtime decisions are scoped to the current deployment, not the abstract workflow.
 
 ---
 
@@ -89,15 +89,15 @@ The HRD is never needed by Tier 1 diagnosis because diagnosis reasons about work
 Documents are generated in dependency order:
 
 ```
-[1] WRD  ←  workflow source code + scientist questions
+[1] WDD  ←  workflow source code + scientist questions
 [2] GD   ←  operator or facility SLA requirements
 [3] HRD  ←  system documentation + hardware profiling
-[4] DDD  ←  WRD + GD + HRD  (agent-assisted or human operator)
+[4] DDD  ←  WDD + GD + HRD  (agent-assisted or human operator)
 [5] IODD ←  DDD + HRD + profiling tools (DataLife, DaYu, Darshan)
             OR predicted by agent from DDD + HRD before first run
 ```
 
-Step 4 is the primary point where AI agent assistance adds high value: given a WRD, a GD, and an HRD, a prescription agent can propose a DDD that is likely to meet the operator's goals on the target hardware, before any run has executed.
+Step 4 is the primary point where AI agent assistance adds high value: given a WDD, a GD, and an HRD, a prescription agent can propose a DDD that is likely to meet the operator's goals on the target hardware, before any run has executed.
 
 Step 5 can be either empirical (from profiling a completed run) or predictive (agent reasoning from DDD + HRD). Predictive IODDs are generated when the operator wants to evaluate deployment strategies before committing to an allocation.
 
@@ -105,38 +105,38 @@ Step 5 can be either empirical (from profiling a completed run) or predictive (a
 
 ---
 
-# Part I: Workflow Representation Document (WRD)
+# Part I: Workflow Definition Document (WDD)
 
-## WRD Purpose
+## WDD Purpose
 
-The WRD captures the logical structure of a workflow — what it *is*, independent of how it is executed or what hardware it runs on. It is the most stable document in the architecture and the root from which all deployment reasoning flows.
+The WDD captures the logical structure of a workflow — what it *is*, independent of how it is executed or what hardware it runs on. It is the most stable document in the architecture and the root from which all deployment reasoning flows.
 
-**What belongs in the WRD:** logical task structure, task semantics, data flow and dataset descriptions, producer-consumer edge patterns, workflow-level structural classification, loop annotations, execution profiles, and the provenance of how the WRD was compiled.
+**What belongs in the WDD:** logical task structure, task semantics, data flow and dataset descriptions, producer-consumer edge patterns, workflow-level structural classification, loop annotations, execution profiles, and the provenance of how the WDD was compiled.
 
-**What does not belong in the WRD:** parallelism decisions, storage tier assignments, memory estimates, placement policies, hardware-specific constraints, operator performance goals, per-run I/O profiles, or observed bandwidth. These belong in the DDD, HRD, GD, and IODD respectively.
+**What does not belong in the WDD:** parallelism decisions, storage tier assignments, memory estimates, placement policies, hardware-specific constraints, operator performance goals, per-run I/O profiles, or observed bandwidth. These belong in the DDD, HRD, GD, and IODD respectively.
 
 ---
 
-## WRD Design Principles
+## WDD Design Principles
 
 | Principle | Description |
 |-----------|-------------|
 | **Workflow-only scope** | Describes what the workflow is. Deployment decisions live in the DDD. Hardware constraints live in the HRD. |
 | **Scientist-first** | Scientists provide a workflow code file and answer a small number of questions that cannot be answered from code. Everything else is extracted by static analysis or AI compilation. |
-| **Versioned immutability** | Semantically immutable at a given version. Changes produce new versions under the same `workflow_lineage_id`. Companion documents pin to a specific WRD version. |
+| **Versioned immutability** | Semantically immutable at a given version. Changes produce new versions under the same `workflow_lineage_id`. Companion documents pin to a specific WDD version. |
 | **Pattern-aware** | Edges carry P-C cardinality patterns; the workflow carries a structural pattern classification. Agents use these as routing signals rather than re-deriving structure from raw topology. |
 | **Portability** | Compiled from Pegasus DAX, Nextflow, Parsl, Swift/T, Slurm, Snakemake, and other formats. Translation gaps recorded with field-level confidence scores. |
 | **Auditability** | Every agent-inferred field records who filled it, when, and with what confidence. No field is silently empty. |
 
 ---
 
-## WRD Section 1: Workflow Header
+## WDD Section 1: Workflow Header
 
 **Purpose:** Top-level identity, provenance, versioning, and workflow-level structural classification.
 
 **Key fields:**
 - `workflow_lineage_id` — Stable UUID. Never changes across versions. Identifies the workflow concept, not a specific snapshot.
-- `version` — Semantic version string (e.g., `1.2.0`). Incremented on any structural change to the WRD. Data enrichments (measured sizes, profiling refinements) update in place without incrementing the version.
+- `version` — Semantic version string (e.g., `1.2.0`). Incremented on any structural change to the WDD. Data enrichments (measured sizes, profiling refinements) update in place without incrementing the version.
 - `version_notes` — Required changelog entry when version is incremented.
 - `deprecated` — If true, companion documents must not use this version for new deployments.
 - `workflow_name`, `workflow_description` — Human-readable. Description must meet Section 2a quality standards.
@@ -157,7 +157,7 @@ This classification belongs in the header because it is derivable from DAG topol
 
 ---
 
-## WRD Section 2a: Semantic Description Quality Standards
+## WDD Section 2a: Semantic Description Quality Standards
 
 **Applies to:** every natural language description field — workflow, task, and dataset levels.
 
@@ -166,11 +166,11 @@ This classification belongs in the header because it is derivable from DAG topol
 - Task level: what the task does in domain terms, inputs, outputs, why it exists.
 - Dataset level: what the data represents scientifically, format rationale, which tasks depend on it.
 
-**Authoring-time validation:** descriptions shorter than 20 words, or containing only generic verbs with no domain nouns, are flagged as quality warnings in Translation Metadata. Flagged descriptions do not block WRD creation.
+**Authoring-time validation:** descriptions shorter than 20 words, or containing only generic verbs with no domain nouns, are flagged as quality warnings in Translation Metadata. Flagged descriptions do not block WDD creation.
 
 ---
 
-## WRD Section 2: Task Registry
+## WDD Section 2: Task Registry
 
 **Purpose:** The catalog of all tasks. The canonical source of truth for all relationships. The Execution Graph is derived from this section.
 
@@ -185,11 +185,11 @@ This classification belongs in the header because it is derivable from DAG topol
 | `executable_ref` | Script or executable reference. |
 | `task_type` | `compute` \| `io` \| `preprocessing` \| `postprocessing` |
 | `io_dominance` | `compute_bound` \| `io_bound` \| `balanced` \| `unknown`. Agent-inferred; refined by profiling. |
-| `output_class` | `intermediate` \| `checkpoint`. Scientist-provided. See WRD Section 5. |
+| `output_class` | `intermediate` \| `checkpoint`. Scientist-provided. See WDD Section 5. |
 | `contention_sensitivity` | `high` \| `medium` \| `low` \| `unknown`. How sensitive this task's performance is to shared storage contention. Agent-inferred; confirmed by profiling. |
 | `relationships` | Typed, annotated edges to upstream tasks. See relationship schema below. |
-| `loop_annotation` | If the task participates in an iterative structure. See WRD Section 2b. |
-| `temporal_io_annotation` | When I/O occurs relative to compute within this task. See WRD Section 2c. |
+| `loop_annotation` | If the task participates in an iterative structure. See WDD Section 2b. |
+| `temporal_io_annotation` | When I/O occurs relative to compute within this task. See WDD Section 2c. |
 
 **Relationship schema** (each entry in `relationships`):
 
@@ -198,14 +198,14 @@ This classification belongs in the header because it is derivable from DAG topol
 | `type` | `data_dependency` \| `depends_on` \| `optional_after` |
 | `target_task_id` | Upstream task this relationship points to. |
 | `description` | What data or ordering constraint this represents. |
-| `pc_pattern` | P-C cardinality (see WRD Section 2d). Only on `data_dependency` edges. |
+| `pc_pattern` | P-C cardinality (see WDD Section 2d). Only on `data_dependency` edges. |
 | `communication_pattern` | `shared_file` \| `file_per_producer` \| `in_memory` \| `streaming_channel`. Workflow-level hint; DDD may override. |
 | `data_volume_class` | `small` (< 1 GB) \| `medium` (1–100 GB) \| `large` (> 100 GB). Agent-estimated. |
 | `co_scheduling_hint` | `beneficial` \| `neutral` \| `harmful`. Whether co-locating producer and consumer is expected to help. Agent-inferred from `pc_pattern` and `io_phase`. |
 
 ---
 
-## WRD Section 2b: Loop Annotation Model
+## WDD Section 2b: Loop Annotation Model
 
 | Field | Description |
 |-------|-------------|
@@ -227,7 +227,7 @@ This classification belongs in the header because it is derivable from DAG topol
 
 ---
 
-## WRD Section 2c: Temporal I/O Annotation
+## WDD Section 2c: Temporal I/O Annotation
 
 Per-task annotation describing the temporal relationship between I/O and compute. Feeds IODD generation and pipeline overlap reasoning.
 
@@ -241,7 +241,7 @@ Agent-inferred from code analysis; confirmed or refined by DPM traces after firs
 
 ---
 
-## WRD Section 2d: Producer-Consumer Edge Pattern Classification
+## WDD Section 2d: Producer-Consumer Edge Pattern Classification
 
 Cardinality annotation on every `data_dependency` edge. Attached to `relationships` entries and reflected in the Execution Graph.
 
@@ -254,7 +254,7 @@ Cardinality annotation on every `data_dependency` edge. Attached to `relationshi
 
 ---
 
-## WRD Section 3: Execution Graph
+## WDD Section 3: Execution Graph
 
 **Purpose:** Standalone encoding of the workflow DAG. Derived from the Task Registry — never edited directly.
 
@@ -271,7 +271,7 @@ Cardinality annotation on every `data_dependency` edge. Attached to `relationshi
 
 ---
 
-## WRD Section 4: Data Flow Layer
+## WDD Section 4: Data Flow Layer
 
 Two levels with different population timing.
 
@@ -292,7 +292,7 @@ One entry per data artifact flowing between tasks.
 
 ### Section 4b: Dataset Lifecycle Layer (progressively populated)
 
-Logical properties derivable from the DAG; size fields populated from completed runs. These belong in the WRD, not the IODD, because they are hardware-agnostic and the DDD generator needs them to make storage tier and cleanup scheduling decisions.
+Logical properties derivable from the DAG; size fields populated from completed runs. These belong in the WDD, not the IODD, because they are hardware-agnostic and the DDD generator needs them to make storage tier and cleanup scheduling decisions.
 
 | Field | Description |
 |-------|-------------|
@@ -307,15 +307,15 @@ Logical properties derivable from the DAG; size fields populated from completed 
 
 ---
 
-## WRD Section 5: Task Output Classification
+## WDD Section 5: Task Output Classification
 
 Per-task scientific judgment. `intermediate` outputs exist only to pass data to downstream tasks and may be cleaned up after their last consumer completes. `checkpoint` outputs have standalone scientific value and must be assigned to persistent storage by the DDD.
 
-This classification cannot be reliably inferred by static analysis. It is the primary non-trivial question the agent asks the scientist during WRD compilation.
+This classification cannot be reliably inferred by static analysis. It is the primary non-trivial question the agent asks the scientist during WDD compilation.
 
 ---
 
-## WRD Section 6: Execution Profiles
+## WDD Section 6: Execution Profiles
 
 Named, valid partial execution subsets representing scientifically meaningful stopping points.
 
@@ -329,25 +329,25 @@ Named, valid partial execution subsets representing scientifically meaningful st
 
 ---
 
-## WRD Section 7: Translation Metadata
+## WDD Section 7: Translation Metadata
 
-Full provenance of how this WRD was produced.
+Full provenance of how this WDD was produced.
 
 | Field | Description |
 |-------|-------------|
-| `source_format`, `source_file` | Origin of the WRD. |
-| `translation_tool` | Agent or tool name and version that compiled this WRD. |
+| `source_format`, `source_file` | Origin of the WDD. |
+| `translation_tool` | Agent or tool name and version that compiled this WDD. |
 | `translation_timestamp` | When the compilation occurred. |
 | `unmapped_fields` | Fields that could not be populated from the source, with reasons. |
-| `round_trip_gaps` | Fields that would be lost if this WRD were compiled back to the source format. |
+| `round_trip_gaps` | Fields that would be lost if this WDD were compiled back to the source format. |
 | `quality_warnings` | Description fields flagged by authoring-time validation. |
 | `field_confidence_records` | One record per agent-inferred field: `field_path`, `filled_by`, `confidence_level` (`high` \| `medium` \| `low` \| `inferred`), `confidence_reason`, `requires_human_review`. |
 
 ---
 
-## WRD Population Sources
+## WDD Population Sources
 
-| WRD Content | Source |
+| WDD Content | Source |
 |-------------|--------|
 | Task list, names, executables | Static analysis of workflow code |
 | Task dependency graph | Static analysis (Nextflow channels, Pegasus DAX edges, Parsl `depends_on`, Slurm `--dependency`, etc.) |
@@ -376,7 +376,7 @@ Full provenance of how this WRD was produced.
 
 The GD captures the operator's performance objectives and constraints that motivate a particular deployment strategy. It encodes *intent* — why the operator chose a particular configuration. Every decision in the DDD must back-reference a GD goal ID. Without the GD, deployment decisions are opaque; a prescription agent cannot evaluate whether a recommendation is aligned with what the operator actually wants.
 
-The GD is a side input to the WRD → DDD step. It does not describe the workflow, the hardware, or the deployment — it describes what success looks like for this run.
+The GD is a side input to the WDD → DDD step. It does not describe the workflow, the hardware, or the deployment — it describes what success looks like for this run.
 
 ---
 
@@ -396,8 +396,8 @@ The GD is a side input to the WRD → DDD step. It does not describe the workflo
 | Field | Description |
 |-------|-------------|
 | `gd_id` | Stable identifier for this goal set. |
-| `wrd_lineage_id` | The `workflow_lineage_id` this GD applies to. A GD is always scoped to a specific workflow. |
-| `wrd_version` | The WRD version this GD was authored against. |
+| `wdd_lineage_id` | The `workflow_lineage_id` this GD applies to. A GD is always scoped to a specific workflow. |
+| `wdd_version` | The WDD version this GD was authored against. |
 | `operator` | Name or role of the operator or team defining these goals. |
 | `created_at`, `last_modified_at` | Timestamps. |
 | `description` | Plain-language summary of the operational context (e.g., "Production 40-year reanalysis run for CMIP7 submission; throughput is the primary concern"). |
@@ -440,7 +440,7 @@ Constraints that the DDD must not violate. Distinct from hard-constraint goals (
 |-------|-------------|
 | `constraint_id` | Stable identifier (e.g., `goal:must_use_pfs_for_checkpoints`). |
 | `description` | Plain-language statement (e.g., "checkpoint datasets must be written to the parallel filesystem, not burst buffer"). |
-| `applies_to` | Which WRD entities this constraint applies to — a `task_id`, `dataset_id`, or `all`. |
+| `applies_to` | Which WDD entities this constraint applies to — a `task_id`, `dataset_id`, or `all`. |
 | `rationale` | Why this constraint exists (e.g., "checkpoint files must survive node failure; burst buffer is not fault-tolerant on this system"). |
 
 ---
@@ -449,8 +449,8 @@ Constraints that the DDD must not violate. Distinct from hard-constraint goals (
 
 ```yaml
 gd_id: "gd:storm_tracking:production_cmip7"
-wrd_lineage_id: "f3a9c2e1-847b-4d02-b6f1-2c3d4e5f6a7b"
-wrd_version: "1.0.0"
+wdd_lineage_id: "f3a9c2e1-847b-4d02-b6f1-2c3d4e5f6a7b"
+wdd_version: "1.0.0"
 operator: "NCAR Mesoscale Dynamics Group"
 description: >
   Production 40-year reanalysis run for CMIP7 submission.
@@ -629,11 +629,11 @@ Empirical measurements and known system behaviors that are not captured by the p
 
 ## DDD Purpose
 
-The DDD defines how a workflow is deployed to achieve a specific set of goals on specific hardware. It is the execution strategy layer — bridging the logical workflow structure (WRD) with the physical constraints (HRD) in pursuit of the operator's objectives (GD).
+The DDD defines how a workflow is deployed to achieve a specific set of goals on specific hardware. It is the execution strategy layer — bridging the logical workflow structure (WDD) with the physical constraints (HRD) in pursuit of the operator's objectives (GD).
 
 Every decision in the DDD is motivated by a GD goal and constrained by HRD capacity. The DDD makes this motivation explicit through `goal_ref` back-references on every decision field. This is what makes the DDD the primary document a prescription agent consults when evaluating whether a recommendation is feasible and aligned with operator intent.
 
-A single WRD can have multiple DDDs representing different deployment strategies (e.g., throughput-optimized, cost-optimized, latency-optimized). Each DDD is a self-contained, versioned document.
+A single WDD can have multiple DDDs representing different deployment strategies (e.g., throughput-optimized, cost-optimized, latency-optimized). Each DDD is a self-contained, versioned document.
 
 ---
 
@@ -643,9 +643,9 @@ A single WRD can have multiple DDDs representing different deployment strategies
 |-----------|-------------|
 | **Decision + motivation** | Every deployment decision records both what was decided and which GD goal motivated it. Decisions without `goal_ref` are flagged as incomplete. |
 | **Hardware-referenced** | Storage tier assignments and compute resource choices reference HRD IDs, not hardcoded names. |
-| **WRD-version-pinned** | Every DDD pins to a specific WRD version and HRD version. If either changes, the DDD must be re-validated. |
-| **One-to-many** | A single WRD can have multiple DDDs. Each represents a distinct deployment strategy. |
-| **Agent-generatable** | The DDD is the primary document an AI prescription agent produces when given a WRD + GD + HRD. |
+| **WDD-version-pinned** | Every DDD pins to a specific WDD version and HRD version. If either changes, the DDD must be re-validated. |
+| **One-to-many** | A single WDD can have multiple DDDs. Each represents a distinct deployment strategy. |
+| **Agent-generatable** | The DDD is the primary document an AI prescription agent produces when given a WDD + GD + HRD. |
 
 ---
 
@@ -653,14 +653,14 @@ A single WRD can have multiple DDDs representing different deployment strategies
 
 | Field | Description |
 |-------|-------------|
-| `ddd_id` | Stable identifier. Format: `deploy:<wrd_lineage_id>:<strategy_name>`. |
+| `ddd_id` | Stable identifier. Format: `deploy:<wdd_lineage_id>:<strategy_name>`. |
 | `strategy_name` | Short label for this deployment strategy (e.g., `throughput_optimized`, `cost_optimized`). |
-| `wrd_lineage_id` | The WRD this DDD is derived from. |
-| `wrd_version` | The specific WRD version this DDD was generated against. Must be re-validated if WRD version changes. |
+| `wdd_lineage_id` | The WDD this DDD is derived from. |
+| `wdd_version` | The specific WDD version this DDD was generated against. Must be re-validated if WDD version changes. |
 | `hrd_id` | The HRD this DDD targets. |
 | `hrd_version` | The specific HRD version. |
 | `gd_id` | The GD that motivated this deployment strategy. |
-| `execution_profile` | Which WRD execution profile this DDD is designed for (e.g., `profile:full`). |
+| `execution_profile` | Which WDD execution profile this DDD is designed for (e.g., `profile:full`). |
 | `generated_by` | Agent or human operator that produced this DDD. |
 | `generated_at` | Timestamp. |
 | `description` | Plain-language summary of this deployment strategy and its primary tradeoffs. |
@@ -669,11 +669,11 @@ A single WRD can have multiple DDDs representing different deployment strategies
 
 ## DDD Section 2: Per-Task Parallelism
 
-One entry per task in the WRD Task Registry.
+One entry per task in the WDD Task Registry.
 
 | Field | Description |
 |-------|-------------|
-| `task_id` | References `task:<name>` from the WRD. |
+| `task_id` | References `task:<name>` from the WDD. |
 | `parallelism_instances` | Number of concurrent task instances. |
 | `ranks_per_instance` | MPI ranks (or equivalent) per task instance. |
 | `threads_per_rank` | OpenMP threads (or equivalent) per rank. |
@@ -685,18 +685,18 @@ One entry per task in the WRD Task Registry.
 
 ## DDD Section 3: Storage Tier Assignments
 
-One entry per dataset in the WRD Data Flow Layer.
+One entry per dataset in the WDD Data Flow Layer.
 
 | Field | Description |
 |-------|-------------|
-| `dataset_id` | References `data:<name>` from the WRD. |
+| `dataset_id` | References `data:<name>` from the WDD. |
 | `assigned_tier` | `tier_id` from HRD. |
-| `cleanup_policy` | `after_last_consumer` \| `end_of_job` \| `retain_indefinitely`. For intermediate datasets, the DDD may schedule cleanup based on WRD `retention_window`. |
+| `cleanup_policy` | `after_last_consumer` \| `end_of_job` \| `retain_indefinitely`. For intermediate datasets, the DDD may schedule cleanup based on WDD `retention_window`. |
 | `replication` | Whether this dataset is replicated for fault tolerance. Boolean. |
-| `caching_policy` | `none` \| `cache_on_first_read` \| `prefetch`. Relevant for datasets read multiple times (informed by WRD `access_frequency_class`). |
+| `caching_policy` | `none` \| `cache_on_first_read` \| `prefetch`. Relevant for datasets read multiple times (informed by WDD `access_frequency_class`). |
 | `goal_ref` | `goal_id` motivating this tier assignment. |
 | `rationale` | Why this tier was chosen (e.g., "large intermediate dataset; burst buffer provides sufficient bandwidth and capacity, reducing PFS contention"). |
-| `feasibility_check` | Whether the HRD tier has sufficient capacity and bandwidth for this dataset. `pass` \| `warning` \| `fail`. Computed from WRD `size_measured_bytes` and HRD `per_job_capacity_tb`. |
+| `feasibility_check` | Whether the HRD tier has sufficient capacity and bandwidth for this dataset. `pass` \| `warning` \| `fail`. Computed from WDD `size_measured_bytes` and HRD `per_job_capacity_tb`. |
 
 ---
 
@@ -709,7 +709,7 @@ One entry per dataset in the WRD Data Flow Layer.
 | `placement_policy` | `co_locate` (same node or node group) \| `spread` (distribute across nodes) \| `no_constraint` |
 | `co_schedule` | Whether these tasks should overlap in time. Boolean. |
 | `goal_ref` | `goal_id` motivating this placement decision. |
-| `rationale` | Typically references WRD `co_scheduling_hint` on the relevant P-C edges. |
+| `rationale` | Typically references WDD `co_scheduling_hint` on the relevant P-C edges. |
 
 ---
 
@@ -777,7 +777,7 @@ All bound to a specific deployment on specific hardware.
 | **Run-scoped** | Every IODD is tied to a specific DDD + HRD + run. Multiple runs of the same DDD produce separate IODDs. |
 | **Empirical or predictive** | Empirical IODDs come from profiling. Predictive IODDs are agent-generated estimates; they carry a `predictive: true` flag and confidence records. |
 | **Diagnosis-ready** | Structured to directly feed Tier 1 diagnosis agents. Fields map to the IPDPS '26 I/O pattern taxonomy. |
-| **Cross-referenceable** | References WRD, DDD, and HRD IDs throughout so any observed I/O characteristic can be traced to the workflow structure, deployment decision, and hardware tier that produced it. |
+| **Cross-referenceable** | References WDD, DDD, and HRD IDs throughout so any observed I/O characteristic can be traced to the workflow structure, deployment decision, and hardware tier that produced it. |
 
 ---
 
@@ -788,7 +788,7 @@ All bound to a specific deployment on specific hardware.
 | `iodd_id` | Stable identifier. Format: `iodd:<ddd_id>:<run_id>`. |
 | `ddd_id` | The DDD that was executed. |
 | `hrd_id` | The HRD on which execution occurred. |
-| `wrd_lineage_id` | Back-reference to the originating WRD. |
+| `wdd_lineage_id` | Back-reference to the originating WDD. |
 | `run_id` | Identifier of the specific execution run. |
 | `run_start`, `run_end` | ISO 8601 timestamps. |
 | `predictive` | Boolean. If true, this IODD was agent-generated from DDD + HRD, not from profiling. |
@@ -803,7 +803,7 @@ One entry per task instance in the execution. For loop tasks, one entry per loop
 
 | Field | Description |
 |-------|-------------|
-| `task_id` | References `task:<name>` from WRD. |
+| `task_id` | References `task:<name>` from WDD. |
 | `instance_id` | Instance index for parallel or loop tasks. |
 | `storage_tier_used` | `tier_id` from HRD (may differ from DDD assignment if runtime routing occurred). |
 | `bytes_read` | Total bytes read. |
@@ -821,7 +821,7 @@ One entry per task instance in the execution. For loop tasks, one entry per loop
 | `posix_write_time_s` | Cumulative time spent in write() calls. |
 | `posix_close_time_s` | Cumulative time spent in close() calls. |
 | `access_pattern_observed` | `sequential` \| `random` \| `strided` \| `mixed`. |
-| `io_phase_observed` | `upfront` \| `streaming` \| `deferred` \| `mixed`. Compared to WRD `temporal_io_annotation.io_phase` to detect anomalies. |
+| `io_phase_observed` | `upfront` \| `streaming` \| `deferred` \| `mixed`. Compared to WDD `temporal_io_annotation.io_phase` to detect anomalies. |
 | `compute_to_io_ratio` | Fraction of task wall time spent in I/O. |
 | `contention_events` | Number of detected contention events (lock waits, bandwidth throttling). |
 | `dpm_trace_ref` | Reference to the DPM trace file or database entry. |
@@ -830,11 +830,11 @@ One entry per task instance in the execution. For loop tasks, one entry per loop
 
 ## IODD Section 3: Communication Channel Definitions
 
-One entry per P-C edge in the WRD Execution Graph that was active in this run.
+One entry per P-C edge in the WDD Execution Graph that was active in this run.
 
 | Field | Description |
 |-------|-------------|
-| `pc_edge_id` | References `pc:<producer>-><consumer>:<pattern>` from WRD. |
+| `pc_edge_id` | References `pc:<producer>-><consumer>:<pattern>` from WDD. |
 | `physical_path` | How data actually moved: `shared_file_on_pfs` \| `staged_through_burst_buffer` \| `node_local_transfer` \| `in_memory_mpi` \| `streaming_pipe` |
 | `tier_id` | `tier_id` from HRD where this data resided during transfer. |
 | `data_volume_bytes` | Total bytes transferred on this channel. |
@@ -847,12 +847,12 @@ One entry per P-C edge in the WRD Execution Graph that was active in this run.
 
 ## IODD Section 4: Data Format Observations
 
-Per-dataset format details observed at runtime, supplementing the WRD `format_internals` with empirical confirmation or corrections.
+Per-dataset format details observed at runtime, supplementing the WDD `format_internals` with empirical confirmation or corrections.
 
 | Field | Description |
 |-------|-------------|
-| `dataset_id` | References `data:<name>` from WRD. |
-| `actual_file_format` | What was actually observed (may differ from WRD declaration if format conversion occurred). |
+| `dataset_id` | References `data:<name>` from WDD. |
+| `actual_file_format` | What was actually observed (may differ from WDD declaration if format conversion occurred). |
 | `actual_chunk_size_bytes` | Observed chunk or request size. |
 | `actual_compression` | Whether compression was active. |
 | `variable_length_data` | Whether variable-length records were observed. |
@@ -874,7 +874,7 @@ System-level view of when I/O occurred across the full workflow execution.
 | `inter_burst_gap_s` | Average time between I/O bursts (for bursty tasks). |
 | `compute_io_overlap_fraction` | Fraction of task wall time where compute and I/O were simultaneous. |
 | `pipeline_overlap_observed` | Whether this task's I/O overlapped with an adjacent task's compute. Boolean. |
-| `match_wrd_io_phase` | Whether observed `io_phase` matched WRD `temporal_io_annotation.io_phase`. Boolean. Mismatches flag for WRD update. |
+| `match_wdd_io_phase` | Whether observed `io_phase` matched WDD `temporal_io_annotation.io_phase`. Boolean. Mismatches flag for WDD update. |
 
 ---
 
@@ -898,7 +898,7 @@ DataLife-style tracking of individual file lifecycle within the run. Enables fin
 
 | Field | Description |
 |-------|-------------|
-| `dataset_id` | References `data:<name>` from WRD. |
+| `dataset_id` | References `data:<name>` from WDD. |
 | `file_path` | Actual filesystem path observed. |
 | `created_at_offset_s` | Seconds after run start when file was created. |
 | `first_read_at_offset_s` | Seconds after run start of first read access. |
@@ -909,7 +909,7 @@ DataLife-style tracking of individual file lifecycle within the run. Enables fin
 | `size_bytes` | Observed file size. |
 | `idle_time_s` | Time between last write and first read (staging gap). |
 | `lifetime_s` | Time from creation to deletion (or end of run if not deleted). |
-| `match_wrd_retention` | Whether actual lifetime matches WRD `retention_window` expectation. Boolean. |
+| `match_wdd_retention` | Whether actual lifetime matches WDD `retention_window` expectation. Boolean. |
 
 ---
 
@@ -919,11 +919,11 @@ A machine-readable diagnosis of the run's I/O behavior, structured to directly f
 
 | Field | Description |
 |-------|-------------|
-| `overall_io_pattern` | The observed workflow-level I/O pattern: `pipeline` \| `scatter_gather` \| `iterative` \| `cascading` \| `hybrid`. Should match WRD `workflow_pattern` if the deployment behaved as designed. |
-| `pattern_match_wrd` | Whether observed I/O pattern matches WRD `workflow_pattern`. Mismatch is a significant diagnostic signal. |
+| `overall_io_pattern` | The observed workflow-level I/O pattern: `pipeline` \| `scatter_gather` \| `iterative` \| `cascading` \| `hybrid`. Should match WDD `workflow_pattern` if the deployment behaved as designed. |
+| `pattern_match_wdd` | Whether observed I/O pattern matches WDD `workflow_pattern`. Mismatch is a significant diagnostic signal. |
 | `bottleneck_summary` | List of identified bottlenecks: `{task_id or tier_id, bottleneck_type, severity: high/medium/low, description}`. |
 | `optimization_opportunities` | List of potential optimizations surfaced from the data: `{opportunity_type, affected_entities, estimated_impact, evidence}`. |
-| `anomalies` | Fields where observed values diverged significantly from WRD annotations or DDD decisions, warranting investigation. |
+| `anomalies` | Fields where observed values diverged significantly from WDD annotations or DDD decisions, warranting investigation. |
 
 ---
 
@@ -934,7 +934,7 @@ A machine-readable diagnosis of the run's I/O behavior, structured to directly f
 ## Document Structure at a Glance
 
 ```
-WRD  (what the workflow IS — stable, hardware-agnostic, deployment-agnostic)
+WDD  (what the workflow IS — stable, hardware-agnostic, deployment-agnostic)
 │
 ├── Header: workflow_lineage_id, version, workflow_pattern
 ├── Task Registry: task_id, semantic_description, functional_role,
@@ -952,7 +952,7 @@ WRD  (what the workflow IS — stable, hardware-agnostic, deployment-agnostic)
 
 GD  (what the operator WANTS — scoped to a workflow + operator context)
 │
-├── Header: gd_id, wrd_lineage_id, operator
+├── Header: gd_id, wdd_lineage_id, operator
 ├── Goals: goal_id, goal_type, metric, target_value, constraint_type, priority
 ├── Conflict Resolution: priority_ordering, resolution_notes
 └── Hard Constraints: constraint_id, applies_to, rationale
@@ -966,9 +966,9 @@ HRD  (what the hardware PROVIDES — scoped to a system)
 │   persistence, contention_model
 └── Empirical Benchmarks: measurement_id, tier, measured_value, conditions
 
-DDD  (how the workflow is DEPLOYED — references WRD + GD + HRD)
+DDD  (how the workflow is DEPLOYED — references WDD + GD + HRD)
 │
-├── Header: ddd_id, wrd_version, hrd_version, gd_id, execution_profile
+├── Header: ddd_id, wdd_version, hrd_version, gd_id, execution_profile
 ├── Per-Task Parallelism: task_id → instances, ranks, compute_id, goal_ref
 ├── Storage Tier Assignments: dataset_id → tier_id, cleanup_policy,
 │   replication, feasibility_check, goal_ref
@@ -990,10 +990,10 @@ IODD  (what I/O HAPPENED — references DDD + HRD, per run)
 ├── Data Format Observations: dataset_id, actual_format, chunk_size,
 │   metadata_fraction
 ├── Temporal I/O Behavior: task_id, io_burst_count, overlap_observed,
-│   match_wrd_io_phase
+│   match_wdd_io_phase
 ├── Contention and Interference: tier_id, degradation_factor, affected_tasks
 ├── Per-File Lifecycle: dataset_id, created/read/deleted timestamps,
-│   idle_time, lifetime, match_wrd_retention
+│   idle_time, lifetime, match_wdd_retention
 └── Diagnosis Summary: overall_io_pattern, bottleneck_summary,
     optimization_opportunities, anomalies
 ```
@@ -1004,10 +1004,10 @@ IODD  (what I/O HAPPENED — references DDD + HRD, per run)
 
 | Document | Inputs Required to Generate |
 |----------|-----------------------------|
-| WRD | Workflow source code file + scientist answers one question (output_class per task) |
+| WDD | Workflow source code file + scientist answers one question (output_class per task) |
 | GD | Operator objectives + facility SLA |
 | HRD | System documentation + hardware profiling benchmarks |
-| DDD | WRD + GD + HRD |
+| DDD | WDD + GD + HRD |
 | IODD (empirical) | Completed run with profiling tools (DataLife, DaYu, Darshan) + DDD + HRD |
 | IODD (predictive) | DDD + HRD + agent reasoning |
 
@@ -1017,11 +1017,11 @@ IODD  (what I/O HAPPENED — references DDD + HRD, per run)
 
 | Area | Change |
 |------|--------|
-| Scope of document | Extended from WRD-only to full five-document architecture. WRD content unchanged from v3. |
+| Scope of document | Extended from WDD-only to full five-document architecture. WDD content unchanged from v3. |
 | GD (Goal Document) | **Fully specified.** Header, Goals with typed fields and priority ordering, Conflict Resolution Policy, Hard Constraints, YAML example. |
 | HRD (Hardware Resource Document) | **Fully specified.** Header, Compute Topology with `compute_id`, Network Fabric with `interconnect_id`, Storage Hierarchy with `tier_id` and Contention Model per tier, Empirical Benchmarks section. |
-| DDD (Deployment Definition Document) | **Fully specified.** Header with WRD + HRD + GD version pins, Per-Task Parallelism with `goal_ref` on every field, Storage Tier Assignments with feasibility checks against HRD, Task Placement and Co-scheduling, Pipelining Decisions, Replication/Caching Strategy, Validation Summary. |
-| IODD (I/O Definition Document) | **Fully specified.** Header with `predictive` flag, Per-Task I/O Profile with full POSIX metrics and phase comparison to WRD, Communication Channel Definitions per P-C edge, Data Format Observations, Temporal I/O Behavior, Contention and Interference model, Per-File Lifecycle (DataLife-style), Diagnosis Summary for Tier 1 agents. |
+| DDD (Deployment Definition Document) | **Fully specified.** Header with WDD + HRD + GD version pins, Per-Task Parallelism with `goal_ref` on every field, Storage Tier Assignments with feasibility checks against HRD, Task Placement and Co-scheduling, Pipelining Decisions, Replication/Caching Strategy, Validation Summary. |
+| IODD (I/O Definition Document) | **Fully specified.** Header with `predictive` flag, Per-Task I/O Profile with full POSIX metrics and phase comparison to WDD, Communication Channel Definitions per P-C edge, Data Format Observations, Temporal I/O Behavior, Contention and Interference model, Per-File Lifecycle (DataLife-style), Diagnosis Summary for Tier 1 agents. |
 | Cross-reference ID convention | **Formalized.** All five documents share a common ID namespace. `task:`, `data:`, `pc:`, `tier:`, `compute:`, `goal:`, `deploy:`, `iodd:` prefixes defined. |
 | Agent context scoping table | **Added.** Maps each agent tier (Diagnosis, Prescription, Orchestration) to its primary documents with rationale. |
 | Generation pipeline | **Extended.** Steps 1–5 with emphasis on step 4 (DDD generation) as the primary AI agent value-add point. |

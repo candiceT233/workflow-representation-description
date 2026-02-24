@@ -8,17 +8,17 @@ Question to anwer: how we structure the data so that the agent can answer our qu
 Use natrual language to asks information about the workflow, how much the agent know about the workflow already with just:
 - understanding the workflow repo vs. 
 - a claude detailed summary in natural language vs.
-- the token of understanding the workflow from template_WRD.yaml
+- the token of understanding the workflow from template_WDD.yaml
 
-How transferable is the template_WRD.yml
+How transferable is the template_WDD.yml
 - compare it with a claude detailed summary
 
 # 2. qualitative
 compare token of understanding the workflow repo vs. 
 - a claude detailed summary in natural language
-- the token of understanding the workflow from template_WRD.yaml
+- the token of understanding the workflow from template_WDD.yaml
 
-How transferable is the template_WRD.yml
+How transferable is the template_WDD.yml
 - compare it with a claude detailed summary
 
 # further down
