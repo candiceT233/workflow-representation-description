@@ -1,6 +1,6 @@
 # =============================================================================
 # WIDGET — Hardware Resource Document (HRD) Agent Template
-# Schema: hrd-5.0  |  Architecture Design: v5
+# Schema: hrd-5.0  |  Architecture Design: v6
 #
 # PURPOSE
 # The HRD describes the physical hardware on which a deployment executes —

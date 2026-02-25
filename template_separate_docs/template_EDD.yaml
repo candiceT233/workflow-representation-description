@@ -1,0 +1,569 @@
+# =============================================================================
+# WIDGET — Experiment Definition Document (EDD) Agent Template
+# Schema: edd-1.0  |  Architecture Design: v6
+#
+# PURPOSE
+# The EDD resolves the experiment-specific unknowns that the WDD documents
+# but cannot resolve from static analysis alone. It is generated in two
+# phases:
+#
+#   Phase 1 — STATIC (generated alongside the WDD from code analysis):
+#     What parameters exist, what they control, what values are possible.
+#     This phase is stable across all experiments on this workflow.
+#
+#   Phase 2 — INSTANCE (filled by scientist before each submission):
+#     Concrete parameter values, resolved cardinalities, selected execution
+#     path, hardware floor implied by those choices.
+#
+# RELATIONSHIP: EDD = f(WDD, input)
+#   WDD provides the structural skeleton and variability annotations.
+#   EDD resolves them into a concrete experiment instance.
+#   DDD reads WDD + EDD + GD + HRD to generate a deployment plan.
+#
+# FIELD STATUS MODEL
+#   required_static      Derivable from static code analysis of the workflow
+#                        repository. Populated alongside the WDD. Stable
+#                        across all experiments on this workflow.
+#
+#   required_instance    Requires a human decision. The scientist must
+#                        provide the value before DDD generation can begin.
+#                        Agent prompts the scientist for each of these.
+#
+#   required_derived     Computed automatically once all required_instance
+#                        fields are filled. Never manually specified.
+#                        Agent computes from resolved parameter values.
+#
+# COMPLETENESS GATE
+# The EDD is ready for DDD generation when:
+#   [ ] All required_static fields are non-null
+#   [ ] All required_instance fields are non-null
+#   [ ] All required_derived fields have been computed
+#   [ ] No experiment_parameters[*].validation_check == "fail"
+#   [ ] resolved_cardinalities has one entry per data object with
+#       cardinality_source.type != fixed in the WDD
+#   [ ] hardware_floor has been computed from resolved parameter values
+#   [ ] target_system in execution_context matches an available HRD
+#
+# VERSIONING
+#   experiment_lineage_id  Stable UUID for a given experiment configuration.
+#                          Shared by all re-runs of the same parameters.
+#   version                Semantic version. Increment when parameters change.
+#   instance_id            Unique per submission — even if parameters are
+#                          identical to a prior run. Links to IODD run records.
+#
+# ID NAMESPACE
+#   EDD:        edd:<wrd_lineage_id_short>:<experiment_name>
+#   Parameters: param:<descriptor>   e.g. param:n_simulations
+#   (All task:, data:, tier:, compute: IDs reference the WDD/HRD — not
+#    redefined here.)
+# =============================================================================
+
+
+# -----------------------------------------------------------------------------
+# METADATA
+# -----------------------------------------------------------------------------
+metadata:
+
+  # --- Experiment configuration identity ---
+  experiment_lineage_id:
+    _status: required_instance
+    _prompt: >
+      I will generate a stable UUID for this experiment configuration.
+      Confirm: is this a new experiment configuration (new UUID needed),
+      or a re-run of an existing configuration (provide existing lineage_id)?
+    _extract: >
+      Generate a new UUID v4 for a new experiment configuration.
+      Preserve existing lineage_id when resubmitting with the same parameters.
+      Two runs with identical parameters share this ID; they differ by instance_id.
+    _value: null
+
+  version:
+    _status: required_instance
+    _prompt: >
+      What version is this experiment configuration?
+      Use "1.0.0" for first creation.
+      Increment the minor version when resolved_values change significantly
+      (e.g., n_simulations 12 → 48).
+      Increment the patch version for minor corrections (description fixes,
+      notes updates).
+    _value: null
+
+  version_notes:
+    _status: required_instance
+    _prompt: >
+      Briefly describe what this version represents.
+      First version: "Initial experiment configuration."
+      Updates: describe what parameter values changed and why.
+    _value: null
+
+  # --- Run instance identity ---
+  instance_id:
+    _status: required_instance
+    _extract: >
+      Generate a fresh UUID v4 for every new submission, even if parameters
+      are identical to a prior run. If a scheduler job ID is available at
+      submission time, use that instead (e.g., Slurm job ID).
+      This is the field that links to IODD run records.
+    _value: null
+
+  # --- WDD pin ---
+  wrd_lineage_id:
+    _status: required_static
+    _extract: Copied from WDD metadata.workflow_lineage_id.
+    _value: null
+
+  wrd_version:
+    _status: required_static
+    _extract: >
+      Copied from WDD metadata.version at the time this EDD was compiled.
+      If the WDD version changes structurally after this EDD was created,
+      re-validate before generating a new DDD.
+    _value: null
+
+  schema_version:
+    _status: required_static
+    _extract: Always set to "edd-1.0".
+    _value: "edd-1.0"
+
+  # --- Human-readable identity ---
+  experiment_name:
+    _status: required_instance
+    _prompt: >
+      Please provide a short name for this experiment configuration.
+      This should be descriptive enough to distinguish it from other
+      experiments on the same workflow.
+      Examples: "1000_genomes_chr1_22_full", "ddmd_12sim_40gpu",
+      "montage_0.5deg_lustre", "pyflex_250km_production"
+    _format: "snake_case, no spaces"
+    _value: null
+
+  experiment_description:
+    _status: required_instance
+    _prompt: >
+      Please describe this experiment in 2-4 sentences.
+      Include: what scientific question it addresses, what distinguishes
+      it from other experiments on the same workflow, and what input data
+      it operates on.
+    _quality_check: { min_words: 20 }
+    _value: null
+
+  # --- Provenance ---
+  submitted_by:
+    _status: required_instance
+    _prompt: >
+      Please provide your name and affiliation.
+      (e.g., "Dr. Jane Smith, Research Scientist, IIT")
+    _value: null
+
+  submitted_at:
+    _status: required_instance
+    _extract: ISO 8601 timestamp at EDD instance creation time.
+    _value: null
+
+  generated_by:
+    _status: required_static
+    _extract: >
+      Name and version of the agent that populated the static phase
+      (e.g., "claude-code-3.7"). Same agent that compiled the WDD.
+    _value: null
+
+
+# -----------------------------------------------------------------------------
+# SECTION A: EXPERIMENT PARAMETER CATALOG
+# One entry per configurable parameter discovered during static analysis.
+# Each entry has a required_static skeleton (Phase 1) and a
+# required_instance resolved_value (Phase 2).
+#
+# WHAT COUNTS AS AN EXPERIMENT PARAMETER?
+# Any value read from a config file, CLI argument, or environment variable
+# that affects the STRUCTURE of workflow execution:
+#   - Number of task instances spawned (affects cardinality)
+#   - Which datasets are processed (affects data flow scope)
+#   - Which execution path is taken (cpu vs. gpu, large vs. small model)
+#   - What files are consumed or produced (input path, output path)
+#
+# Does NOT include purely scientific tuning parameters that don't affect
+# data flow structure (e.g., optimizer learning rate, convergence tolerance,
+# physical model constants) — those are scientific choices captured in
+# experiment_description, not structural parameters.
+#
+# DISCOVERY PROTOCOL (Phase 1):
+#   1. Scan all config files in the repo (*.yaml, *.json, *.cfg, *.ini,
+#      *.toml, run_*.sh, submit_*.sh)
+#   2. Scan argparse definitions in Python scripts
+#   3. Scan os.environ.get() and os.getenv() calls
+#   4. Cross-reference against WDD cardinality_source.controlling_parameter
+#      and hardware_path.execution_alternatives to identify structural params
+#   5. Create one parameter entry for every parameter that appears in WDD
+#      cross-references; optionally include others that affect input paths
+# -----------------------------------------------------------------------------
+experiment_parameters:
+  # Agent populates as a list of parameter entries matching _param_schema.
+
+  _param_schema:
+
+    parameter_id:
+      _status: required_static
+      _extract: >
+        Short snake_case identifier matching the parameter name as used in
+        code. Use the same name as WDD cardinality_source.controlling_parameter
+        where applicable. Format: param:<descriptor>
+        Examples: param:n_simulations, param:n_chromosomes, param:device_type
+      _value: null
+
+    display_name:
+      _status: required_static
+      _extract: Human-readable parameter name.
+      _value: null
+
+    description:
+      _status: required_static
+      _extract: >
+        What does this parameter control? How does changing it affect the
+        workflow structure — which cardinalities change, which execution paths
+        are selected, which data objects are scoped in or out?
+      _value: null
+
+    source_file:
+      _status: required_static
+      _extract: >
+        Relative path (from repo root) to the file where this parameter
+        is defined or read. Examples: "config/run_config.yaml",
+        "workflow/submit.sh", "src/main.py"
+      _value: null
+
+    source_location:
+      _status: required_static
+      _extract: >
+        Specific location within source_file.
+        For config files: the YAML/JSON key path (e.g., "simulation.n_replicas")
+        For Python scripts: "file.py:line_number" or "argparse argument name"
+        For shell scripts: "variable name or line reference"
+      _value: null
+
+    parameter_type:
+      _status: required_static
+      _allowed_values: [integer, float, string, boolean, enum, path, list]
+      _value: null
+
+    possible_values:
+      _status: required_static
+      _extract: >
+        Range or enumeration if statically determinable from code:
+          - Explicit validation in code: "1–22 (from assert 1 <= n <= 22)"
+          - argparse choices= or type= with range validator: list them
+          - Hardcoded iteration list: enumerate the values
+          - Enum class or constant dict: list all values
+          - Unconstrained: write "any positive integer", "any valid path", etc.
+        Always prefer specificity. The agent must read validation code carefully.
+      _value: null
+
+    default_value:
+      _status: required_static
+      _extract: >
+        Default value if defined in code (argparse default=, config file
+        default section, or env var fallback value). Null if no default.
+      _value: null
+
+    affects:
+      _status: required_static
+      _extract: >
+        Cross-reference against WDD to identify what this parameter controls.
+        Auto-derive by searching WDD for:
+          cardinality_source.controlling_parameter == this parameter_id
+          hardware_path.execution_alternatives[*].condition referencing this parameter
+      _cardinalities:
+        _extract: >
+          List data_ids from WDD data_objects where
+          cardinality_source.controlling_parameter matches this parameter_id.
+          Empty list if no data object cardinalities depend on this parameter.
+        _value: []
+      _hardware_paths:
+        _extract: >
+          List task_ids from WDD tasks where
+          hardware_path.has_conditional_execution = true and the condition
+          references this parameter.
+          Empty list if no hardware paths depend on this parameter.
+        _value: []
+      _data_objects_in_scope:
+        _extract: >
+          List data_ids that only exist when this parameter takes a specific
+          value. E.g., if RUN_ONLY_CHR1=true causes chromosome 2–22 data
+          objects to be skipped, list those data_ids here.
+          Empty list if this parameter does not gate entire data flows.
+        _value: []
+
+    resolved_value:
+      _status: required_instance
+      _prompt: >
+        What value should '{parameter_id}' ({display_name}) take for this
+        experiment?
+        Possible values: {possible_values}
+        Default: {default_value}
+      _value: null
+
+    validation_check:
+      _status: required_derived
+      _extract: >
+        COMPUTED once resolved_value is filled:
+          pass:    resolved_value is consistent with possible_values and parameter_type
+          fail:    resolved_value is out of range, wrong type, or invalid
+          skipped: possible_values = "unconstrained" or type = path
+                   (path existence cannot be checked at EDD generation time)
+        A fail here must be resolved before DDD generation proceeds.
+      _allowed_values: [pass, fail, skipped]
+      _value: null
+
+    validation_note:
+      _status: required_derived
+      _extract: >
+        Required if validation_check = fail. Explain what is wrong with
+        resolved_value and what a valid value would look like.
+        Null if validation_check = pass or skipped.
+      _value: null
+
+
+# -----------------------------------------------------------------------------
+# SECTION B: RESOLVED CARDINALITIES
+# Concrete instance counts for every data object whose
+# cardinality_source.type is config_determined or runtime_determined in WDD.
+#
+# Fixed-cardinality data objects (cardinality_source.type = fixed) are
+# OMITTED — their count is already fully specified in the WDD and does
+# not change across experiments.
+#
+# AGENT PROTOCOL:
+#   For each data_id in WDD data_objects where cardinality_source.type != fixed:
+#     1. If config_determined: compute resolved_count from the resolved_value
+#        of the controlling_parameter. This is required_derived.
+#     2. If runtime_determined: prompt the scientist to provide resolved_count
+#        (or run a directory scan if input_data_root is accessible).
+#        This is required_instance.
+# -----------------------------------------------------------------------------
+resolved_cardinalities:
+  # Agent populates as a list of entries matching _cardinality_schema.
+  # One entry per variable data object (config_determined or runtime_determined).
+
+  _cardinality_schema:
+
+    data_id:
+      _status: required_derived
+      _extract: data_id from WDD data_objects where cardinality_source.type != fixed.
+      _value: null
+
+    wrd_cardinality_source_type:
+      _status: required_derived
+      _extract: >
+        Copied from WDD data_objects[data_id].cardinality_source.type.
+        Determines whether resolved_count is derived or instance-provided.
+      _allowed_values: [config_determined, runtime_determined]
+      _value: null
+
+    controlling_parameter_id:
+      _status: required_derived
+      _extract: >
+        Copied from WDD data_objects[data_id].cardinality_source.controlling_parameter.
+        Null for runtime_determined data objects.
+      _value: null
+
+    resolved_count:
+      _status: required_derived    # when wrd_cardinality_source_type = config_determined
+      # _status: required_instance  when wrd_cardinality_source_type = runtime_determined
+      _extract: >
+        config_determined: compute from resolved_value of controlling_parameter_id.
+          E.g., param:n_simulations resolved_value = 12 → resolved_count = 12.
+        runtime_determined: agent should attempt to count by scanning
+          input_data_root if accessible. If not accessible, prompt scientist:
+          "How many instances of '{data_id}' will exist in this run?
+          (e.g., count of input files in the {input_data_root} directory)"
+      _value: null
+
+    resolved_count_basis:
+      _status: required_derived
+      _extract: >
+        How was resolved_count obtained?
+        config_determined: "param:{id} resolved_value = {v} → {count} instances."
+        runtime_determined (scan): "Directory scan of {path}: {n} files matching pattern."
+        runtime_determined (manual): "Provided by scientist: {count} {data_id} instances."
+      _value: null
+
+    estimated_total_size:
+      _status: required_derived
+      _extract: >
+        COMPUTED: WDD estimated_size_hint × resolved_count.
+        E.g., "12 × ~100 MB = ~1.2 GB total."
+        Write "unknown" if WDD estimated_size_hint = "unknown".
+        This is the primary input to DDD capacity feasibility checks.
+      _value: null
+
+
+# -----------------------------------------------------------------------------
+# SECTION C: HARDWARE RESOLUTION
+# Resolves WDD hardware_path annotations into:
+#   C.1 — execution path selections (which CPU/GPU path for each task)
+#   C.2 — hardware floor (minimum resource requirements for this experiment)
+#
+# The DDD must satisfy all hardware_floor entries when making parallelism
+# and storage decisions within the HRD's physical envelope.
+# -----------------------------------------------------------------------------
+hardware_resolution:
+
+  # --- C.1: Execution Path Selections ---
+  # One entry per task where WDD hardware_path.has_conditional_execution = true.
+  # If no tasks in the WDD have conditional execution, this list is empty.
+
+  path_selections:
+    # Agent populates as a list of path selection entries.
+
+    _path_selection_schema:
+
+      task_id:
+        _status: required_derived
+        _extract: >
+          task_id from WDD tasks where hardware_path.has_conditional_execution = true.
+        _value: null
+
+      available_paths:
+        _status: required_derived
+        _extract: >
+          List of path_ids from WDD hardware_path.execution_alternatives for this task.
+          Present to scientist with descriptions so they can make an informed choice.
+        _value: []
+
+      selected_path_id:
+        _status: required_instance
+        _prompt: >
+          Task '{task_id}' has multiple execution paths:
+          {available_paths_with_descriptions}
+          Which path should be used for this experiment?
+          Consider: target system capabilities, parameter values already resolved,
+          and scientific objectives.
+        _value: null
+
+      selection_basis:
+        _status: required_instance
+        _prompt: >
+          Briefly explain why '{selected_path_id}' was selected for task '{task_id}'.
+          (e.g., "GPU nodes available on target system and n_simulations=12 warrants
+          GPU acceleration." Or "CPU-only target system; gpu_path not available.")
+        _value: null
+
+  # --- C.2: Hardware Floor ---
+  # Minimum resource requirements for this experiment, derived from WDD
+  # minimum_resource_assertions with resolved parameter values substituted.
+  # Required_derived: computed after all required_instance fields are filled.
+
+  hardware_floor:
+    # Agent populates as a list of floor entries.
+    # One entry per minimum_resource_assertion in the WDD that applies to
+    # the selected execution path.
+
+    _floor_entry_schema:
+
+      task_id:
+        _status: required_derived
+        _extract: task_id from WDD tasks containing this assertion.
+        _value: null
+
+      resource:
+        _status: required_derived
+        _extract: >
+          Copied from WDD hardware_path.minimum_resource_assertions[*].resource.
+          E.g., "gpu_memory_gb", "n_nodes", "n_mpi_ranks"
+        _value: null
+
+      wrd_assertion_condition:
+        _status: required_derived
+        _extract: >
+          Copied from WDD hardware_path.minimum_resource_assertions[*].condition
+          as written in the source code. E.g., ">= 40", "== N_PROCS", "in [1, 4, 8]"
+        _value: null
+
+      minimum_value:
+        _status: required_derived
+        _extract: >
+          Resolved minimum value for this experiment.
+          If assertion references a parameter (e.g., "== N_PROCS"):
+            substitute resolved_value of that parameter.
+          If assertion is hardcoded (e.g., ">= 40"):
+            copy the bound value directly.
+          Express as a number: e.g., 40, 48, 1
+        _value: null
+
+      derivation_basis:
+        _status: required_derived
+        _extract: >
+          How was minimum_value computed?
+          Parameter-dependent: "WDD asserts n_mpi_ranks == N_PROCS;
+            param:N_PROCS resolved to 48 → floor is 48 MPI ranks."
+          Hardcoded: "WDD asserts gpu_memory_gb >= 40; no parameter
+            dependency → floor is 40 GB."
+        _value: null
+
+      satisfied_by_hrd:
+        _status: required_instance
+        _extract: >
+          Filled by the DDD generator after reading the target HRD.
+          The compute_id or tier_id from HRD that satisfies this floor.
+          E.g., "compute:gpu_node (80 GB A100 — satisfies >= 40 GB floor)"
+          Null until DDD generation has consulted the HRD.
+        _value: null
+
+      satisfied:
+        _status: required_derived
+        _extract: >
+          COMPUTED by DDD generator: true if satisfied_by_hrd is non-null
+          and the HRD resource value meets or exceeds minimum_value.
+          false = this experiment cannot run on the target system.
+          A false here must halt DDD generation with an explanatory error.
+        _value: null    # boolean
+
+
+# -----------------------------------------------------------------------------
+# SECTION D: EXECUTION CONTEXT
+# Where and how this specific instance will run.
+# Used for traceability between EDD instances and IODD run records.
+# -----------------------------------------------------------------------------
+execution_context:
+
+  target_system:
+    _status: required_instance
+    _prompt: >
+      Which HRD system will this experiment run on?
+      Provide the hrd_id from the HRD document for the target system.
+      (e.g., "hrd:perlmutter_nersc", "hrd:frontier_olcf")
+    _value: null
+
+  execution_profile:
+    _status: required_instance
+    _prompt: >
+      Which execution profile should be used for this experiment?
+      Available profiles from WDD execution_profiles:
+      {profile_names_from_wdd}
+      (e.g., "full", "tracks_only", "model_checkpoint")
+    _value: null
+
+  input_data_root:
+    _status: required_instance
+    _prompt: >
+      What is the root path of the input data for this run on the target system?
+      (e.g., "/scratch/user/1000genomes/inputs/", "s3://bucket/ddmd-inputs/")
+      Used to confirm runtime_determined cardinalities if a scan is possible,
+      and to help the DDD generator plan storage tier assignments for input data.
+    _value: null
+
+  output_data_root:
+    _status: required_instance
+    _prompt: >
+      Where should checkpoint and output data be written on the target system?
+      (e.g., "/scratch/user/1000genomes/outputs/run_2026_02_25/")
+    _value: null
+
+  notes:
+    _status: required_instance
+    _extract: >
+      Any additional context about this specific run: why this parameter
+      combination was chosen, what scientific question it tests, what
+      distinguishes it from other instances with the same lineage_id.
+      Set to null if not needed.
+    _value: null

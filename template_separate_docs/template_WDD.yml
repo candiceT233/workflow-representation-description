@@ -1,16 +1,29 @@
 # =============================================================================
-# WIDGET — Workflow Definition Document (WDD) Agent Template
-# Schema: wdd-5.0  |  Architecture Design: v5
+# WIDGET — Workflow Representation Document (WRD) Agent Template
+# Schema: wrd-6.0  |  Architecture Design: v6
 #
 # PURPOSE
 # This file is the schema an AI agent reads before analyzing a workflow
 # repository. The agent fills every field according to its _status annotation.
-# Once all required fields are populated the WDD is a valid, self-contained
+# Once all required fields are populated the WRD is a valid, self-contained
 # description of the workflow's logical structure.
 #
-# The WDD captures ONLY what is derivable from static analysis of the source
+# The WRD captures ONLY what is derivable from static analysis of the source
 # code — no profiling data, no hardware specifics, no deployment decisions.
-# Those belong in the DDD, HRD, GD, and IODD respectively.
+# Those belong in the DDD, HRD, GD, IODD, and EDD respectively.
+#
+# NEW IN v6: Two EDD hook annotations are added.
+#   tasks[*].hardware_path     — conditional CPU/GPU execution paths and
+#                                minimum resource assertions visible in code.
+#                                The EDD reads this to resolve which path an
+#                                experiment takes and what hardware floor applies.
+#   data_objects[*].cardinality_source
+#                              — whether cardinality is fixed, config-determined,
+#                                or runtime-determined, and which parameter
+#                                controls it. The EDD reads this to resolve
+#                                concrete instance counts for a specific run.
+#
+# Both new fields contain only static observations — no resolved values.
 #
 # FIELD STATUS MODEL
 #   required_static       Extract from workflow source code via static analysis.
@@ -20,7 +33,7 @@
 #                         Agent MUST prompt the scientist before proceeding.
 #
 # COMPLETENESS GATE
-# The WDD is complete when ALL of the following are true:
+# The WRD is complete when ALL of the following are true:
 #   [ ] All required_static fields are non-null
 #   [ ] All required_static_ask fields are non-null
 #   [ ] workflow_graph.integrity_hash is current against pc_edges
@@ -49,7 +62,7 @@ metadata:
     _status: required_static
     _extract: >
       Generate a new UUID v4 for a new workflow. Preserve existing
-      lineage_id when recompiling an existing WDD.
+      lineage_id when recompiling an existing WRD.
       Companion documents (DDD, IODD) pin to this ID + a specific version.
     _value: null
 
@@ -64,13 +77,13 @@ metadata:
   version_notes:
     _status: required_static
     _extract: >
-      For first compilation: "Initial WDD compiled from <source_file>".
+      For first compilation: "Initial WRD compiled from <source_file>".
       For updates: describe structural changes made.
     _value: null
 
   deprecated:
     _status: required_static
-    _extract: Set to false for all new WDDs.
+    _extract: Set to false for all new WRDs.
     _value: null
 
   workflow_name:
@@ -130,8 +143,8 @@ metadata:
 
   schema_version:
     _status: required_static
-    _extract: Always set to "wdd-5.0".
-    _value: "wdd-5.0"
+    _extract: Always set to "wrd-6.0".
+    _value: "wrd-6.0"
 
   generated_by:
     _status: required_static
@@ -140,7 +153,7 @@ metadata:
 
   generated_at:
     _status: required_static
-    _extract: ISO 8601 timestamp at WDD compilation time.
+    _extract: ISO 8601 timestamp at WRD compilation time.
     _value: null
 
   last_modified_at:
@@ -206,7 +219,7 @@ tasks:
       _status: required_static
       _extract: >
         Normalize task/process/function name from source code to snake_case.
-        Must be unique within this WDD. Use prefix "task:" in cross-document
+        Must be unique within this WRD. Use prefix "task:" in cross-document
         references (e.g., task:contact_map).
       _value: null
 
@@ -286,6 +299,81 @@ tasks:
         Write "unknown" if not determinable from code alone.
       _allowed_values: [compute_bound, io_bound, balanced, unknown]
       _value: unknown
+
+    hardware_path:
+      # NEW in v6. Static observation of hardware-related code structure.
+      # The EDD reads these annotations to resolve which execution path is
+      # active for a specific experiment and what hardware floor applies.
+      # Document only what is visible in the code — no resolved values here.
+
+      has_conditional_execution:
+        _status: required_static
+        _extract: >
+          true if this task contains code paths that select different
+          execution logic based on a runtime parameter (e.g., --device cpu/gpu,
+          USE_GPU env var, conditional MPI init, torch.cuda.is_available() guards).
+          false if the task always executes the same code regardless of parameters.
+        _value: null    # boolean
+
+      execution_alternatives:
+        # Required when has_conditional_execution = true. Empty list otherwise.
+        # One entry per distinct execution path visible in the source code.
+        _status: required_static
+        _extract: >
+          Identify conditional branches that change execution behavior:
+            - if/else blocks gated on a device flag or env var
+            - try/except blocks that fall back from GPU to CPU
+            - argparse choices that select different compute backends
+          For each path: document the triggering condition, what changes,
+          and the expected io_dominance under that path.
+        _path_schema:
+          path_id:
+            _extract: Short label. E.g., "gpu_path", "cpu_path", "large_model", "small_model"
+            _value: null
+          condition:
+            _extract: >
+              What triggers this path as found in code.
+              E.g., "USE_GPU=true", "--device gpu", "n_nodes >= 8"
+            _value: null
+          description:
+            _extract: >
+              What differs between this path and others. Name the library
+              (CUDA, OpenMP), the data access pattern if it changes, the
+              expected compute dominance.
+            _value: null
+          io_dominance_hint:
+            _allowed_values: [compute_bound, io_bound, balanced, unknown]
+            _value: null
+        _value: []
+
+      minimum_resource_assertions:
+        # Resource requirements explicitly asserted or validated in source code.
+        # Look for: assert statements, argparse range checks, MPI size guards,
+        # torch.cuda.get_device_properties checks, explicit sys.exit() on
+        # insufficient resources.
+        # These are code-observed facts — not operator choices or estimates.
+        _status: required_static
+        _extract: >
+          Read the task source code carefully for any validation that checks
+          system resources before or during execution. Document each check.
+        _assertion_schema:
+          resource:
+            _extract: >
+              What is being checked. Use consistent names:
+              gpu_memory_gb, n_nodes, n_mpi_ranks, n_gpus, cpu_cores,
+              host_memory_gb, or a workflow-specific name.
+            _value: null
+          condition:
+            _extract: >
+              The constraint as written or implied in code.
+              E.g., ">= 40", "== N_PROCS", "in [1, 4, 8, 16]", "> 0"
+            _value: null
+          source_location:
+            _extract: >
+              File path and line number where this check appears.
+              E.g., "src/train.py:142", "submit.sh:35"
+            _value: null
+        _value: []    # Empty list if no resource assertions found
 
     output_class:
       _status: required_static_ask
@@ -424,7 +512,58 @@ data_objects:
         Infer from loop structures, job arrays, or scatter patterns.
         E.g., "one per chromosome (22 total)", "one per simulation task
         (12 instances)", "single global file".
+        When the count depends on a config parameter or input data, write
+        "config-determined (see cardinality_source)" or
+        "runtime-determined (see cardinality_source)".
       _value: null
+
+    cardinality_source:
+      # NEW in v6. Documents how cardinality is determined.
+      # The EDD reads this to know what to resolve and where to look.
+
+      type:
+        _status: required_static
+        _extract: >
+          fixed:             Count is hardcoded in the workflow or determinable
+                             from code alone. No EDD resolution needed.
+          config_determined: Count comes from a parameter in a config file,
+                             CLI argument, or environment variable.
+                             The EDD resolves this by reading the parameter value.
+          runtime_determined: Count depends on actual input data (e.g., number
+                              of files in a directory, rows in a CSV) and cannot
+                              be known without inspecting the input at job time.
+        _allowed_values: [fixed, config_determined, runtime_determined]
+        _value: null
+
+      controlling_parameter:
+        _status: required_static
+        _extract: >
+          For config_determined: the parameter name as it appears in the config
+          file or as the argparse/env var name. Must match a parameter_id in the
+          EDD experiment_parameters section.
+          E.g., "n_simulations", "NCHROM", "ensemble_size"
+          Null for fixed and runtime_determined.
+        _value: null
+
+      config_file:
+        _status: required_static
+        _extract: >
+          For config_determined: relative path from repo root to the file
+          where controlling_parameter is defined or read.
+          E.g., "config/run_config.yaml", "submit.sh"
+          Null for fixed and runtime_determined.
+        _value: null
+
+      possible_values:
+        _status: required_static
+        _extract: >
+          Enumeration or range if statically determinable from code.
+          E.g., "integers 1–22 (chromosome count validated in code)",
+          "values in [1, 4, 8, 16, 32] (hardcoded sweep list)",
+          "any positive integer (no validation found in code)".
+          Write "runtime-determined" for runtime_determined type.
+          Write "n/a" for fixed type.
+        _value: null
 
     estimated_size_hint:
       _status: required_static
@@ -872,7 +1011,7 @@ execution_profiles:
 
 # -----------------------------------------------------------------------------
 # SECTION I: TRANSLATION METADATA
-# Full provenance of how this WDD was produced.
+# Full provenance of how this WRD was produced.
 # -----------------------------------------------------------------------------
 translation_metadata:
 
@@ -909,7 +1048,7 @@ translation_metadata:
   round_trip_gaps:
     _status: required_static
     _extract: >
-      List fields that would be lost if this WDD is compiled back to the
+      List fields that would be lost if this WRD is compiled back to the
       source format (e.g., description has no representation in Pegasus DAX;
       execution_profiles have no Nextflow equivalent).
     _value: []

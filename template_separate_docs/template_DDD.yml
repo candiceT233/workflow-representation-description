@@ -1,29 +1,37 @@
 # =============================================================================
 # WIDGET — Deployment Definition Document (DDD) Agent Template
-# Schema: ddd-5.0  |  Architecture Design: v5
+# Schema: ddd-6.0  |  Architecture Design: v6
+#
+# FORMAL RELATIONSHIP
+#   DDD = prescription(WRD, EDD, GD, HRD)
+#   [sets of IODD] = execution(WRD, EDD, DDD, HRD, GD)
 #
 # PURPOSE
 # The DDD defines how a workflow is deployed to achieve a specific set of
-# goals on specific hardware. It bridges WRD logical structure, GD intent,
-# and HRD physical constraints into a concrete execution strategy.
+# goals on specific hardware for a specific experiment. It bridges:
+#   WRD logical structure  — what the workflow is
+#   EDD resolved inputs    — what this experiment is (cardinalities, hardware floor)
+#   GD operator intent     — what the operator wants to optimize
+#   HRD physical hardware  — what resources are available
+# into a concrete execution strategy.
 #
 # The DDD is the primary artifact produced by a WIDGET prescription agent.
 # Every decision records both WHAT was decided and WHY (via goal_ref).
 # A DDD without goal_refs is incomplete — the agent must not emit one.
 #
-# A single WRD can have multiple DDDs representing different strategies
-# (e.g., throughput_optimized, cost_optimized, latency_optimized).
+# A single WRD + EDD combination can have multiple DDDs representing different
+# strategies (e.g., throughput_optimized, cost_optimized, latency_optimized).
 # Each DDD is a separate, self-contained, versioned document.
 #
 # WHO FILLS THIS DOCUMENT
-# Primarily the AI prescription agent, given WRD + GD + HRD as inputs.
+# Primarily the AI prescription agent, given WRD + EDD + GD + HRD as inputs.
 # The agent fills all required_agent fields through reasoning.
 # required_agent_ask fields are filled after the agent presents a proposed
 # value and the operator confirms or overrides.
 # auto_validated fields are computed checks — never manually set.
 #
 # FIELD STATUS LEGEND
-#   required_agent        Agent derives from WRD + GD + HRD reasoning.
+#   required_agent        Agent derives from WRD + EDD + GD + HRD reasoning.
 #                         No operator input needed unless confidence is low.
 #
 #   required_agent_ask    Agent proposes a value; operator must confirm or
@@ -37,19 +45,30 @@
 # AGENT REASONING PROTOCOL
 # Before filling any section, the agent must:
 #   1. Read the full WRD (all sections)
-#   2. Read the full GD (all goals and hard constraints)
-#   3. Read the full HRD (all storage tiers, compute topology, network fabric)
-#   4. Identify which GD goals are hard (must satisfy) vs soft (optimize)
-#   5. For each hard constraint, identify which WRD entities it applies to
-#   6. Derive a candidate strategy name from the dominant soft goal
-#   7. Fill sections in order: header → parallelism → storage → placement
+#   2. Read the full EDD — verify completeness gate passed, then extract:
+#        - resolved_cardinalities (concrete instance counts and total sizes)
+#        - hardware_resolution.path_selections (which cpu/gpu path per task)
+#        - hardware_resolution.hardware_floor (minimum resource requirements)
+#        - execution_context.target_system and execution_profile
+#   3. Read the full GD (all goals and hard constraints)
+#   4. Read the full HRD (all storage tiers, compute topology, network fabric)
+#   5. Verify all EDD hardware_floor entries are satisfied by HRD resources
+#   6. Identify which GD goals are hard (must satisfy) vs soft (optimize)
+#   7. For each hard constraint, identify which WRD entities it applies to
+#   8. Derive a candidate strategy name from the dominant soft goal
+#   9. Fill sections in order: header → parallelism → storage → placement
 #      → pipelining → replication → validation
 #
 # AGENT READINESS GATE
 # Before handing this DDD to Jarvis-MCP for deployment:
 #   [ ] All required_agent fields non-null
 #   [ ] All required_agent_ask fields confirmed by operator
+#   [ ] EDD completeness gate confirmed passed (no required_instance nulls,
+#       no validation_check == "fail")
+#   [ ] All EDD hardware_floor entries have satisfied == true against HRD
 #   [ ] Every task in WRD tasks has a parallelism entry
+#   [ ] parallelism_instances derived from EDD resolved_cardinalities (not
+#       inferred from WRD cardinality prose)
 #   [ ] Every dataset in WRD data_objects has a storage tier assignment
 #   [ ] Every goal_ref references a valid goal_id from the GD
 #   [ ] validation_summary.validation_status == "valid"
@@ -58,9 +77,10 @@
 #   [ ] No bandwidth_check has status == "fail"
 #
 # ID NAMESPACE
-#   DDD:   deploy:<wrd_lineage_id_short>:<strategy_name>
+#   DDD:   deploy:<wrd_lineage_id_short>:<edd_instance_id_short>:<strategy_name>
 #   (All task:, data:, pc:, tier:, compute:, goal: IDs are referenced
 #    from their respective source documents — never redefined here.)
+# =============================================================================
 # =============================================================================
 
 
@@ -72,8 +92,8 @@ header:
   ddd_id:
     _status: auto_validated
     _extract: >
-      Format: deploy:<first_8_chars_of_wrd_lineage_id>:<strategy_name>
-      Example: deploy:f3a9c2e1:throughput_optimized
+      Format: deploy:<first_8_chars_of_wrd_lineage_id>:<first_8_chars_of_edd_instance_id>:<strategy_name>
+      Example: deploy:f3a9c2e1:7a3b2c1d:throughput_optimized
     _value: null
 
   strategy_name:
@@ -100,6 +120,23 @@ header:
     _extract: >
       Copied from WRD header.version. If WRD version changes after this DDD
       is generated, this DDD must be re-validated before reuse.
+    _value: null
+
+  edd_lineage_id:
+    _status: required_agent
+    _extract: >
+      Copied from EDD metadata.experiment_lineage_id.
+      Stable across all re-runs of the same experiment configuration.
+      Enables grouping of DDDs by experiment type.
+    _value: null
+
+  edd_instance_id:
+    _status: required_agent
+    _extract: >
+      Copied from EDD metadata.instance_id.
+      Unique per submission. Links this DDD to the specific resolved
+      cardinalities and hardware floor of the EDD instance it was
+      generated for.
     _value: null
 
   hrd_id:
@@ -140,7 +177,7 @@ header:
 
   schema_version:
     _status: required_agent
-    _value: "ddd-5.0"
+    _value: "ddd-6.0"
 
   description:
     _status: required_agent
@@ -206,9 +243,13 @@ per_task_parallelism:
       _status: required_agent
       _reasoning: >
         Number of concurrent instances of this task.
-        For loop tasks: how many iterations run concurrently.
-        For non-loop tasks: typically 1 unless the task has 1_to_n or
-        n_to_1 edges suggesting parallelism.
+        PRIMARY SOURCE: EDD resolved_cardinalities — find the entry for the
+        data object produced by this task and read resolved_count. This is the
+        authoritative instance count for this experiment.
+        If this task produces multiple data objects, use the one whose
+        cardinality_source.controlling_parameter governs the task fan-out.
+        FALLBACK (if task has no variable-cardinality output): infer from
+        WRD pc_edges pattern (1_to_n or n_to_1 suggests parallelism); default 1.
       _value: null
 
     ranks_per_instance:
@@ -232,9 +273,14 @@ per_task_parallelism:
       _status: required_agent
       _reasoning: >
         Which HRD compute_id to use for this task.
-        If accelerators are present and the task is compute_bound, prefer
-        compute:gpu_node. If the task is io_bound, prefer compute:cpu_node.
-        Cross-reference with GD hard constraints for any placement restrictions.
+        PRIMARY SOURCE: EDD hardware_resolution.path_selections — find the
+        entry for this task_id and use selected_path_id to determine whether
+        a CPU or GPU resource is required.
+        VERIFY: EDD hardware_floor entry for this task (if any) must be
+        satisfied by the selected HRD resource. A floor violation must halt
+        DDD generation.
+        FALLBACK (if task has no conditional execution in WRD): if task is
+        compute_bound prefer compute:gpu_node; if io_bound prefer compute:cpu_node.
       _value: null
 
     total_nodes_required:
@@ -365,13 +411,14 @@ storage_tier_assignments:
     feasibility_check:
       _status: auto_validated
       _extract: >
-        COMPUTED from WRD estimated_size_hint × cardinality for each dataset.
-          Compare sum of all datasets on this tier against
-          HRD per_job_capacity_tb (converted to bytes).
+        COMPUTED using EDD resolved_cardinalities for each dataset on this tier.
+          For each dataset: look up EDD resolved_cardinalities[data_id].estimated_total_size
+          Sum all estimated_total_size values for datasets assigned to this tier.
+          Compare sum against HRD per_job_capacity_tb (converted to bytes).
           pass:    total < 80% of per_job_capacity_tb
           warning: total between 80% and 100% of per_job_capacity_tb
           fail:    total > per_job_capacity_tb
-        If estimated_size_hint is "unknown" for all datasets on this tier:
+        If EDD estimated_total_size is "unknown" for all datasets on this tier:
           Set to "unavailable — estimated_size_hint not provided in WRD"
         NOTE: After the first run, actual sizes from IODD per_file_lifecycle
         can replace estimates here for higher-confidence checks.
@@ -618,12 +665,13 @@ validation_summary:
     _extract: >
       For each tier used in storage_tier_assignments:
         tier_id: <tier_id>
-        total_assigned_gb: sum of estimated sizes (from WRD estimated_size_hint
-                           × cardinality) for all datasets assigned to this tier.
-                           Null if all hints are "unknown".
+        total_assigned_gb: sum of EDD resolved_cardinalities[*].estimated_total_size
+                           for all datasets assigned to this tier.
+                           Null if all EDD estimated_total_size values are "unknown".
         tier_capacity_gb: HRD per_job_capacity_tb * 1024
         status: pass | warning | fail | unavailable
-        note: if sizes unavailable, note that estimated_size_hint is unknown
+        note: if sizes unavailable, note EDD estimated_total_size is "unknown"
+              (trace back to WRD estimated_size_hint for the affected datasets)
     _value: []
 
   bandwidth_checks:

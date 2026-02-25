@@ -15,13 +15,15 @@ Question to anwer: how we structure the data so that the agent can answer our qu
         - if utilization of any hardware
 - experiment definition document (EDD) = file(wdd, input)
 - DDD = file(EDD, HRD)
-- [IODocumeents] = execution (WDD, EDD DDD, HRD)
+- [sets of IODD] = execution (WDD, EDD DDD, HRD, GD)
+
+
 # next step:
 * improve design of WDD (based on above note)
-    - need to iterate through with architecutre document with other files
-    - recheck the v2, move content out that does not belong to WDD
-    - add conditional sementioncs to the WDD
-* take this new v3 WDD fill in based on workflow repo only
+    - need to iterate through with architecutre document with other files (done)
+    - add conditional sementioncs to the WDD (done)
+    - recheck the latest version, move content out that does not belong to WDD (next)
+* take this new v6 WDD fill in based on workflow repo only
 * given the repo only and generate a document
 * compare the document generated from pure workflow repo exploration vs. WDD
 (make agent recheck: things missing in WDD v3, overexplaining, gaps, anything info in the workflow repo was not included in the WDD due to it's format)
