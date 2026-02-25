@@ -1,0 +1,166 @@
+TASK: Generate a Workflow Definition Document (WDD) (Schema: wrd-7.0)
+You are analyzing a scientific workflow codebase to produce a Workflow Definition Document (WDD) as defined in `wdd_design-v7.md` and `template_separate_docs/template_WDD.yml`.
+
+PURPOSE
+The WDD captures workflow logical structure only (what the workflow is), independent of deployment/hardware/runtime behavior.
+
+HARD SCOPE RULES
+- Use static code analysis only.
+- Do not include deployment details (node counts, storage tiers, placement policy, hardware constraints, runtime bandwidth, performance targets, resolved cardinality counts for input-determined data objects).
+- If a value cannot be determined, use "unknown" and explain why in the relevant field.
+- Mark assumptions inline with [ASSUMPTION] and also add a corresponding `translation_metadata.field_confidence_records` entry.
+
+OUTPUT
+Produce exactly one YAML file: `wdd.yaml`.
+
+REQUIRED TOP-LEVEL SECTIONS (all required)
+1. metadata
+2. stages
+3. tasks
+4. data_objects
+5. pc_edges
+6. workflow_graph
+7. workflow_patterns
+8. io_behavioral_hints
+9. execution_profiles
+10. translation_metadata
+
+REQUIRED ID CONVENTIONS
+- stage_id:  stage:<descriptor>
+- task_id:   task:<descriptor>
+- data_id:   data:<descriptor>
+- edge_id:   pc:<producer_task>-><consumer_task>:<pattern>
+- hint_id:   hint:<short_name>
+
+SCHEMA-CRITICAL ENUMS (must match exactly)
+- pc_edges[].pc_pattern:                1_to_1 | 1_to_n | n_to_1 | n_to_n
+- pc_edges[].coupling:                  tight | loose
+- pc_edges[].communication_pattern:     shared_file | file_per_producer | in_memory | streaming_channel
+- pc_edges[].data_volume_class:         small | medium | large
+- workflow_patterns.primary_pattern:    cascading | iterative | scatter_gather | pipeline | broadcast | checkpointing | conditional | hybrid
+- tasks[].parallelism_model.type:       serial | embarrassingly_parallel | data_parallel | task_parallel
+- tasks[].io_dominance:                 compute_bound | io_bound | balanced | unknown
+- tasks[].io_access_type:               posix_independent | mpi_io_collective | mpi_io_independent | hdf5_parallel | netcdf4_parallel | python_serial | unknown
+- tasks[].restart_model:                idempotent | checkpoint_restart | non_restartable | unknown
+- tasks[].output_class:                 intermediate | checkpoint
+- data_objects[].category:              input | intermediate | output | checkpoint | config
+- data_objects[].persistence:           transient | stage_scoped | workflow_scoped | persistent
+- data_objects[].cardinality_source.type: fixed | config_determined | runtime_determined
+- io_behavioral_hints[].potential_concern: partial_access | format_mismatch | small_file_overhead | unnecessary_serialization | data_reuse | checkpoint_waste | metadata_overhead | mpi_io_pattern_risk | unknown
+
+REQUIRED METADATA FIELDS
+metadata must include: workflow_lineage_id, version, version_notes, deprecated, workflow_name, workflow_description, source_repository, source_commit, source_format, source_file, schema_version (must be "wrd-7.0"), generated_by, generated_at, last_modified_at.
+
+SPECIAL REQUIREMENTS FROM DESIGN SPEC
+- pc_edges[].data_objects is a list; one edge carries all datasets shared between a producer-consumer pair. Do not create separate edges per dataset for the same task relationship.
+- tasks[].io_access_type: infer from imports and API calls. mpi4py + MPI.File.Open + Read_all/Write_all → mpi_io_collective. mpi4py + Read/Write (no _all) → mpi_io_independent. h5py with driver='mpio' → hdf5_parallel. netCDF4 with parallel=True → netcdf4_parallel. Standard Python I/O without MPI → python_serial. Direct POSIX syscalls → posix_independent.
+- tasks[].restart_model: infer from checkpoint-read logic at startup, --resume/--restart CLI flags, or "skip if output exists" guards.
+- tasks[].restart_checkpoint_dataset: set to the data_id of the checkpoint read at startup when restart_model = checkpoint_restart; null otherwise.
+- tasks[].hardware_path: document has_conditional_execution, execution_alternatives (when true), and minimum_resource_assertions (assert statements, argparse checks, MPI size guards visible in source).
+- data_objects[].cardinality_source: always populate type, controlling_parameter, config_file, and possible_values.
+- workflow_graph is derived from pc_edges and tasks. Must include: integrity_hash (SHA-256 of canonical pc_edges serialization), last_generated, dag_edges, loop_groups, critical_path_hint, control_flow (has_iteration, iteration_description, has_conditional_branches, conditional_description), stage_execution_order, cross_reference (task_to_stage, data_to_producer, data_to_consumers).
+- workflow_patterns must include primary_pattern, secondary_patterns, classification_rationale, and pattern_table_row.
+- execution_profiles[].required_task_set must be auto-derived by backward DAG traversal from terminal_task_id — never manually specified.
+- execution_profiles[].conditional_inclusions: list tasks in this profile's DAG reachability that are only active under a specific EDD parameter condition (e.g., "param:n_chromosomes > 1"). Empty list if no conditional tasks.
+
+REQUIRED HUMAN-ASK FIELDS (required_static_ask)
+If not reliably inferable from code, ask and record answers for:
+- metadata.workflow_description
+- tasks[].description
+- tasks[].output_class
+- data_objects[].description
+- execution_profiles[].profile_name
+- execution_profiles[].description
+
+MINIMUM CONFIDENCE TRACKING REQUIREMENTS
+translation_metadata.field_confidence_records must include at least:
+- all description fields (tasks, data_objects, stages)
+- all pc_pattern fields
+- workflow_patterns classification fields
+- each task: io_dominance, io_access_type, restart_model, behavioral_notes
+- all io_behavioral_hints
+- all execution_profile proposals
+
+GENERATION PROCEDURE
+
+Step 1 — Survey codebase structure
+Read top-level files, README, and orchestration files (Makefile, shell scripts, Nextflow, Pegasus DAX, Parsl, Snakemake, Slurm, Swift/T). Identify the entry point, task definition mechanism, and key config files.
+
+Step 2 — Enumerate stages and tasks
+Identify all distinct executable units and their stage membership. Record per-task inputs/outputs and executable names.
+
+Step 3 — Classify io_access_type per task
+Inspect import statements and API calls for each task.
+- mpi_io_collective:   mpi4py + MPI.File.Open + Read_all / Write_all.
+- mpi_io_independent:  mpi4py + MPI.File.Open + Read / Write (not _all). Flag hint:mpi_io_pattern_risk if many ranks share a file.
+- hdf5_parallel:       h5py with driver='mpio' (requires parallel HDF5 build).
+- netcdf4_parallel:    netCDF4 with parallel=True.
+- python_serial:       standard Python I/O (open(), numpy, pandas) without MPI.
+- posix_independent:   direct POSIX file I/O without an MPI or Python layer.
+
+Step 4 — Classify restart_model per task
+Look for checkpoint-read logic at startup (e.g., if os.path.exists(checkpoint): load(checkpoint)). Look for --resume / --restart / --continue CLI flags. Look for "skip if output exists" guards (if os.path.exists(output): sys.exit(0) → idempotent). Look for tasks that write partial results in-place without atomicity → non_restartable. Set restart_checkpoint_dataset to the checkpoint data_id when restart_model = checkpoint_restart.
+
+Step 5 — Build data object registry
+Deduplicate all workflow data objects. Classify category and persistence. For HDF5/netCDF4, extract dataset names, dtypes, and shapes where visible. Populate cardinality_source (type, controlling_parameter, config_file, possible_values). Derive lifecycle fields (creation_phase, last_consumer_phase, retention_window, access_frequency_class, consumer_count) from DAG topology.
+
+Step 6 — Build producer-consumer edges
+Map producers and consumers per data object. Classify pc_pattern, coupling, communication_pattern, and data_volume_class with rationale. Capture multi-dataset edges correctly with the data_objects list.
+
+Step 7 — Build workflow graph and pattern classification
+Derive workflow_graph including the integrity hash and cross-reference tables. Classify primary and secondary workflow patterns with rationale. Fill the pattern summary row.
+
+Step 8 — Extract I/O behavioral hints
+Re-read task source code looking for: partial_access, format_mismatch, small_file_overhead, unnecessary_serialization, data_reuse, checkpoint_waste, metadata_overhead, mpi_io_pattern_risk. For mpi_io_pattern_risk: flag when independent MPI-IO is used with many ranks sharing a file or using strided access where collective I/O would reduce metadata overhead. Include affected tasks and data objects for each hint.
+
+Step 9 — Build execution profiles
+Identify all tasks with output_class = checkpoint. Propose one profile per checkpoint task in topological order plus a full profile. Present to the scientist for confirmation. Ensure required_task_set is DAG-derived from terminal_task_id (never manually specified). Populate conditional_inclusions for tasks conditionally active based on EDD parameters. Populate output_dataset_ids.
+
+Step 10 — Assemble translation metadata
+Fill source translation metadata, unmapped fields, round-trip gaps, quality warnings, and confidence records.
+
+Step 11 — Validate before finalizing
+- Completeness: every file read/written is represented in data_objects.
+- Consistency: all references resolve across tasks, data, edges, and stages.
+- Pattern accuracy: P-C cardinality matches pc_pattern.
+- No deployment leakage.
+- Cross-reference integrity matches body content.
+- Stage ordering matches DAG.
+- workflow_graph.integrity_hash is current against pc_edges.
+- Every assumption has [ASSUMPTION] and a confidence record.
+- Multi-dataset edges use pc_edges[].data_objects list.
+- Every task has a non-null io_access_type (use unknown only with confidence record).
+- Every task has a non-null restart_model.
+
+REFERENCE: PATTERN TAXONOMY
+
+P-C Patterns (per-edge)
+- 1_to_1   One producer, one consumer. Example: simulation → post-processing.
+- 1_to_n   One producer shared across multiple consumers. Example: static input → many analysis tasks; scatter fan-out.
+- n_to_1   Several producers → one consumer. Example: aggregation of parallel outputs.
+- n_to_n   Multiple producers and consumers with shared I/O. Example: parallel ML training, ensemble workflows.
+
+Workflow-Level Patterns
+- cascading      Linear chain of stages. Any P-C structure.
+- iterative      Repeats computation with prior output as input. Often 1_to_1.
+- scatter_gather Fan-out to parallel tasks, fan-in to aggregator. 1_to_n scatter; n_to_1 gather.
+- pipeline       Stages overlap in time with streaming data. 1_to_1 or 1_to_n with loose coupling.
+- broadcast      One task provides shared input to many. 1_to_n.
+- checkpointing  Saves task state for restart/recovery. Usually 1_to_1 or n_to_1.
+- conditional    Tasks execute only if a runtime condition is met. Usually 1_to_1 or 1_to_n.
+- hybrid         Combination of the above. Mixed.
+
+io_access_type Values
+- mpi_io_collective   mpi4py + MPI.File.Write_all / Read_all.
+- mpi_io_independent  mpi4py + MPI.File.Write / Read (no _all).
+- hdf5_parallel       h5py with driver='mpio' (parallel HDF5).
+- netcdf4_parallel    netCDF4 with parallel=True.
+- python_serial       Python file I/O (open, numpy, pandas) without MPI.
+- posix_independent   Direct POSIX I/O without Python or MPI layer.
+- unknown             Cannot determine from source; add confidence record with requires_human_review: true.
+
+restart_model Values
+- idempotent          "Skip if output exists" guard; safe to re-run from scratch.
+- checkpoint_restart  Reads checkpoint file at startup (--resume flag or explicit load logic).
+- non_restartable     Writes partial results in-place; no recovery mechanism.
+- unknown             Cannot determine from code alone; add confidence record with requires_human_review: true.
