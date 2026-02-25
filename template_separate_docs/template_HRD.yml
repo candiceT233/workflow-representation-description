@@ -1,6 +1,6 @@
 # =============================================================================
 # WIDGET — Hardware Resource Document (HRD) Agent Template
-# Schema: hrd-4.0  |  Architecture Design: v4
+# Schema: hrd-5.0  |  Architecture Design: v5
 #
 # PURPOSE
 # The HRD describes the physical hardware on which a deployment executes —
@@ -103,7 +103,7 @@ header:
 
   schema_version:
     _status: auto_derived
-    _value: "hrd-4.0"
+    _value: "hrd-5.0"
 
   created_at:
     _status: auto_derived

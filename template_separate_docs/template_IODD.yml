@@ -1,6 +1,6 @@
 # =============================================================================
 # WIDGET — I/O Definition Document (IODD) Agent Template
-# Schema: iodd-4.0  |  Architecture Design: v4
+# Schema: iodd-5.0  |  Architecture Design: v5
 #
 # PURPOSE
 # The IODD captures the concrete I/O and communication behavior that emerges
@@ -29,7 +29,7 @@
 #                         (DataLife, DaYu, Darshan). Null in predictive mode.
 #
 #   required_agent        Computed or derived by the agent from profiling
-#                         output, DDD, HRD, and WDD cross-references.
+#                         output, DDD, HRD, and WRD cross-references.
 #                         In predictive mode: agent estimates from DDD + HRD.
 #
 #   optional_profiler     Richer profiling data if available; improves
@@ -47,8 +47,8 @@
 #   [ ] communication_channels has one entry per active pc edge
 #   [ ] temporal_io_behavior has one entry per task
 #   [ ] diagnosis_summary.bottleneck_summary populated
-#   [ ] diagnosis_summary.pattern_match_wdd computed
-#   [ ] All match_ddd and match_wdd_io_phase checks computed
+#   [ ] diagnosis_summary.pattern_match_wrd computed
+#   [ ] All match_ddd and match_wrd_io_phase checks computed
 #
 # AGENT READINESS GATE (predictive mode)
 # Before presenting predictive IODD to operator:
@@ -85,9 +85,9 @@ header:
     _extract: Copied from DDD header.hrd_id.
     _value: null
 
-  wdd_lineage_id:
+  wrd_lineage_id:
     _status: required_agent
-    _extract: Copied from DDD header.wdd_lineage_id.
+    _extract: Copied from DDD header.wrd_lineage_id.
     _value: null
 
   run_id:
@@ -139,7 +139,7 @@ header:
 
   schema_version:
     _status: required_agent
-    _value: "iodd-4.0"
+    _value: "iodd-5.0"
 
   description:
     _status: required_agent
@@ -157,7 +157,7 @@ header:
 # One entry per task instance in the execution.
 # For loop tasks: one entry per iteration, or one aggregate entry with
 # per-iteration statistics (agent chooses based on data volume).
-# Source: Darshan log per process, matched to WDD task_ids by task name
+# Source: Darshan log per process, matched to WRD task_ids by task name
 # and PID mapping from DPM trace.
 # -----------------------------------------------------------------------------
 per_task_io_profile:
@@ -168,8 +168,8 @@ per_task_io_profile:
     PID-to-task mapping from DPM trace or Slurm step IDs.
 
     PREDICTIVE: For each task in DDD per_task_parallelism:
-      - Estimate bytes_read from WDD data_flow.lifecycle.size_measured_bytes
-        for input datasets of this task (null if unavailable)
+      - Estimate bytes_read from WRD estimated_size_hint × cardinality
+        for input datasets of this task (null if hint is "unknown")
       - Estimate bytes_written similarly for output datasets
       - Estimate bandwidth as min(HRD tier peak bandwidth, task read/write rate
         implied by DDD parallelism and GD throughput goal)
@@ -179,7 +179,7 @@ per_task_io_profile:
 
     task_id:
       _status: required_agent
-      _extract: task_id from WDD task_registry.
+      _extract: task_id from WRD tasks.
       _value: null
 
     instance_id:
@@ -202,16 +202,16 @@ per_task_io_profile:
       _status: required_profiler
       _extract: Total bytes read by this task instance. Source: Darshan.
       _predictive_reasoning: >
-        Sum of WDD size_measured_bytes for all input datasets of this task.
-        Null if sizes unavailable.
+        Sum of WRD estimated_size_hint × cardinality for all input datasets
+        of this task. Null if any hint is "unknown".
       _value: null
 
     bytes_written:
       _status: required_profiler
       _extract: Total bytes written by this task instance. Source: Darshan.
       _predictive_reasoning: >
-        Sum of WDD size_measured_bytes for all output datasets of this task.
-        Null if sizes unavailable.
+        Sum of WRD estimated_size_hint × cardinality for all output datasets
+        of this task. Null if any hint is "unknown".
       _value: null
 
     read_ops:
@@ -299,8 +299,8 @@ per_task_io_profile:
           deferred:  all writes occur in last 10% of task wall time
           streaming: reads and/or writes distributed throughout task duration
           mixed:     reads upfront, writes deferred
-        Compare to WDD temporal_io_annotation.io_phase.
-        Flag mismatch in match_wdd_io_phase below.
+        Compare to the I/O timing pattern described in WRD behavioral_notes
+        for this task. Flag mismatch in match_wrd_io_phase below.
       _allowed_values: [upfront, streaming, deferred, mixed]
       _value: null
 
@@ -310,7 +310,7 @@ per_task_io_profile:
         COMPUTED: (posix_read_time_s + posix_write_time_s + posix_open_time_s
                    + posix_close_time_s) / task_wall_time_s
         Value near 1.0 = I/O bound. Value near 0.0 = compute bound.
-        Use to update WDD io_dominance if this contradicts WDD estimate.
+        Use to update WRD io_dominance if this contradicts WRD estimate.
       _value: null
 
     contention_events:
@@ -328,24 +328,24 @@ per_task_io_profile:
         this task instance. Used for deeper investigation.
       _value: null
 
-    match_wdd_io_phase:
+    match_wrd_io_phase:
       _status: required_agent
       _extract: >
-        COMPUTED: true if io_phase_observed == WDD task
-                  temporal_io_annotation.io_phase
+        COMPUTED: true if io_phase_observed matches the I/O timing pattern
+        described in WRD behavioral_notes for this task.
         false = anomaly; flag in diagnosis_summary.anomalies.
       _value: null    # boolean
 
 
 # -----------------------------------------------------------------------------
 # SECTION 3: COMMUNICATION CHANNEL DEFINITIONS
-# One entry per P-C edge in the WDD execution_graph that was active in
+# One entry per P-C edge in the WRD pc_edges that was active in
 # this run. Source: DataLife DFL-G + DaYu SDG.
 # -----------------------------------------------------------------------------
 communication_channels:
 
   _population_protocol: >
-    EMPIRICAL: For each data_dependency edge in WDD execution_graph:
+    EMPIRICAL: For each data_dependency edge in WRD pc_edges:
       - Use DataLife to identify the actual file paths and tiers used
       - Use DaYu to characterize the semantic data flow pattern
       - Compute transfer bandwidth from Darshan bytes transferred /
@@ -354,7 +354,8 @@ communication_channels:
 
     PREDICTIVE: For each edge, derive from DDD storage_tier_assignments
       - physical_path from assigned_tier tier_type
-      - data_volume_bytes from WDD size_measured_bytes (null if unavailable)
+      - data_volume_bytes from WRD estimated_size_hint × cardinality
+        (null if estimated_size_hint is "unknown")
       - transfer_bandwidth_gbs estimated as min(HRD tier bandwidth, required)
 
   _channel_schema:
@@ -362,8 +363,8 @@ communication_channels:
     pc_edge_id:
       _status: required_agent
       _extract: >
-        pc:<producer_task_id>-><consumer_task_id>:<pc_pattern>
-        Copied from WDD execution_graph.edges.
+        edge_id from WRD pc_edges.
+        Format: pc:<producer_task_id>-><consumer_task_id>:<pc_pattern>
       _value: null
 
     physical_path:
@@ -407,7 +408,9 @@ communication_channels:
         Total bytes transferred on this channel.
         Source: DataLife or Darshan bytes written by producer + bytes read
         by consumer (use min to avoid double-counting replicated data).
-      _predictive_reasoning: WDD size_measured_bytes for this dataset.
+      _predictive_reasoning: >
+        WRD estimated_size_hint × cardinality for this dataset.
+        Null if estimated_size_hint is "unknown".
       _value: null
 
     transfer_bandwidth_gbs:
@@ -451,7 +454,7 @@ communication_channels:
 # SECTION 4: DATA FORMAT OBSERVATIONS
 # Per-dataset format details observed at runtime.
 # Source: DaYu semantic analysis or Darshan access pattern heuristics.
-# Supplements WDD format_internals with empirical confirmation.
+# Supplements WRD format_internals with empirical confirmation.
 # -----------------------------------------------------------------------------
 data_format_observations:
 
@@ -459,14 +462,14 @@ data_format_observations:
 
     dataset_id:
       _status: required_agent
-      _extract: dataset_id from WDD data_flow.semantic.
+      _extract: data_id from WRD data_objects.
       _value: null
 
     actual_file_format:
       _status: required_profiler
       _extract: >
         Format observed at runtime. Source: DaYu file format detector.
-        Flag if different from WDD declared file_format.
+        Flag if different from WRD declared file_format.
       _value: null
 
     actual_chunk_size_bytes:
@@ -501,10 +504,10 @@ data_format_observations:
         flag in diagnosis_summary.
       _value: null
 
-    format_match_wdd:
+    format_match_wrd:
       _status: required_agent
       _extract: >
-        COMPUTED: true if actual_file_format == WDD file_format.
+        COMPUTED: true if actual_file_format == WRD file_format.
         false = format conversion occurred unexpectedly; flag in anomalies.
       _value: null    # boolean
 
@@ -572,20 +575,20 @@ temporal_io_behavior:
       _status: required_agent
       _extract: >
         COMPUTED: true if this task was performing I/O at the same time
-        that the immediately downstream task (per WDD DAG) was also
+        that the immediately downstream task (per WRD DAG) was also
         active. Indicates effective pipeline overlap.
         Source: DataLife timeline cross-task analysis.
       _value: null    # boolean
 
-    match_wdd_io_phase:
+    match_wrd_io_phase:
       _status: required_agent
       _extract: >
         COMPUTED: Compare io_start_offset_s and io_end_offset_s against
-        task wall time to re-derive io_phase_observed. Compare to WDD
-        temporal_io_annotation.io_phase:
+        task wall time to re-derive io_phase_observed. Compare to the
+        I/O timing pattern described in WRD behavioral_notes for this task:
           Match = true. Mismatch = false.
-        false = WDD annotation was incorrect; record in anomalies and
-        recommend WDD update.
+        false = WRD behavioral_notes I/O timing description was incorrect;
+        record in anomalies and recommend WRD update.
       _value: null    # boolean
 
 
@@ -685,7 +688,7 @@ per_file_lifecycle:
 
     dataset_id:
       _status: required_agent
-      _extract: dataset_id from WDD data_flow.semantic this file belongs to.
+      _extract: data_id from WRD data_objects this file belongs to.
       _value: null
 
     file_path:
@@ -747,11 +750,11 @@ per_file_lifecycle:
           If retained: run end time offset - created_at_offset_s
       _value: null
 
-    match_wdd_retention:
+    match_wrd_retention:
       _status: required_agent
       _extract: >
-        COMPUTED: Compare lifetime_s against expected retention from WDD
-        data_flow.lifecycle.retention_window.
+        COMPUTED: Compare lifetime_s against expected retention from WRD
+        data_objects[*].lifecycle.retention_window.
           For intermediate datasets: true if deleted after last_consumer_phase,
             false if deleted early (data loss risk) or retained too long
             (wasted capacity).
@@ -773,20 +776,20 @@ diagnosis_summary:
     _extract: >
       Classify the observed I/O pattern at the workflow level.
       Derive from:
-        - WDD workflow_pattern (structural expectation)
+        - WRD workflow_pattern (structural expectation)
         - Actual communication_channels.physical_path distribution
         - Temporal ordering of I/O events across tasks
-      Should match WDD workflow_pattern if deployment behaved as designed.
+      Should match WRD workflow_pattern if deployment behaved as designed.
       Mismatch is a significant diagnostic signal.
     _allowed_values: [pipeline, scatter_gather, iterative, cascading, hybrid]
     _value: null
 
-  pattern_match_wdd:
+  pattern_match_wrd:
     _status: required_agent
     _extract: >
-      COMPUTED: true if overall_io_pattern == WDD header.workflow_pattern.
+      COMPUTED: true if overall_io_pattern == WRD header.workflow_pattern.
       false = observed execution pattern diverged from structural expectation.
-      Investigate: incorrect WDD classification, unexpected runtime behavior,
+      Investigate: incorrect WRD classification, unexpected runtime behavior,
       or DDD decisions that changed data flow routing.
     _value: null    # boolean
 
@@ -806,8 +809,9 @@ diagnosis_summary:
         STAGING BOTTLENECK:
           idle_time_s > 10% of workflow wall time for any large dataset
         PIPELINE STALL:
-          pipeline_overlap_observed = false for tasks where WDD
-          co_scheduling_hint = beneficial
+          pipeline_overlap_observed = false for tasks where DDD
+          task_placement places producer and consumer in a co_locate group
+          with co_schedule = true
     _bottleneck_entry_schema:
       entity:
         _extract: task_id or tier_id or dataset_id where bottleneck manifests.
@@ -887,9 +891,9 @@ diagnosis_summary:
   anomalies:
     _status: required_agent
     _extract: >
-      List of fields where observed values diverged significantly from WDD
+      List of fields where observed values diverged significantly from WRD
       annotations or DDD plans. Each anomaly should reference the specific
-      mismatched fields and suggest whether a WDD update is needed.
+      mismatched fields and suggest whether a WRD update is needed.
     _anomaly_entry_schema:
       anomaly_type:
         _allowed_values:
@@ -905,19 +909,19 @@ diagnosis_summary:
         _extract: task_id or dataset_id or tier_id where anomaly was observed.
         _value: null
       expected:
-        _extract: The value predicted by WDD or DDD.
+        _extract: The value predicted by WRD or DDD.
         _value: null
       observed:
         _extract: The value actually observed in this run.
         _value: null
       recommendation:
         _extract: >
-          Should the WDD be updated to match observed reality?
+          Should the WRD be updated to match observed reality?
           Or is this a deployment anomaly that should be corrected in the DDD?
-          Example: "WDD temporal_io_annotation.io_phase for task:build_tracks
-          should be updated from 'deferred' to 'mixed' — observed I/O is
-          interleaved with compute. Update WDD and re-derive DDD pipelining
-          decisions."
+          Example: "WRD behavioral_notes for task:build_tracks describe
+          deferred I/O (writes only at task completion), but observed I/O is
+          interleaved with compute. Update WRD behavioral_notes and
+          re-evaluate DDD pipelining decisions."
         _value: null
     _value: []
 
@@ -926,7 +930,7 @@ diagnosis_summary:
     _required_when: header.predictive == true
     _extract: >
       In predictive mode: one confidence record per estimated field.
-      Same schema as WDD translation_metadata.field_confidence_records:
+      Same schema as WRD translation_metadata.field_confidence_records:
         field_path, filled_by, confidence_level, confidence_reason,
         requires_human_review
       In empirical mode: null (all values are measured, not estimated).

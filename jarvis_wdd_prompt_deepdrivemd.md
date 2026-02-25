@@ -10,6 +10,9 @@ Hard Scope Rules
 - Do not invent workflow tasks or dependencies not present in WDD.
 - If any required value cannot be inferred from WDD, use explicit placeholders and report what is missing.
 - Before destructive actions (destroy pipeline, remove package), print exactly what will be changed and require explicit confirmation.
+- If any Jarvis CLI command is used, load environment first with `source ~/iowarp/load-jarvis.sh`.
+- For shell-based Jarvis commands, run in one command chain, for example:
+  `source ~/iowarp/load-jarvis.sh && jarvis pipeline list`
 
 Inputs
 - `WDD_PATH`: `workflow_wdd/deepdrivemd-wdd-gemini.yaml`
@@ -18,6 +21,7 @@ Inputs
 - `REPO_ROOT_PATH`: `/home/mtang11/jarvis-work/repos/deepdrivemd_repo`
 - `REPO_NAME`: `deepdrivemd_repo`
 - `RUN_DIR_BASE`: `/home/mtang11/scripts/workflow-representation-description/workflows_repo/deepdrivemd`
+- `LATER_TASK_INPUT_DATA_PATH`: `/home/mtang11/scripts/workflow-representation-description/workflows_repo/deepdrivemd/data/bba`
 - `HOSTFILE_OR_NULL`: `null`
 
 Output
@@ -64,6 +68,10 @@ Step 1 — Parse and validate WDD
 - Print a short plan: task count, edge count, derived package list, proposed pipeline order.
 
 Step 2 — Prepare Jarvis manager state
+- Environment bootstrap (required before any Jarvis CLI fallback):
+  - Run `source ~/iowarp/load-jarvis.sh`
+  - Verify with `command -v jarvis`
+  - If `jarvis` is still unavailable, stop and report environment failure.
 - Load Jarvis configuration.
 - Initialize config dirs if needed.
 - If `HOSTFILE_OR_NULL` is not null, set hostfile.
@@ -86,7 +94,10 @@ Step 4 — Register repo and persist config
 Step 5 — Create and configure pipeline
 - Create `PIPELINE_ID` if absent.
 - Append each `pkg_type` exactly once in topological order.
-- Configure package defaults using `RUN_DIR_BASE` and WDD task metadata.
+- Configure package defaults using `RUN_DIR_BASE`, WDD task metadata, and `LATER_TASK_INPUT_DATA_PATH` for downstream tasks.
+- Initial input generation tasks should not require external raw input; they generate starting artifacts used by later tasks.
+- For later tasks that need persisted input context, use:
+  - `/home/mtang11/scripts/workflow-representation-description/workflows_repo/deepdrivemd/data/bba`
 - Validate no duplicate `pkg_id`s in pipeline.
 
 Step 6 — Build and run

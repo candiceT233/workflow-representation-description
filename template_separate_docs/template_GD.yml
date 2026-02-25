@@ -1,6 +1,6 @@
 # =============================================================================
 # WIDGET — Goal Document (GD) Agent Template
-# Schema: gd-4.0  |  Architecture Design: v4
+# Schema: gd-5.0  |  Architecture Design: v5
 #
 # PURPOSE
 # The GD captures the operator's performance objectives and constraints that
@@ -61,18 +61,18 @@ header:
     _format: "gd:<workflow_name>:<context_name>"
     _value: null
 
-  wdd_lineage_id:
+  wrd_lineage_id:
     _status: required_operator
     _prompt: >
-      What is the workflow_lineage_id of the WDD this goal set applies to?
-      (Find it in the WDD header.)
+      What is the workflow_lineage_id of the WRD this goal set applies to?
+      (Find it in the WRD header.)
     _value: null
 
-  wdd_version:
+  wrd_version:
     _status: required_operator
     _prompt: >
-      Which WDD version is this goal set authored against?
-      (e.g., "1.0.0". Find it in the WDD header.)
+      Which WRD version is this goal set authored against?
+      (e.g., "1.0.0". Find it in the WRD header.)
     _value: null
 
   operator:
@@ -95,8 +95,8 @@ header:
 
   schema_version:
     _status: auto_derived
-    _extract: Always set to "gd-4.0".
-    _value: "gd-4.0"
+    _extract: Always set to "gd-5.0".
+    _value: "gd-5.0"
 
   description:
     _status: required_operator

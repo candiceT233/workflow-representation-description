@@ -1,29 +1,29 @@
 # =============================================================================
 # WIDGET — Deployment Definition Document (DDD) Agent Template
-# Schema: ddd-4.0  |  Architecture Design: v4
+# Schema: ddd-5.0  |  Architecture Design: v5
 #
 # PURPOSE
 # The DDD defines how a workflow is deployed to achieve a specific set of
-# goals on specific hardware. It bridges WDD logical structure, GD intent,
+# goals on specific hardware. It bridges WRD logical structure, GD intent,
 # and HRD physical constraints into a concrete execution strategy.
 #
 # The DDD is the primary artifact produced by a WIDGET prescription agent.
 # Every decision records both WHAT was decided and WHY (via goal_ref).
 # A DDD without goal_refs is incomplete — the agent must not emit one.
 #
-# A single WDD can have multiple DDDs representing different strategies
+# A single WRD can have multiple DDDs representing different strategies
 # (e.g., throughput_optimized, cost_optimized, latency_optimized).
 # Each DDD is a separate, self-contained, versioned document.
 #
 # WHO FILLS THIS DOCUMENT
-# Primarily the AI prescription agent, given WDD + GD + HRD as inputs.
+# Primarily the AI prescription agent, given WRD + GD + HRD as inputs.
 # The agent fills all required_agent fields through reasoning.
 # required_agent_ask fields are filled after the agent presents a proposed
 # value and the operator confirms or overrides.
 # auto_validated fields are computed checks — never manually set.
 #
 # FIELD STATUS LEGEND
-#   required_agent        Agent derives from WDD + GD + HRD reasoning.
+#   required_agent        Agent derives from WRD + GD + HRD reasoning.
 #                         No operator input needed unless confidence is low.
 #
 #   required_agent_ask    Agent proposes a value; operator must confirm or
@@ -36,11 +36,11 @@
 #
 # AGENT REASONING PROTOCOL
 # Before filling any section, the agent must:
-#   1. Read the full WDD (all sections)
+#   1. Read the full WRD (all sections)
 #   2. Read the full GD (all goals and hard constraints)
 #   3. Read the full HRD (all storage tiers, compute topology, network fabric)
 #   4. Identify which GD goals are hard (must satisfy) vs soft (optimize)
-#   5. For each hard constraint, identify which WDD entities it applies to
+#   5. For each hard constraint, identify which WRD entities it applies to
 #   6. Derive a candidate strategy name from the dominant soft goal
 #   7. Fill sections in order: header → parallelism → storage → placement
 #      → pipelining → replication → validation
@@ -49,8 +49,8 @@
 # Before handing this DDD to Jarvis-MCP for deployment:
 #   [ ] All required_agent fields non-null
 #   [ ] All required_agent_ask fields confirmed by operator
-#   [ ] Every task in WDD task_registry has a parallelism entry
-#   [ ] Every dataset in WDD data_flow.semantic has a storage tier assignment
+#   [ ] Every task in WRD tasks has a parallelism entry
+#   [ ] Every dataset in WRD data_objects has a storage tier assignment
 #   [ ] Every goal_ref references a valid goal_id from the GD
 #   [ ] validation_summary.validation_status == "valid"
 #   [ ] No hard_constraint_check has status == "fail"
@@ -58,7 +58,7 @@
 #   [ ] No bandwidth_check has status == "fail"
 #
 # ID NAMESPACE
-#   DDD:   deploy:<wdd_lineage_id_short>:<strategy_name>
+#   DDD:   deploy:<wrd_lineage_id_short>:<strategy_name>
 #   (All task:, data:, pc:, tier:, compute:, goal: IDs are referenced
 #    from their respective source documents — never redefined here.)
 # =============================================================================
@@ -72,7 +72,7 @@ header:
   ddd_id:
     _status: auto_validated
     _extract: >
-      Format: deploy:<first_8_chars_of_wdd_lineage_id>:<strategy_name>
+      Format: deploy:<first_8_chars_of_wrd_lineage_id>:<strategy_name>
       Example: deploy:f3a9c2e1:throughput_optimized
     _value: null
 
@@ -90,15 +90,15 @@ header:
       Does this name accurately describe the intent?"
     _value: null
 
-  wdd_lineage_id:
+  wrd_lineage_id:
     _status: required_agent
-    _extract: Copied from WDD header.workflow_lineage_id.
+    _extract: Copied from WRD header.workflow_lineage_id.
     _value: null
 
-  wdd_version:
+  wrd_version:
     _status: required_agent
     _extract: >
-      Copied from WDD header.version. If WDD version changes after this DDD
+      Copied from WRD header.version. If WRD version changes after this DDD
       is generated, this DDD must be re-validated before reuse.
     _value: null
 
@@ -120,7 +120,7 @@ header:
   execution_profile:
     _status: required_agent_ask
     _reasoning: >
-      Look at WDD execution_profiles. If the GD specifies a partial run
+      Look at WRD execution_profiles. If the GD specifies a partial run
       (e.g., only through stage 3), select the matching profile.
       Default to profile:full if no partial run is indicated.
       Present to operator: "I will generate a deployment for the
@@ -140,7 +140,7 @@ header:
 
   schema_version:
     _status: required_agent
-    _value: "ddd-4.0"
+    _value: "ddd-5.0"
 
   description:
     _status: required_agent
@@ -159,21 +159,31 @@ header:
 
 # -----------------------------------------------------------------------------
 # SECTION 2: PER-TASK PARALLELISM
-# One entry per task in the WDD task_registry for the chosen execution profile.
-# Agent reasons from: WDD task type, io_dominance, loop annotations,
-# pc_pattern on edges, GD throughput/latency goals, HRD node count limits.
+# One entry per task in WRD tasks for the chosen execution profile.
+# Agent reasons from: WRD task description, io_dominance, parallelism_model,
+# pc_edges (pc_pattern, coupling), GD throughput/latency goals, HRD node limits.
 # -----------------------------------------------------------------------------
 per_task_parallelism:
   # Agent populates as a list of entries matching _task_parallelism_schema.
-  # Include every task in the WDD execution_profile.required_task_set.
+  # Include every task in the WRD execution_profile.required_task_set.
 
   _agent_reasoning_protocol: >
     For each task, reason as follows:
-    1. READ from WDD: task_type, io_dominance, loop_annotation,
-       temporal_io_annotation, relationships[*].pc_pattern
+    1. READ from WRD: task type (inferred from stage + description),
+       io_dominance, loop_groups, pc_edges[*].pc_pattern and coupling
     2. READ from GD: primary soft goal (throughput vs latency vs cost)
     3. READ from HRD: compute_id options, node_count limits
-    4. COMPUTE:
+    4. ASSESS contention_sensitivity for this task:
+       The WRD does not carry a contention_sensitivity field — the DDD
+       agent must assess it from WRD signals:
+         high:   io_bound task on a shared storage tier with n_to_1 or
+                 n_to_n pc_pattern, or many parallel instances writing
+                 simultaneously
+         medium: io_bound task with 1_to_1 or 1_to_n edges, moderate
+                 parallelism
+         low:    compute_bound task; I/O is a small fraction of runtime
+         unknown: insufficient evidence from WRD alone
+    5. COMPUTE:
        - io_bound tasks: scale instances to maximize bandwidth utilization.
          Target: (peak_tier_bandwidth / expected_per_instance_bandwidth).
          Cross-check against HRD tier contention_model.
@@ -182,14 +192,14 @@ per_task_parallelism:
          (or GD max_nodes limit if sweep is larger).
        - convergence loops: set instances = 1 unless parallelizable within
          each iteration.
-    5. For every decision, record goal_ref pointing to the GD goal that
+    6. For every decision, record goal_ref pointing to the GD goal that
        most directly motivated the choice.
 
   _task_parallelism_schema:
 
     task_id:
       _status: required_agent
-      _extract: task_id from WDD task_registry.
+      _extract: task_id from WRD tasks.
       _value: null
 
     parallelism_instances:
@@ -248,8 +258,8 @@ per_task_parallelism:
       _status: required_agent
       _reasoning: >
         1-2 sentence explanation of why this parallelism was chosen.
-        Must reference the WDD fields that informed the reasoning.
-        Example: "task:detect_cyclones is io_bound (WDD io_dominance=io_bound)
+        Must reference the WRD fields that informed the reasoning.
+        Example: "task:detect_cyclones is io_bound (WRD io_dominance=io_bound)
         with 1_to_n fan-out from preprocess. 64 instances saturate the burst
         buffer bandwidth (goal:throughput_10gbs) within the node allocation
         limit (goal:max_nodes_256)."
@@ -258,38 +268,40 @@ per_task_parallelism:
 
 # -----------------------------------------------------------------------------
 # SECTION 3: STORAGE TIER ASSIGNMENTS
-# One entry per dataset in WDD data_flow.semantic for the chosen profile.
-# Agent reasons from: WDD dataset role, lifecycle, access_frequency_class,
-# pc_pattern; GD data_placement constraints; HRD tier capacities and
-# persistence; GD reliability goals.
+# One entry per dataset in WRD data_objects for the chosen profile.
+# Agent reasons from: WRD dataset category, lifecycle, access_frequency_class,
+# pc_edges; GD data_placement constraints; HRD tier capacities and persistence.
 # -----------------------------------------------------------------------------
 storage_tier_assignments:
 
   _agent_reasoning_protocol: >
     For each dataset, reason as follows:
-    1. READ from WDD: role (input/intermediate/checkpoint), retention_window,
-       access_frequency_class, consumer_count, size_measured_bytes (if available),
-       pc_pattern, format_internals
+    1. READ from WRD: category (input/intermediate/checkpoint/config),
+       lifecycle.retention_window, lifecycle.access_frequency_class,
+       lifecycle.consumer_count, estimated_size_hint,
+       pc_edges[*].pc_pattern and data_volume_class,
+       format_hint (chunk size, compression, layout)
     2. READ from GD: hard_constraints (any data_placement restrictions),
        reliability goals (any replication requirements)
     3. READ from HRD: available tiers, persistence, capacity, contention_model
     4. ASSIGN:
        checkpoint datasets → persistent tier (GD typically requires PFS;
                              check hard_constraints first)
-       intermediate datasets, high-access (few_times or repeatedly) → 
+       intermediate datasets, high-access (few_times or repeatedly) →
                              burst_buffer or node_local_ssd if available and
                              non-contended; else PFS
        intermediate datasets, single-access (once), large → PFS directly
                              (no benefit from staging)
        input datasets → PFS or object_store (already there at job start;
                         stage to burst_buffer if access_frequency > once)
+       config datasets → PFS; never stage to volatile tiers
     5. Compute feasibility_check against HRD tier capacity.
 
   _dataset_assignment_schema:
 
     dataset_id:
       _status: required_agent
-      _extract: dataset_id from WDD data_flow.semantic.
+      _extract: data_id from WRD data_objects.
       _value: null
 
     assigned_tier:
@@ -302,7 +314,7 @@ storage_tier_assignments:
     cleanup_policy:
       _status: required_agent
       _reasoning: >
-        after_last_consumer:  delete after task identified by WDD
+        after_last_consumer:  delete after task identified by WRD
                               last_consumer_phase completes. Use for
                               intermediate datasets on volatile tiers.
         end_of_job:           delete at job end. Use for intermediates on
@@ -323,7 +335,7 @@ storage_tier_assignments:
       _reasoning: >
         none:              single access, no benefit from caching
         cache_on_first_read: multiple consumers; cache after first read
-                            (use when WDD access_frequency_class = few_times)
+                            (use when WRD access_frequency_class = few_times)
         prefetch:          stage from cold storage before task starts
                            (use when access_frequency_class = repeatedly
                             and staging latency would otherwise be on
@@ -343,9 +355,9 @@ storage_tier_assignments:
     rationale:
       _status: required_agent
       _reasoning: >
-        1-2 sentences. Reference WDD dataset properties and GD goals.
+        1-2 sentences. Reference WRD dataset properties and GD goals.
         Example: "data:era5_raw is an external input read once by
-        task:preprocess_era5 (WDD access_frequency=once). No staging
+        task:preprocess_era5 (WRD access_frequency=once). No staging
         benefit; assign directly to tier:pfs to avoid wasting burst buffer
         capacity for data that will not be reused."
       _value: null
@@ -353,15 +365,16 @@ storage_tier_assignments:
     feasibility_check:
       _status: auto_validated
       _extract: >
-        COMPUTED:
-        If WDD size_measured_bytes is available:
-          Compare sum of all datasets on this tier (in bytes) against
+        COMPUTED from WRD estimated_size_hint × cardinality for each dataset.
+          Compare sum of all datasets on this tier against
           HRD per_job_capacity_tb (converted to bytes).
           pass:    total < 80% of per_job_capacity_tb
           warning: total between 80% and 100% of per_job_capacity_tb
           fail:    total > per_job_capacity_tb
-        If WDD size_measured_bytes is unavailable:
-          Set to "unavailable — first run required"
+        If estimated_size_hint is "unknown" for all datasets on this tier:
+          Set to "unavailable — estimated_size_hint not provided in WRD"
+        NOTE: After the first run, actual sizes from IODD per_file_lifecycle
+        can replace estimates here for higher-confidence checks.
       _allowed_values: [pass, warning, fail, unavailable]
       _value: null
 
@@ -369,22 +382,29 @@ storage_tier_assignments:
 # -----------------------------------------------------------------------------
 # SECTION 4: TASK PLACEMENT AND CO-SCHEDULING
 # Groups of tasks that should be co-located or overlapped in time.
-# Agent derives from WDD co_scheduling_hint on relationships and
-# temporal_io_annotation overlap_potential.
+# The WRD does not carry a co_scheduling_hint field — the DDD agent derives
+# co-location recommendations from WRD pc_edges (coupling, pc_pattern,
+# data_volume_class) and behavioral_notes (streaming vs. batch).
 # -----------------------------------------------------------------------------
 task_placement:
   # Agent populates as a list of placement group entries.
-  # If WDD has no edges with co_scheduling_hint = beneficial, this list
-  # may be empty.
+  # May be empty if no task pairs benefit from co-location.
 
   _agent_reasoning_protocol: >
-    For each data_dependency edge where WDD co_scheduling_hint = beneficial:
-      - Create a co-location group containing the producer and consumer tasks
-      - Set placement_policy = co_locate
-      - Set co_schedule = true if both tasks have high overlap_potential
-    For tasks with co_scheduling_hint = harmful:
-      - Create a spread group to explicitly separate them
-    Skip edges with co_scheduling_hint = neutral or unknown.
+    For each pc_edge in the WRD, assess whether co-location is beneficial:
+      BENEFICIAL (create co_locate group):
+        - coupling = loose AND data_volume_class = medium or large
+          (producer and consumer can pipeline; co-location keeps data local)
+        - behavioral_notes of producer mention streaming output AND
+          behavioral_notes of consumer mention streaming input
+      NEUTRAL (skip; do not create a group):
+        - coupling = tight (sequential anyway; no pipeline benefit)
+        - data_volume_class = small (movement cost negligible)
+      HARMFUL (create spread group):
+        - Both tasks are io_bound with n_to_n or n_to_1 patterns on a
+          shared tier; co-location would concentrate contention
+    For tasks assessed as HARMFUL co-location, create a spread group
+    to explicitly separate them across nodes.
 
   _placement_group_schema:
 
@@ -423,18 +443,20 @@ task_placement:
     rationale:
       _status: required_agent
       _reasoning: >
-        Reference the WDD co_scheduling_hint and pc_pattern that motivated
-        this grouping. Example: "task:detect_cyclones and task:build_tracks
-        share a 1_to_n edge with co_scheduling_hint=beneficial (WDD).
-        Co-locating keeps per-storm output files in node-local SSD,
-        avoiding PFS round-trips between these stages."
+        Reference the WRD pc_edge fields (coupling, pc_pattern,
+        data_volume_class) and behavioral_notes that motivated this grouping.
+        Example: "task:detect_cyclones and task:build_tracks share a 1_to_n
+        edge with loose coupling and data_volume_class=medium. Producer
+        behavioral_notes indicate streaming output; consumer can begin on
+        partial data. Co-locating keeps per-storm output files in node-local
+        SSD, avoiding PFS round-trips between these stages."
       _value: null
 
 
 # -----------------------------------------------------------------------------
 # SECTION 5: STAGE ORDERING AND PIPELINING
 # Decisions about whether workflow stages overlap in time.
-# Agent derives from WDD workflow_pattern and temporal_io_annotation.
+# Agent derives from WRD workflow_patterns and behavioral_notes per task.
 # -----------------------------------------------------------------------------
 pipelining:
   # Agent populates if workflow_pattern is pipeline or cascading.
@@ -442,18 +464,20 @@ pipelining:
   # handled by parallelism_instances, not by overlapping stages.
 
   _agent_reasoning_protocol: >
-    Relevant when WDD workflow_pattern = pipeline or cascading.
-    For each consecutive stage pair where:
-      - upstream task temporal_io_annotation.io_phase = deferred (writes
-        only after compute)
-      - downstream task temporal_io_annotation.io_phase = upfront (reads
-        before compute)
-    The downstream task cannot start until the upstream task writes outputs.
-    Pipeline overlap is only beneficial when:
-      - upstream task produces output in chunks (streaming)
-      - downstream task can start processing as soon as first chunk arrives
-    If pipeline overlap is not beneficial, set overlap_strategy = sequential
-    and document why.
+    Relevant when WRD workflow_patterns.primary_pattern = pipeline or
+    cascading. For each consecutive stage pair, inspect WRD behavioral_notes
+    of both tasks:
+      - If producer behavioral_notes indicate deferred writes (all output
+        written at task completion) AND consumer behavioral_notes indicate
+        upfront reads (all input read before compute begins), the consumer
+        cannot start until the producer completes — pipeline overlap is
+        not possible; set overlap_strategy = sequential.
+      - If producer behavioral_notes indicate streaming/incremental output
+        AND consumer behavioral_notes indicate streaming/incremental reads,
+        pipeline overlap IS possible; set overlap_strategy = full_overlap
+        or partial_overlap.
+    For scatter_gather and iterative workflows, pipelining is typically
+    handled by parallelism_instances, not by overlapping stages.
 
   _pipeline_group_schema:
 
@@ -488,7 +512,7 @@ pipelining:
       _reasoning: >
         For full_overlap or partial_overlap: how many data items (files,
         timesteps, ensemble members) are in each pipeline cycle.
-        Derive from: WDD loop parameter_ref size if known, or HRD
+        Derive from: WRD loop parameter_ref size if known, or HRD
         burst_buffer per_job_capacity relative to dataset sizes.
         Null for sequential strategies.
       _value: null
@@ -521,7 +545,7 @@ replication_and_caching:
   checkpoint_interval:
     _status: required_agent
     _reasoning: >
-      For iterative workflows (WDD workflow_pattern = iterative or hybrid
+      For iterative workflows (WRD workflow_pattern = iterative or hybrid
       with iterative stages): how frequently to write checkpoints,
       expressed as every N iterations.
       Derive from: GD reliability goals, loop max_iterations_guard,
@@ -594,20 +618,21 @@ validation_summary:
     _extract: >
       For each tier used in storage_tier_assignments:
         tier_id: <tier_id>
-        total_assigned_gb: sum of size_measured_bytes for all datasets
-                           assigned to this tier (null if sizes unavailable)
+        total_assigned_gb: sum of estimated sizes (from WRD estimated_size_hint
+                           × cardinality) for all datasets assigned to this tier.
+                           Null if all hints are "unknown".
         tier_capacity_gb: HRD per_job_capacity_tb * 1024
         status: pass | warning | fail | unavailable
-        note: if sizes unavailable, note that first run is required
+        note: if sizes unavailable, note that estimated_size_hint is unknown
     _value: []
 
   bandwidth_checks:
     _status: auto_validated
     _extract: >
-      For each data_dependency edge in WDD execution_graph where the
+      For each data_dependency edge in WRD pc_edges where the
       assigned storage tier is the transfer path:
         pc_edge_id: <pc edge id>
-        required_bandwidth_gbs: estimate from WDD data_volume_class and
+        required_bandwidth_gbs: estimate from WRD data_volume_class and
                                  GD throughput goal timeline
         tier_peak_bandwidth_gbs: HRD peak_read_bandwidth_gbs or
                                   peak_write_bandwidth_gbs for assigned tier
@@ -626,5 +651,5 @@ validation_summary:
       If validation_status = valid and no warnings, write "All checks passed."
       If warnings exist, describe what the operator should monitor at runtime.
       If invalid, describe which constraints are violated and what
-      changes to the WDD, GD, or hardware assumptions would resolve them.
+      changes to the WRD, GD, or hardware assumptions would resolve them.
     _value: null

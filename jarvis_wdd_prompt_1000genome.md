@@ -10,6 +10,9 @@ Hard Scope Rules
 - Do not invent workflow tasks or dependencies not present in WDD.
 - If any required value cannot be inferred from WDD, use explicit placeholders and report what is missing.
 - Before destructive actions (destroy pipeline, remove package), print exactly what will be changed and require explicit confirmation.
+- If any Jarvis CLI command is used, load environment first with `source ~/iowarp/load-jarvis.sh`.
+- For shell-based Jarvis commands, run in one command chain, for example:
+  `source ~/iowarp/load-jarvis.sh && jarvis pipeline list`
 
 Inputs
 - `WDD_PATH`: `workflow_wdd/1000genome-wdd-gemini.yaml`
@@ -17,7 +20,10 @@ Inputs
 - `PIPELINE_ID`: `1000genome-workflow`
 - `REPO_ROOT_PATH`: `/home/mtang11/jarvis-work/repos/1000genome_repo`
 - `REPO_NAME`: `1000genome_repo`
-- `RUN_DIR_BASE`: `/mnt/common/mtang11/scripts/1kgenome-pnnl/1000genome-workflow`
+- `RUN_DIR_BASE`: `/home/mtang11/scripts/workflow-representation-description/workflows_repo/1000genome-workflow`
+- `WORKFLOW_INPUT_DATA_PATHS`:
+  - `/home/mtang11/scripts/workflow-representation-description/workflows_repo/1000genome-workflow/data/20130502`
+  - `/home/mtang11/scripts/workflow-representation-description/workflows_repo/1000genome-workflow/data/populations`
 - `HOSTFILE_OR_NULL`: `null`
 
 Output
@@ -64,6 +70,10 @@ Step 1 — Parse and validate WDD
 - Print a short plan: task count, edge count, derived package list, proposed pipeline order.
 
 Step 2 — Prepare Jarvis manager state
+- Environment bootstrap (required before any Jarvis CLI fallback):
+  - Run `source ~/iowarp/load-jarvis.sh`
+  - Verify with `command -v jarvis`
+  - If `jarvis` is still unavailable, stop and report environment failure.
 - Load Jarvis configuration.
 - Initialize config dirs if needed.
 - If `HOSTFILE_OR_NULL` is not null, set hostfile.
@@ -86,7 +96,10 @@ Step 4 — Register repo and persist config
 Step 5 — Create and configure pipeline
 - Create `PIPELINE_ID` if absent.
 - Append each `pkg_type` exactly once in topological order.
-- Configure package defaults using `RUN_DIR_BASE` and WDD task metadata.
+- Configure package defaults using `RUN_DIR_BASE`, WDD task metadata, and `WORKFLOW_INPUT_DATA_PATHS`.
+- Ensure package configs that require raw workflow inputs explicitly reference:
+  - `/home/mtang11/scripts/workflow-representation-description/workflows_repo/1000genome-workflow/data/20130502`
+  - `/home/mtang11/scripts/workflow-representation-description/workflows_repo/1000genome-workflow/data/populations`
 - Validate no duplicate `pkg_id`s in pipeline.
 
 Step 6 — Build and run
