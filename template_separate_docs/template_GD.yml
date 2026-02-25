@@ -1,49 +1,35 @@
 # =============================================================================
 # WIDGET — Goal Document (GD) Agent Template
-# Schema: gd-5.0  |  Architecture Design: v6
+# Schema: gd-7.0  |  Architecture Design: v7
+# See WIDGET_conventions.md for ID namespace and field status codes.
 #
 # PURPOSE
 # The GD captures the operator's performance objectives and constraints that
-# motivate a deployment strategy. Every decision in the DDD must back-reference
+# motivate a deployment strategy. Every decision in the DDD must reference
 # a goal_id defined here. Without the GD, the DDD is a set of choices without
-# justification — a prescription agent cannot evaluate whether any
-# recommendation is aligned with what the operator actually wants.
+# justification.
 #
 # WHO FILLS THIS DOCUMENT
-# The GD is authored by the operator or HPC facility staff — not the AI agent.
-# The agent's role here is to:
-#   1. Prompt the operator with structured questions to elicit goal entries
+# Authored by the operator or HPC facility staff — not the AI agent.
+# The agent's role is to:
+#   1. Elicit goal entries through structured prompting
 #   2. Validate that all hard goals are quantified and measurable
-#   3. Detect conflicts between goals and prompt for conflict resolution policy
-#   4. Ensure every goal_id follows the naming convention goal:<n>
+#   3. Detect conflicts between goals and surface them for resolution
+#   4. Ensure every goal_id follows the naming convention goal:<descriptor>
 #   5. Flag any goal that lacks a metric or target_value as incomplete
 #
-# FIELD STATUS LEGEND
-#   required_operator     Operator must provide. Agent prompts if missing.
-#                         DDD generation cannot begin until all required_operator
-#                         fields are non-null.
-#
-#   optional_operator     Improves DDD quality but is not strictly required.
-#                         Agent prompts once; proceeds if operator declines.
-#
-#   auto_derived          Agent computes from other fields in this document.
-#                         Never manually specified.
-#
 # AGENT READINESS GATE
-# Before handing this GD to the DDD generator, verify:
 #   [ ] header fields all non-null
 #   [ ] At least one goal entry exists
-#   [ ] Every goal has goal_id, goal_type, metric, target_value, target_unit,
+#   [ ] Every goal has: goal_id, goal_type, metric, target_value, target_unit,
 #       constraint_type
 #   [ ] Every soft goal has a priority value
 #   [ ] conflict_resolution.priority_ordering lists all soft goals
-#   [ ] If any two soft goals could conflict, resolution_notes is non-null
+#   [ ] If two soft goals share the same priority rank, resolution_notes is non-null
 #   [ ] All hard_constraints have applies_to and rationale
+#   [ ] schema_version = "gd-7.0"
 #
-# ID NAMESPACE
-#   Goals:       goal:<n>    e.g.  goal:throughput_10gbs
-#   Constraints: goal:<n>    e.g.  goal:must_use_pfs_for_checkpoints
-#   (Goals and hard constraints share the goal: namespace for DDD back-refs)
+# Field status codes: see WIDGET_conventions.md Section 3.
 # =============================================================================
 
 
@@ -51,287 +37,180 @@
 # SECTION 1: HEADER
 # -----------------------------------------------------------------------------
 header:
+  gd_id: "gd:<workflow_name>:<context_name>"
+  # [required_operator]
+  # Prompt: "What short name describes this deployment context?
+  # (e.g., 'production_cmip7_run', 'test_50node', 'dev_single_node')
+  # I will form: gd:<workflow_name>:<your_context_name>"
+  _value: null
 
-  gd_id:
-    _status: required_operator
-    _prompt: >
-      I will assign a GD identifier. What short name describes this
-      deployment context? (e.g., "production_cmip7_run", "test_50node",
-      "dev_single_node"). I will form: gd:<workflow_name>:<your_context_name>
-    _format: "gd:<workflow_name>:<context_name>"
-    _value: null
+  wrd_lineage_id: null
+  # [required_operator] workflow_lineage_id from the WDD this goal set applies to.
 
-  wrd_lineage_id:
-    _status: required_operator
-    _prompt: >
-      What is the workflow_lineage_id of the WRD this goal set applies to?
-      (Find it in the WRD header.)
-    _value: null
+  wrd_version: null
+  # [required_operator] WDD version this goal set was authored against.
 
-  wrd_version:
-    _status: required_operator
-    _prompt: >
-      Which WRD version is this goal set authored against?
-      (e.g., "1.0.0". Find it in the WRD header.)
-    _value: null
+  operator: null
+  # [required_operator] Name, role, and group/institution.
+  # E.g., "Dr. Jane Smith, Research Scientist, NCAR Mesoscale Dynamics Group"
 
-  operator:
-    _status: required_operator
-    _prompt: >
-      Who is defining these performance goals? Please provide your name,
-      role, and group or institution.
-      (e.g., "Dr. Jane Smith, Research Scientist, NCAR Mesoscale Dynamics Group")
-    _value: null
+  created_at: null        # [auto_derived] ISO 8601
+  last_modified_at: null  # [auto_derived] ISO 8601
+  schema_version: "gd-7.0"  # [auto_derived]
 
-  created_at:
-    _status: auto_derived
-    _extract: ISO 8601 timestamp at document creation.
-    _value: null
-
-  last_modified_at:
-    _status: auto_derived
-    _extract: ISO 8601 timestamp. Same as created_at on first creation.
-    _value: null
-
-  schema_version:
-    _status: auto_derived
-    _extract: Always set to "gd-5.0".
-    _value: "gd-5.0"
-
-  description:
-    _status: required_operator
-    _prompt: >
-      Please describe the context for this run in a few sentences.
-      What kind of run is this (production, testing, benchmarking)?
-      What is the scientific purpose? What is the primary performance concern?
-      (e.g., "Production 40-year reanalysis for CMIP7 submission.
-      Throughput is the primary concern. Must complete within a 48-hour
-      allocation window on Perlmutter.")
-    _value: null
+  description: null
+  # [required_operator]
+  # Prompt: "Describe the context for this run in a few sentences.
+  # What kind of run is this (production, testing, benchmarking)?
+  # What is the scientific purpose? What is the primary performance concern?
+  # E.g., 'Production 40-year reanalysis for CMIP7. Throughput is the primary
+  # concern. Must complete within a 48-hour allocation window on Perlmutter.'"
 
 
 # -----------------------------------------------------------------------------
 # SECTION 2: GOALS
-# One entry per performance objective. Agent elicits these through structured
-# prompting. See agent_goal_elicitation_script below.
+# One entry per performance objective.
+#
+# ELICITATION ORDER — Agent asks in this sequence:
+#
+# 1. THROUGHPUT
+#    "Do you have a minimum required data throughput?
+#    (e.g., 'at least 10 GB/s sustained input ingestion').
+#    Hard requirement or soft target to optimize toward?"
+#
+# 2. LATENCY / WALL TIME
+#    "Do you have an end-to-end wall time budget?
+#    (e.g., 'must complete within 30 minutes'). Hard or soft?"
+#
+# 3. RESOURCE BUDGET
+#    "Are there hard limits on compute resources?
+#    (e.g., maximum node count, maximum node-hours, memory per node limits).
+#    These are typically set by the allocation."
+#
+# 4. RELIABILITY
+#    "How important is fault tolerance? Should checkpoint datasets be
+#    replicated? Is it acceptable to restart from the beginning if a node
+#    fails, or must the workflow support mid-run restart from checkpoints?"
+#
+# 5. COST / EFFICIENCY
+#    "Is minimizing node-hours or allocation cost a goal?
+#    More or less important than the throughput or latency targets?"
+#
+# 6. DATA PLACEMENT
+#    "Are there requirements about where specific data must reside?
+#    (e.g., 'checkpoints must be on PFS', 'do not use burst buffer').
+#    These are typically facility policy or fault-tolerance requirements."
+#
+# Assign goal_id following: goal:<descriptor>
+# E.g., goal:throughput_10gbs, goal:wall_time_30min, goal:max_128_nodes
 # -----------------------------------------------------------------------------
 goals:
-  # Agent populates as a list of goal objects matching _goal_schema.
-  # Each entry must have a unique goal_id in the goal:<n> namespace.
+  # Agent populates as a list. Each entry follows the schema below.
 
-  _agent_goal_elicitation_script: >
-    Ask the operator in sequence:
+  - goal_id: "goal:<short_descriptor>"
+    # [required_operator]
+    # Examples: goal:throughput_10gbs, goal:wall_time_48hr, goal:max_nodes_256
 
-    THROUGHPUT
-    "Do you have a minimum required data throughput? (e.g., 'at least 10 GB/s
-    sustained input ingestion'). If yes, is this a hard requirement the
-    deployment must meet, or a soft target to optimize toward?"
+    goal_type: "<throughput | latency | resource_budget | cost | reliability |
+                  data_placement | other>"
+    # [required_operator]
 
-    LATENCY / WALL TIME
-    "Do you have an end-to-end wall time budget? (e.g., 'must complete within
-    30 minutes'). Is this hard or soft?"
+    description: null
+    # [required_operator] Plain language: what specifically are you trying to achieve?
 
-    RESOURCE BUDGET
-    "Are there hard limits on compute resources? (e.g., maximum node count,
-    maximum node-hours, memory per node limits). These are typically hard
-    constraints set by the allocation."
+    metric: null
+    # [required_operator] Measurable quantity. Must be a single measurable value, not a narrative.
+    # E.g., input_ingestion_rate_gbs, end_to_end_wall_time_hours, node_count, node_hours
 
-    RELIABILITY
-    "How important is fault tolerance? Should checkpoint datasets be replicated?
-    Is it acceptable to restart from the beginning if a node fails, or must
-    the workflow support mid-run restart from checkpoints?"
+    target_value: null
+    # [required_operator] Numeric threshold.
 
-    COST / EFFICIENCY
-    "Is minimizing node-hours or allocation cost a goal? Is this more or less
-    important than meeting the throughput or latency targets?"
+    target_unit: null
+    # [required_operator] E.g., GB/s, hours, minutes, nodes, node-hours, count
 
-    DATA PLACEMENT
-    "Are there any requirements about where specific data must reside?
-    (e.g., 'checkpoints must be on PFS', 'do not use burst buffer for
-    anything'). These are typically facility policy or fault-tolerance
-    requirements."
+    target_direction: null
+    # [required_operator]
+    # maximize: higher is better (e.g., throughput)
+    # minimize: lower is better (e.g., wall time, cost)
+    # exact:    held at exactly the target value
+    # _allowed_values: [maximize, minimize, exact]
 
-    For each confirmed goal, assign a goal_id following: goal:<descriptor>
-    where descriptor is a short snake_case label matching the metric
-    (e.g., goal:throughput_10gbs, goal:wall_time_30min, goal:max_128_nodes).
+    constraint_type: null
+    # [required_operator]
+    # hard: deployment is invalid if violated (allocation limits, facility policy)
+    # soft: optimize toward, but trade-offs are acceptable
+    # _allowed_values: [hard, soft]
 
-  _goal_schema:
-
-    goal_id:
-      _status: required_operator
-      _format: "goal:<short_descriptor>"
-      _extract: >
-        Assign based on goal_type and target. Examples:
-          goal:throughput_10gbs
-          goal:wall_time_48hr
-          goal:max_nodes_256
-          goal:reliability_checkpoint_replication
-          goal:minimize_node_hours
-      _value: null
-
-    goal_type:
-      _status: required_operator
-      _allowed_values:
-        - throughput
-        - latency
-        - resource_budget
-        - cost
-        - reliability
-        - data_placement
-        - other
-      _value: null
-
-    description:
-      _status: required_operator
-      _prompt: >
-        Please describe this goal in plain language. What specifically
-        are you trying to achieve or limit?
-      _value: null
-
-    metric:
-      _status: required_operator
-      _prompt: >
-        What is the measurable quantity for this goal?
-        Examples: input_ingestion_rate_gbs, end_to_end_wall_time_hours,
-        node_count, node_hours, checkpoint_replication_factor
-      _validation: Must be a single measurable quantity, not a narrative.
-      _value: null
-
-    target_value:
-      _status: required_operator
-      _prompt: >
-        What is the target threshold (numeric)?
-        For "at least" goals: the minimum acceptable value.
-        For "at most" goals: the maximum acceptable value.
-      _value: null
-
-    target_unit:
-      _status: required_operator
-      _prompt: >
-        What unit? (e.g., GB/s, hours, minutes, nodes, node-hours, count)
-      _value: null
-
-    target_direction:
-      _status: required_operator
-      _prompt: >
-        Should this metric be maximized (higher is better, e.g., throughput),
-        minimized (lower is better, e.g., wall time, cost), or held at
-        exactly the target value?
-      _allowed_values: [maximize, minimize, exact]
-      _value: null
-
-    constraint_type:
-      _status: required_operator
-      _prompt: >
-        Is this a HARD constraint (the deployment is invalid if violated —
-        e.g., allocation limits, facility policy) or a SOFT target
-        (optimize toward, but trade-offs are acceptable)?
-      _allowed_values: [hard, soft]
-      _value: null
-
-    priority:
-      _status: required_operator
-      _required_when: constraint_type == soft
-      _prompt: >
-        Among all soft goals, what is the priority of this one?
-        Assign an integer rank: 1 = highest priority, 2 = next, etc.
-        (Hard goals are always satisfied first; priority ordering only
-        applies when two soft goals conflict.)
-      _value: null
+    priority: null
+    # [required_operator] Required when constraint_type = soft.
+    # Integer rank: 1 = highest priority, 2 = next, etc.
+    # Hard goals are always satisfied first; priority ordering only applies
+    # when two soft goals conflict.
+    # NOTE (v7): If only one soft goal exists at a given priority rank, no
+    # conflict is possible. resolution_notes is only required when two or more
+    # soft goals share the same priority rank.
 
 
 # -----------------------------------------------------------------------------
 # SECTION 3: CONFLICT RESOLUTION POLICY
-# Defines agent behavior when two soft goals cannot be simultaneously
-# maximized. Agent auto-derives priority_ordering from goal priorities
-# and prompts for resolution_notes when conflicts are likely.
+# Agent auto-derives priority_ordering from goal priorities.
+# resolution_notes is ONLY required when two soft goals share the same
+# priority rank (v7 change: previously triggered on any potential conflict).
 # -----------------------------------------------------------------------------
 conflict_resolution:
 
   priority_ordering:
-    _status: auto_derived
-    _extract: >
-      Ordered list of all goal_ids with constraint_type = soft, sorted by
-      priority (ascending). Hard goals are not listed here — they are always
-      binding. Auto-derived from goals[*].priority. Never manually specified.
+    # [auto_derived]
+    # Ordered list of all goal_ids with constraint_type = soft, sorted by
+    # priority (ascending). Hard goals are not listed here — they are always
+    # binding. Never manually specified.
     _value: []
 
-  resolution_notes:
-    _status: required_operator
-    _prompt: >
-      I detected that the following soft goals may conflict:
-      {conflicting_goal_pairs}
-
-      For each pair, how should I resolve the tradeoff?
-      (e.g., "Accept up to 20% latency increase to achieve the throughput
-      target. Do not sacrifice reliability under any circumstances.")
-
-      If all goals are compatible, write "No known conflicts — optimize
-      all soft goals jointly."
-    _conflict_detection_rule: >
-      Flag as potentially conflicting when:
-        - throughput goal and cost/resource_budget goal exist together
-          (more throughput often requires more nodes)
-        - latency goal and cost goal exist together
-          (lower latency often requires more aggressive parallelism)
-        - two goals have the same priority rank
-    _value: null
+  resolution_notes: null
+  # [required_operator] ONLY when two or more soft goals share the same priority rank.
+  # Prompt (triggered only on rank collision):
+  # "Goals {goal_ids} share priority rank {rank}. When these two goals
+  # cannot both be maximized, how should I resolve the tradeoff?
+  # (e.g., 'Accept up to 20% latency increase to achieve the throughput
+  # target. Do not sacrifice reliability under any circumstances.')
+  # If no such conflict is expected, write: 'No expected conflict at
+  # this priority rank — optimize jointly.'"
+  #
+  # Default conflict resolution policy (requires no operator input):
+  # 1. Satisfy all hard goals first.
+  # 2. Among soft goals, satisfy in ascending priority rank order.
+  # 3. For soft goals at the same rank: optimize jointly until a tradeoff
+  #    is detected, then prompt operator for resolution.
 
 
 # -----------------------------------------------------------------------------
 # SECTION 4: HARD CONSTRAINTS
-# Categorical restrictions the DDD must not violate. Distinct from hard-
-# constraint goals (which are quantified thresholds). These are policy rules.
+# Categorical restrictions the DDD must not violate. Distinct from
+# hard-constraint goals (which are quantified thresholds). These are policy rules.
+#
+# Agent prompts after goals are collected:
+# "Are there categorical restrictions beyond the numeric goals above?
+# E.g., 'checkpoints must be on PFS', 'do not use node-local storage',
+# 'this data is ITAR-controlled and must not leave the facility network'."
 # -----------------------------------------------------------------------------
 hard_constraints:
-  # Agent populates as a list of constraint objects matching _constraint_schema.
-  # Prompt operator after goals are collected:
-  # "Are there any categorical restrictions on this deployment that go beyond
-  # the numeric goals above? For example: 'checkpoints must be on PFS',
-  # 'do not use node-local storage', 'this data is ITAR-controlled and must
-  # not leave the facility network'."
+  # Agent populates as a list.
 
-  _constraint_schema:
+  - constraint_id: "goal:<short_descriptor>"
+    # [required_operator] Uses goal: namespace for DDD back-reference consistency.
+    # E.g., goal:must_use_pfs_for_checkpoints, goal:no_burst_buffer
 
-    constraint_id:
-      _status: required_operator
-      _format: "goal:<short_descriptor>"
-      _extract: >
-        Use the goal: namespace for consistency with DDD back-references.
-        Examples:
-          goal:must_use_pfs_for_checkpoints
-          goal:no_burst_buffer
-          goal:itar_data_no_external_transfer
-          goal:must_restart_from_checkpoint_on_failure
-      _value: null
+    description: null
+    # [required_operator] What is prohibited or required.
 
-    description:
-      _status: required_operator
-      _prompt: >
-        Describe the constraint in plain language. What is prohibited or required?
-      _value: null
+    applies_to: null
+    # [required_operator] Which entities: a specific task_id, data_id,
+    # "all checkpoint datasets", "all tasks", or free-text.
 
-    applies_to:
-      _status: required_operator
-      _prompt: >
-        Which entities does this constraint apply to?
-        Options: a specific task_id, a specific dataset_id,
-        "all checkpoint datasets", "all intermediate datasets", "all tasks",
-        or a free-text description.
-      _value: null
+    rationale: null
+    # [required_operator] Why this constraint exists.
+    # E.g., "Burst buffer on Perlmutter is volatile and lost at job end."
 
-    rationale:
-      _status: required_operator
-      _prompt: >
-        Why does this constraint exist? (e.g., "Checkpoint files must survive
-        node failure. Burst buffer on Perlmutter is volatile and lost at job
-        end." or "ITAR export control requirement.")
-      _value: null
-
-    enforced_by:
-      _status: optional_operator
-      _prompt: >
-        Is this constraint enforced by facility policy, your team's policy,
-        or a scientific requirement?
-      _allowed_values: [facility_policy, team_policy, scientific_requirement, other]
-      _value: null
+    enforced_by: null
+    # [optional_operator]
+    # _allowed_values: [facility_policy, team_policy, scientific_requirement, other]

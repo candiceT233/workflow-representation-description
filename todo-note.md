@@ -22,7 +22,7 @@ Question to anwer: how we structure the data so that the agent can answer our qu
 * improve design of WDD (based on above note)
     - need to iterate through with architecutre document with other files (done)
     - add conditional sementioncs to the WDD (done)
-    - recheck the latest version, move content out that does not belong to WDD (next)
+    - recheck the latest version, move content out that does not belong to WDD (done)
 * take this new v6 WDD fill in based on workflow repo only
 * given the repo only and generate a document
 * compare the document generated from pure workflow repo exploration vs. WDD

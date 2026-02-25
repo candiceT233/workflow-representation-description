@@ -1,29 +1,42 @@
 # =============================================================================
-# WIDGET — Workflow Representation Document (WRD) Agent Template
-# Schema: wrd-6.0  |  Architecture Design: v6
+# WIDGET — Workflow Definition Document (WDD) Agent Template
+# Schema: wrd-7.0  |  Architecture Design: v7
+# See WIDGET_conventions.md for ID namespace, field status codes, and
+# compact inter-agent transfer format.
 #
 # PURPOSE
 # This file is the schema an AI agent reads before analyzing a workflow
 # repository. The agent fills every field according to its _status annotation.
-# Once all required fields are populated the WRD is a valid, self-contained
+# Once all required fields are populated the WDD is a valid, self-contained
 # description of the workflow's logical structure.
 #
-# The WRD captures ONLY what is derivable from static analysis of the source
+# The WDD captures ONLY what is derivable from static analysis of the source
 # code — no profiling data, no hardware specifics, no deployment decisions.
 # Those belong in the DDD, HRD, GD, IODD, and EDD respectively.
 #
-# NEW IN v6: Two EDD hook annotations are added.
-#   tasks[*].hardware_path     — conditional CPU/GPU execution paths and
-#                                minimum resource assertions visible in code.
-#                                The EDD reads this to resolve which path an
-#                                experiment takes and what hardware floor applies.
-#   data_objects[*].cardinality_source
-#                              — whether cardinality is fixed, config-determined,
-#                                or runtime-determined, and which parameter
-#                                controls it. The EDD reads this to resolve
-#                                concrete instance counts for a specific run.
+# NEW IN v7 (additions over v6):
+#   tasks[*].io_access_type
+#       Explicit MPI/HDF5/POSIX I/O access type per task.
+#       Inferred from import statements and API calls.
+#       Values: posix_independent | mpi_io_collective | mpi_io_independent |
+#               hdf5_parallel | netcdf4_parallel | python_serial | unknown
+#       Used by DDD to configure MPI-IO aggregators; by IODD to detect
+#       aggregator misconfigurations.
 #
-# Both new fields contain only static observations — no resolved values.
+#   tasks[*].restart_model
+#       Recovery behavior if this task fails mid-run.
+#       Values: idempotent | checkpoint_restart | non_restartable | unknown
+#       Companion: tasks[*].restart_checkpoint_dataset (data_id or null)
+#       Used by DDD to derive the restart_strategy for the deployment.
+#
+#   execution_profiles[*].conditional_inclusions
+#       Tasks conditionally included in a profile based on an EDD parameter
+#       value. Replaces the v6 Section 11.8 corner case note with a first-
+#       class structured field.
+#
+#   io_behavioral_hints[*].potential_concern: mpi_io_pattern_risk (new value)
+#       Triggered when independent MPI-IO is used where collective would
+#       improve performance (many ranks writing the same file, strided access).
 #
 # FIELD STATUS MODEL
 #   required_static       Extract from workflow source code via static analysis.
@@ -33,23 +46,32 @@
 #                         Agent MUST prompt the scientist before proceeding.
 #
 # COMPLETENESS GATE
-# The WRD is complete when ALL of the following are true:
+# The WDD is complete when ALL of the following are true:
 #   [ ] All required_static fields are non-null
 #   [ ] All required_static_ask fields are non-null
 #   [ ] workflow_graph.integrity_hash is current against pc_edges
 #   [ ] All required_task_sets in execution_profiles were AUTO-DERIVED
 #   [ ] translation_metadata.field_confidence_records has one entry per
-#       agent-inferred field
+#       agent-inferred field (at minimum: all description fields, all
+#       pc_pattern fields, workflow_patterns, io_dominance per task,
+#       behavioral_notes per task, io_access_type per task,
+#       restart_model per task)
 #   [ ] Any requires_human_review: true field has been reviewed or
 #       explicitly deferred by the scientist
 #
-# ID NAMESPACE (shared across all five WIDGET documents)
-#   Stages:    stage:<descriptor>    e.g.  stage:simulation
-#   Tasks:     task:<descriptor>     e.g.  task:contact_map
-#   Datasets:  data:<descriptor>     e.g.  data:trajectory_frames
-#   P-C edges: pc:<prod>-><cons>:<pattern>
-#   Hints:     hint:<short_name>
-#   Profiles:  profile:<name>
+# GENERATION PROCEDURE (9 steps)
+#   1. Survey codebase structure (README, orchestration files, config files)
+#   2. Identify all stages and tasks
+#   3. Classify io_access_type per task (imports, MPI API calls, HDF5 usage)
+#   4. Classify restart_model per task (checkpoint-read logic, --resume flags)
+#   5. Build data object registry (formats, cardinality sources, lifecycle)
+#   6. Map producer-consumer edges (patterns, coupling, multi-dataset edges)
+#   7. Analyze workflow-level patterns (DAG topology, control flow)
+#   8. Extract I/O behavioral hints (partial access, format mismatch, MPI-IO risks)
+#   9. Assemble and validate (mark assumptions, fill confidence records)
+#
+# For format-specific extraction rules (Nextflow, Pegasus, Parsl, Slurm,
+# Snakemake, Swift/T) see wdd_design-v7.md Section 5.
 # =============================================================================
 
 
@@ -62,29 +84,29 @@ metadata:
     _status: required_static
     _extract: >
       Generate a new UUID v4 for a new workflow. Preserve existing
-      lineage_id when recompiling an existing WRD.
-      Companion documents (DDD, IODD) pin to this ID + a specific version.
+      lineage_id when recompiling an existing WDD.
+      Companion documents (EDD, DDD, IODD) pin to this ID + a specific version.
     _value: null
 
   version:
     _status: required_static
     _extract: >
-      Set to "1.0.0" for first compilation. Increment on any structural
-      change (task added/removed, edge changed, stage added/removed).
-      Data enrichments do NOT increment the version — they update in place.
+      "1.0.0" for first compilation. Increment on any structural change
+      (task added/removed, edge changed, stage added/removed).
+      Data enrichments (measured sizes) update in place without incrementing.
     _value: null
 
   version_notes:
     _status: required_static
     _extract: >
-      For first compilation: "Initial WRD compiled from <source_file>".
-      For updates: describe structural changes made.
+      First compilation: "Initial WDD compiled from <source_file>."
+      Updates: describe structural changes made.
     _value: null
 
   deprecated:
     _status: required_static
-    _extract: Set to false for all new WRDs.
-    _value: null
+    _extract: Set to false for all new WDDs.
+    _value: false
 
   workflow_name:
     _status: required_static
@@ -102,7 +124,7 @@ metadata:
     _prompt: >
       Please describe this workflow. Include: what scientific problem it
       solves, what domain it belongs to, what data it starts from, and
-      what results it ultimately produces. (Minimum 2-3 sentences.)
+      what results it ultimately produces. (Minimum 2–3 sentences.)
     _quality_check: { min_words: 20, must_contain_domain_nouns: true }
     _value: null
 
@@ -143,8 +165,8 @@ metadata:
 
   schema_version:
     _status: required_static
-    _extract: Always set to "wrd-6.0".
-    _value: "wrd-6.0"
+    _extract: Always set to "wrd-7.0".
+    _value: "wrd-7.0"
 
   generated_by:
     _status: required_static
@@ -153,7 +175,7 @@ metadata:
 
   generated_at:
     _status: required_static
-    _extract: ISO 8601 timestamp at WRD compilation time.
+    _extract: ISO 8601 timestamp at WDD compilation time.
     _value: null
 
   last_modified_at:
@@ -169,20 +191,18 @@ metadata:
 # Stages give agents a coarser reasoning granularity before drilling to tasks.
 # -----------------------------------------------------------------------------
 stages:
-  # Agent populates as a list of stage objects matching _stage_schema.
+  # Agent populates as a list of stage objects.
 
-  _stage_schema:
-
-    stage_id:
+  - stage_id:
       _status: required_static
       _extract: >
         Normalize stage name to snake_case. Prefix with "stage:".
-        Example: stage:simulation, stage:aggregation, stage:training.
+        E.g., stage:simulation, stage:aggregation, stage:training.
       _value: null
 
     name:
       _status: required_static
-      _extract: Human-readable stage name.
+      _extract: Human-readable stage name (title case).
       _value: null
 
     order:
@@ -192,15 +212,12 @@ stages:
 
     description:
       _status: required_static
-      _extract: >
-        What this stage accomplishes in the workflow. 1-2 sentences.
+      _extract: What this stage accomplishes in the workflow. 1–2 sentences.
       _value: null
 
     tasks:
       _status: required_static
-      _extract: >
-        List of task_id values belonging to this stage.
-        Derived from task_catalog entries with this stage_id.
+      _extract: List of task_id values belonging to this stage.
       _value: []
 
 
@@ -208,26 +225,24 @@ stages:
 # SECTION B: TASK CATALOG
 # Every distinct executable unit in the workflow.
 # Canonical source of truth for all task structure and relationships.
-# workflow_graph is derived from this section — never edited directly.
+# workflow_graph is DERIVED from this section — never edited directly.
 # -----------------------------------------------------------------------------
 tasks:
-  # Agent populates as a list of task objects matching _task_schema.
+  # Agent populates as a list of task objects.
 
-  _task_schema:
-
-    task_id:
+  - task_id:
       _status: required_static
       _extract: >
-        Normalize task/process/function name from source code to snake_case.
-        Must be unique within this WRD. Use prefix "task:" in cross-document
-        references (e.g., task:contact_map).
+        Normalize task/process/function name from source to snake_case.
+        Must be unique within this WDD. Prefix with "task:" in cross-refs.
+        E.g., task:openmm, task:aggregate, task:train_vae.
       _value: null
 
     name:
       _status: required_static
       _extract: >
-        Human-readable form of task_id. Convert underscores to spaces and
-        apply title case (e.g., preprocess_era5 → "ERA5 Preprocessing").
+        Human-readable form: underscores to spaces, title case.
+        E.g., "preprocess_era5" → "ERA5 Preprocessing"
       _value: null
 
     stage:
@@ -246,21 +261,15 @@ tasks:
       _status: required_static_ask
       _extract: >
         Infer from: process docstring, inline comments, input/output variable
-        names, executable name. Construct a 2-4 sentence candidate description
+        names, executable name. Construct a 2–4 sentence candidate description
         covering: what it does in domain terms, what data it reads, what it
         produces, and why it exists. Quality check: >20 words, domain-specific
-        nouns present. If candidate fails quality check, ask.
+        nouns present. If candidate fails quality check, escalate to ask.
       _prompt: >
         I could not generate a sufficient description for task '{task_id}'.
         What does this task do? Please include: what it does in domain terms,
-        what data it reads, what data it produces, and why it exists in the
-        workflow.
+        what data it reads, what data it produces, and why it exists.
       _quality_check: { min_words: 20, must_contain_domain_nouns: true }
-      _confidence_record:
-        filled_by: null
-        confidence_level: null   # high | medium | low | inferred
-        confidence_reason: null
-        requires_human_review: null
       _value: null
 
     behavioral_notes:
@@ -268,8 +277,8 @@ tasks:
       _extract: >
         I/O-relevant behaviors observable from the code. Focus on I/O
         behavior, not scientific meaning. Address:
-          - Reads all input at startup or streams incrementally?
-          - Writes output at completion or incrementally?
+          - Reads all input at startup, or streams incrementally?
+          - Writes output at completion, or incrementally?
           - Internal iteration or checkpointing?
           - Memory patterns: loads full dataset vs. chunked processing?
           - Notable access patterns (random, strided, sequential)?
@@ -278,14 +287,16 @@ tasks:
     parallelism_model:
       _status: required_static
       _extract: >
-        Structural parallelism as visible in the source code.
+        Structural parallelism visible in source code.
         Infer type from: for-loops/map over input sets
         (embarrassingly_parallel), MPI collectives (data_parallel),
         task graph fan-out (task_parallel).
-      _parallelism_type:
+
+      type:
         _allowed_values: [serial, embarrassingly_parallel, data_parallel, task_parallel]
         _value: null
-      _parallelism_description:
+
+      description:
         _extract: >
           How multiple instances relate to each other.
           E.g., "Each instance processes one chromosome independently."
@@ -300,24 +311,117 @@ tasks:
       _allowed_values: [compute_bound, io_bound, balanced, unknown]
       _value: unknown
 
+    # NEW IN v7 ---------------------------------------------------------------
+    io_access_type:
+      _status: required_static
+      _extract: >
+        Classify how this task performs I/O. Infer from imports and API calls:
+
+        mpi_io_collective:
+          Imports mpi4py; uses MPI.File.Open + Read_all / Write_all.
+          Good for large contiguous transfers; leverages ROMIO aggregators.
+          DDD will configure io_aggregator_config for this task.
+
+        mpi_io_independent:
+          Imports mpi4py; uses MPI.File.Open + Read / Write (not _all).
+          Each rank I/Os independently — may hammer metadata servers at scale.
+          Flag hint:mpi_io_pattern_risk if many ranks write to same file.
+
+        hdf5_parallel:
+          Imports h5py with driver='mpio' (parallel HDF5 / PHDF5).
+          Requires HDF5 built with MPI support (EDD will verify).
+          DDD will configure io_aggregator_config for this task.
+
+        netcdf4_parallel:
+          Imports netCDF4 with parallel=True.
+          Similar to hdf5_parallel; requires parallel netCDF4 build.
+
+        posix_independent:
+          Standard POSIX file I/O (open/read/write/close) directly;
+          no MPI-IO layer. Each rank accesses its own file or uses
+          file locking for shared files.
+
+        python_serial:
+          Python file I/O (open(), numpy.load(), pandas.read_csv(), etc.)
+          without MPI. Common in single-rank tasks or Python scripts that
+          are not MPI-aware. Each rank opens/reads independently.
+          Known bottleneck: metadata storms when many ranks open same file.
+
+        unknown:
+          Cannot be determined from source code alone. Add confidence record
+          with requires_human_review: true.
+      _allowed_values:
+        - posix_independent
+        - mpi_io_collective
+        - mpi_io_independent
+        - hdf5_parallel
+        - netcdf4_parallel
+        - python_serial
+        - unknown
+      _value: null
+
+    # NEW IN v7 ---------------------------------------------------------------
+    restart_model:
+      _status: required_static
+      _extract: >
+        How this task recovers if it fails mid-run. Infer from:
+          - Is there checkpoint-read logic at task startup?
+            (e.g., "if os.path.exists(checkpoint_file): load_checkpoint()")
+          - Are there --resume / --restart / --continue CLI flags?
+          - Is there a "skip if output exists" guard at the top of the script?
+            (e.g., "if os.path.exists(output_file): sys.exit(0)")
+          - Does the task write partial outputs that would be invalid if
+            the task is killed and restarted?
+
+        idempotent:
+          Safe to re-run from scratch; produces the same output.
+          No recovery mechanism needed — just re-submit.
+          Typical: tasks with "skip if output exists" guards.
+
+        checkpoint_restart:
+          Reads a checkpoint file at startup to resume from a saved state.
+          Requires restart_checkpoint_dataset to be set.
+          Typical: iterative ML training loops, long MD simulations.
+
+        non_restartable:
+          No recovery mechanism. Failure requires full restart from Stage 1
+          (or from whatever the last successful checkpoint stage was).
+          Typical: tasks that write partial results in place without atomicity.
+
+        unknown:
+          Cannot be determined from code alone.
+          Add confidence record with requires_human_review: true.
+      _allowed_values: [idempotent, checkpoint_restart, non_restartable, unknown]
+      _value: null
+
+    # NEW IN v7 ---------------------------------------------------------------
+    restart_checkpoint_dataset:
+      _status: required_static
+      _extract: >
+        Required when restart_model = checkpoint_restart.
+        The data_id of the checkpoint file this task reads at startup to
+        resume a previous run. Must reference an entry in data_objects.
+        Used by DDD to ensure this checkpoint is replicated and retained.
+        Null for all other restart_model values.
+      _value: null
+
     hardware_path:
-      # NEW in v6. Static observation of hardware-related code structure.
+      # Static observation of hardware-related code structure.
       # The EDD reads these annotations to resolve which execution path is
       # active for a specific experiment and what hardware floor applies.
-      # Document only what is visible in the code — no resolved values here.
+      # Document only what is visible in code — no resolved values here.
 
       has_conditional_execution:
         _status: required_static
         _extract: >
           true if this task contains code paths that select different
           execution logic based on a runtime parameter (e.g., --device cpu/gpu,
-          USE_GPU env var, conditional MPI init, torch.cuda.is_available() guards).
-          false if the task always executes the same code regardless of parameters.
+          USE_GPU env var, conditional MPI init, torch.cuda.is_available()).
+          false if the task always executes the same code path.
         _value: null    # boolean
 
       execution_alternatives:
         # Required when has_conditional_execution = true. Empty list otherwise.
-        # One entry per distinct execution path visible in the source code.
         _status: required_static
         _extract: >
           Identify conditional branches that change execution behavior:
@@ -326,9 +430,10 @@ tasks:
             - argparse choices that select different compute backends
           For each path: document the triggering condition, what changes,
           and the expected io_dominance under that path.
-        _path_schema:
+        _path_entry:
           path_id:
-            _extract: Short label. E.g., "gpu_path", "cpu_path", "large_model", "small_model"
+            _extract: >
+              Short label. E.g., "gpu_path", "cpu_path", "large_model".
             _value: null
           condition:
             _extract: >
@@ -338,8 +443,7 @@ tasks:
           description:
             _extract: >
               What differs between this path and others. Name the library
-              (CUDA, OpenMP), the data access pattern if it changes, the
-              expected compute dominance.
+              (CUDA, OpenMP), data access changes, expected compute dominance.
             _value: null
           io_dominance_hint:
             _allowed_values: [compute_bound, io_bound, balanced, unknown]
@@ -347,19 +451,18 @@ tasks:
         _value: []
 
       minimum_resource_assertions:
-        # Resource requirements explicitly asserted or validated in source code.
+        # Resource requirements explicitly asserted or validated in source.
         # Look for: assert statements, argparse range checks, MPI size guards,
-        # torch.cuda.get_device_properties checks, explicit sys.exit() on
-        # insufficient resources.
-        # These are code-observed facts — not operator choices or estimates.
+        # torch.cuda.get_device_properties checks, sys.exit() on insufficient
+        # resources. These are code-observed facts — not operator choices.
         _status: required_static
         _extract: >
-          Read the task source code carefully for any validation that checks
-          system resources before or during execution. Document each check.
-        _assertion_schema:
+          Read task source carefully for any validation that checks system
+          resources before or during execution. Document each check found.
+        _assertion_entry:
           resource:
             _extract: >
-              What is being checked. Use consistent names:
+              What is being checked. Consistent names:
               gpu_memory_gb, n_nodes, n_mpi_ranks, n_gpus, cpu_cores,
               host_memory_gb, or a workflow-specific name.
             _value: null
@@ -373,7 +476,7 @@ tasks:
               File path and line number where this check appears.
               E.g., "src/train.py:142", "submit.sh:35"
             _value: null
-        _value: []    # Empty list if no resource assertions found
+        _value: []    # Empty list if no resource assertions found.
 
     output_class:
       _status: required_static_ask
@@ -381,8 +484,7 @@ tasks:
         Attempt inference: terminal DAG tasks (no downstream consumers) are
         likely checkpoint. Tasks whose outputs feed directly into the next
         task with no standalone scientific value are likely intermediate.
-        Always validate with scientist — this cannot be reliably inferred
-        from code.
+        Always validate with scientist — cannot be reliably inferred from code.
       _prompt: >
         Does task '{task_id}' produce outputs that are scientifically
         valuable to retain after the workflow completes (checkpoint), or are
@@ -406,7 +508,7 @@ tasks:
       _status: required_static
       _extract: >
         List of data_id values this task writes. Sources: mirror of inputs
-        but for output declarations/write paths.
+        but for output declarations and write paths.
       _value: []
 
 
@@ -414,46 +516,43 @@ tasks:
 # SECTION C: DATA OBJECT REGISTRY
 # Every logical data object flowing through the workflow.
 # Logical descriptions only — not bound to physical paths or storage tiers.
-# C.1: Semantic layer (always required)
-# C.2: Lifecycle layer (DAG-derivable)
+# Two layers: Semantic (C.1) and Lifecycle (C.2, DAG-derivable).
 # -----------------------------------------------------------------------------
 data_objects:
-  # Agent populates as a list of data object entries matching _data_schema.
+  # Agent populates as a list of data object entries.
 
-  _data_schema:
+  # --- C.1: Semantic Layer ---------------------------------------------------
 
-    # --- C.1: Semantic Layer -----------------------------------------------
-
-    data_id:
+  - data_id:
       _status: required_static
       _extract: >
-        Derive from channel name, file variable name, or output filename
-        pattern. Normalize to snake_case. Prefix with "data:" in
-        cross-document references (e.g., data:trajectory_frames).
+        Normalize dataset name to snake_case. Prefix with "data:".
+        E.g., data:sim_output_h5, data:aggregated_h5, data:model_weights.
       _value: null
 
     name:
       _status: required_static
-      _extract: Human-readable form of data_id.
+      _extract: Human-readable name for this data object.
       _value: null
 
     description:
       _status: required_static_ask
       _extract: >
-        Infer from variable name, file extension, surrounding code context.
-        Quality check: >20 words, domain nouns present.
+        What this data represents scientifically and structurally.
+        Quality check: >20 words, domain-specific nouns required.
       _prompt: >
-        What does dataset '{data_id}' represent scientifically?
-        (e.g., "Per-simulation HDF5 file containing contact maps and point
-        clouds for one protein trajectory, produced by OpenMM.")
+        Please describe data object '{data_id}'. Include: what scientific
+        information it contains, what format it uses, and what its role is
+        in the workflow (input to, output of, or intermediate between tasks).
+      _quality_check: { min_words: 20, must_contain_domain_nouns: true }
       _value: null
 
     category:
       _status: required_static
       _extract: >
         input:        external data entering the workflow (no producer task).
-        intermediate: produced by a task, consumed downstream, no standalone
-                      scientific value.
+        intermediate: produced by a task, consumed downstream; no standalone
+                      scientific value. May be deleted after use.
         output:       final result consumed outside this workflow.
         checkpoint:   has standalone scientific value; must be retained.
         config:       parameter files, run configs — NOT part of the P-C data
@@ -473,9 +572,7 @@ data_objects:
 
     format_hint:
       _status: required_static
-      _extract: >
-        Inspect file-creation code. Capture what is visible in source.
-        Mark unknown fields as null.
+      _extract: Inspect file-creation code. Mark unknown fields as null.
 
       container:
         _allowed_values: [HDF5, netCDF4, CSV, parquet, tar, plain_binary, text, JSON, unknown]
@@ -484,7 +581,7 @@ data_objects:
       datasets:
         # For HDF5/netCDF4 only: list dataset-level details visible in
         # file-creation code. Omit this list for all other formats.
-        _dataset_entry_schema:
+        _dataset_entry:
           dataset_name: { _value: null }     # name within the container
           description:  { _value: null }     # what this dataset holds
           dtype:        { _value: null }     # float32 | int64 | string | etc.
@@ -501,8 +598,8 @@ data_objects:
 
       typical_request_size_kb:
         _extract: >
-          Estimated I/O request size from code inspection (e.g., HDF5 chunk
-          size set in the file-creation call). Null if not determinable.
+          Estimated I/O request size from code (e.g., HDF5 chunk size set
+          in file-creation call). Null if not determinable from code.
         _value: null
 
     cardinality:
@@ -510,28 +607,29 @@ data_objects:
       _extract: >
         How many instances of this data object exist at runtime?
         Infer from loop structures, job arrays, or scatter patterns.
-        E.g., "one per chromosome (22 total)", "one per simulation task
-        (12 instances)", "single global file".
-        When the count depends on a config parameter or input data, write
-        "config-determined (see cardinality_source)" or
-        "runtime-determined (see cardinality_source)".
+        E.g., "one per chromosome (22 total)", "one per simulation (12 instances)",
+        "single global file".
+        When the count depends on a config parameter write:
+          "config-determined (see cardinality_source)"
+        When the count depends on actual input data write:
+          "runtime-determined (see cardinality_source)"
       _value: null
 
     cardinality_source:
-      # NEW in v6. Documents how cardinality is determined.
+      # Documents how cardinality is determined.
       # The EDD reads this to know what to resolve and where to look.
 
       type:
         _status: required_static
         _extract: >
-          fixed:             Count is hardcoded in the workflow or determinable
-                             from code alone. No EDD resolution needed.
-          config_determined: Count comes from a parameter in a config file,
-                             CLI argument, or environment variable.
-                             The EDD resolves this by reading the parameter value.
+          fixed:              Count is hardcoded or derivable from code alone.
+                              No EDD resolution needed.
+          config_determined:  Count comes from a config file parameter,
+                              CLI argument, or environment variable.
+                              EDD resolves this from the parameter value.
           runtime_determined: Count depends on actual input data (e.g., number
-                              of files in a directory, rows in a CSV) and cannot
-                              be known without inspecting the input at job time.
+                              of files in a directory, rows in a CSV).
+                              Cannot be known without inspecting input at job time.
         _allowed_values: [fixed, config_determined, runtime_determined]
         _value: null
 
@@ -539,9 +637,9 @@ data_objects:
         _status: required_static
         _extract: >
           For config_determined: the parameter name as it appears in the config
-          file or as the argparse/env var name. Must match a parameter_id in the
-          EDD experiment_parameters section.
-          E.g., "n_simulations", "NCHROM", "ensemble_size"
+          file or as the argparse/env var name.
+          Must match a parameter_id that will be in the EDD.
+          E.g., "n_simulations", "NCHROM", "ensemble_size".
           Null for fixed and runtime_determined.
         _value: null
 
@@ -568,8 +666,10 @@ data_objects:
     estimated_size_hint:
       _status: required_static
       _extract: >
-        Order-of-magnitude size if inferrable from code.
-        E.g., "~50–200 MB per instance" or "small config file, <1 KB".
+        Order-of-magnitude size per instance if inferrable from code.
+        E.g., "~50–200 MB per instance (from HDF5 dataset dimensions and dtype)",
+        "~100 MB based on trajectory length and atom count",
+        "small config file, <1 KB".
         Write "unknown" if not determinable from code alone.
       _value: null
 
@@ -583,9 +683,9 @@ data_objects:
       _extract: List of task_id values that read this dataset.
       _value: []
 
-    # --- C.2: Lifecycle Layer (DAG-derivable) --------------------------------
-    # All fields in this layer are derived purely from DAG topology and the
-    # semantic layer above — no profiling or runtime data is needed or used.
+    # --- C.2: Lifecycle Layer (DAG-derivable) ---------------------------------
+    # All fields derived from DAG topology and the semantic layer above.
+    # No profiling or runtime data needed or used.
 
     lifecycle:
 
@@ -606,18 +706,17 @@ data_objects:
       retention_window:
         _status: required_static
         _extract: >
-          The span between creation_phase and last_consumer_phase expressed
-          as task completion events. Derivable from DAG topology alone.
-          Format: "from task:X completion to task:Y completion"
+          Span between creation and last consumer expressed as task completion
+          events. E.g., "from task:openmm completion to task:aggregate completion"
         _value: null
 
       access_frequency_class:
         _status: required_static
         _extract: >
           Derived from consumer_tasks count and loop context:
-          once:        single consumer, no loop
-          few_times:   2-5 consumer accesses total
-          repeatedly:  consumed in a loop or by many consumers (>5)
+          once:       single consumer, no loop
+          few_times:  2–5 consumer accesses total
+          repeatedly: consumed in a loop or by many consumers (>5)
         _allowed_values: [once, few_times, repeatedly]
         _value: null
 
@@ -630,25 +729,20 @@ data_objects:
 
 
 # -----------------------------------------------------------------------------
-# SECTION D: PRODUCER–CONSUMER EDGES
+# SECTION D: PRODUCER-CONSUMER EDGES
 # Every data dependency between tasks. Encodes relationship structure —
 # not just which data objects exist.
-# coupling describes a structural property of the workflow derivable from
-# code: tight = consumer requires producer to fully complete; loose =
-# consumer can begin on partial or streaming output.
+# One edge per producer-consumer task pair, carrying ALL shared datasets.
+# Do NOT create one edge per dataset for a single task relationship.
 # -----------------------------------------------------------------------------
 pc_edges:
-  # Agent populates as a list of edge objects matching _edge_schema.
-  # One edge per producer-consumer task pair, carrying ALL shared datasets.
-  # Do NOT create one edge per dataset for a single task relationship.
+  # Agent populates as a list of edge objects.
 
-  _edge_schema:
-
-    edge_id:
+  - edge_id:
       _status: required_static
       _extract: >
         Format: pc:<producer_task_id>-><consumer_task_id>:<pattern>
-        Example: pc:openmm->aggregate:n_to_1
+        E.g., pc:openmm->aggregate:n_to_1
       _value: null
 
     producer:
@@ -666,17 +760,17 @@ pc_edges:
       _extract: >
         List of data_id values carried by this edge.
         One edge carries ALL datasets shared between a given producer-consumer
-        pair — even if they are in a single container (e.g., one HDF5 file
-        with four datasets = one edge with one data_id).
+        pair — even if they reside in a single container file.
+        E.g., one HDF5 file with four datasets = one edge with one data_id.
       _value: []
 
     pc_pattern:
       _status: required_static
       _extract: >
         1_to_1: single producer instance, single consumer instance
-        1_to_n: single producer, multiple consumer instances (fan-out or broadcast)
+        1_to_n: single producer, multiple consumer instances (fan-out/broadcast)
         n_to_1: multiple producer instances, single consumer (fan-in/aggregation)
-        n_to_n: multiple producers and multiple consumers (all-to-all exchange)
+        n_to_n: multiple producers and multiple consumers (all-to-all)
         Derive from cardinality of producing and consuming task instances.
       _allowed_values: [1_to_1, 1_to_n, n_to_1, n_to_n]
       _value: null
@@ -684,7 +778,7 @@ pc_edges:
     pc_pattern_rationale:
       _status: required_static
       _extract: >
-        Why this classification? Reference the actual producer and consumer
+        Why this classification? Reference actual producer and consumer
         cardinalities. E.g., "All 12 parallel simulation tasks produce
         trajectory files consumed by a single aggregate task → n_to_1."
       _value: null
@@ -693,15 +787,15 @@ pc_edges:
       _status: required_static
       _extract: >
         What data moves, how it is accessed (full read, partial read,
-        streamed), and any notable characteristics. E.g., "Consumer reads
-        only 3 of 4 HDF5 datasets from each producer file."
+        streamed), and any notable characteristics.
+        E.g., "Consumer reads only 3 of 4 HDF5 datasets from each producer file."
       _value: null
 
     coupling:
       _status: required_static
       _extract: >
         tight: consumer cannot begin until producer fully completes and
-               data is written. No pipeline overlap is possible.
+               data is written. No pipeline overlap possible.
         loose: consumer can begin on partial/streaming output. Pipeline
                overlap is possible.
         Determine by examining whether the consumer opens the file after
@@ -713,18 +807,18 @@ pc_edges:
       _status: required_static
       _extract: >
         Why this coupling? Reference the code behavior that implies it.
-        E.g., "Aggregate waits for a completion signal from all simulation
-        tasks before opening any file — tight."
+        E.g., "Aggregate waits for a completion signal before opening any
+        file — tight." Or "Training reads chunks as they become available — loose."
       _value: null
 
     communication_pattern:
       _status: required_static
       _extract: >
-        shared_file:      multiple producer instances write to / multiple
-                          consumers read from a single shared file.
+        shared_file:       multiple producers write to / consumers read from
+                           a single shared file.
         file_per_producer: each producer instance writes its own file;
-                          consumer reads all of them.
-        in_memory:        data passed in memory without touching disk.
+                           consumer reads all of them.
+        in_memory:         data passed in memory without touching disk.
         streaming_channel: data streamed through a pipe or shared buffer.
         Observe from code: shared path vs. per-instance path templates.
       _allowed_values: [shared_file, file_per_producer, in_memory, streaming_channel]
@@ -741,7 +835,7 @@ pc_edges:
 
 # -----------------------------------------------------------------------------
 # SECTION E: WORKFLOW GRAPH
-# Derived from Task Catalog and P-C Edges. Never edited directly.
+# Derived from Task Catalog and P-C Edges. NEVER edited directly.
 # integrity_hash must match pc_edges on every read.
 # -----------------------------------------------------------------------------
 workflow_graph:
@@ -751,7 +845,7 @@ workflow_graph:
     _extract: >
       Compute SHA-256 of the canonical serialization of all pc_edges.
       Any agent reading this graph must verify this hash before use.
-      Hash mismatch = reject and request regeneration.
+      Hash mismatch = reject graph and request regeneration.
     _value: null
 
   last_generated:
@@ -763,9 +857,9 @@ workflow_graph:
     _status: required_static
     _extract: >
       List of {from, to, via} objects derived from pc_edges.
-      from: producer task_id
-      to:   consumer task_id
-      via:  edge_id
+        from: producer task_id
+        to:   consumer task_id
+        via:  edge_id
       One entry per pc_edge. Deduplicated.
     _value: []
 
@@ -825,25 +919,22 @@ workflow_graph:
     _value: []
 
   cross_reference:
-    # Flat lookup table. Auto-derived — never manually edited.
+    # Flat lookup table. Auto-derived — NEVER manually edited.
     # Removes multi-hop traversal cost for downstream agents.
 
     task_to_stage:
       _status: required_static
-      _extract: >
-        Map of task_id → stage_id for all tasks. Derived from task catalog.
+      _extract: Map of task_id → stage_id for all tasks. Derived from task catalog.
       _value: {}    # { "task:<n>": "stage:<n>", ... }
 
     data_to_producer:
       _status: required_static
-      _extract: >
-        Map of data_id → producer task_id. Null for external inputs.
+      _extract: Map of data_id → producer task_id. Null for external inputs.
       _value: {}    # { "data:<n>": "task:<n>", ... }
 
     data_to_consumers:
       _status: required_static
-      _extract: >
-        Map of data_id → list of consumer task_ids.
+      _extract: Map of data_id → list of consumer task_ids.
       _value: {}    # { "data:<n>": ["task:<n>", ...], ... }
 
 
@@ -857,13 +948,13 @@ workflow_patterns:
     _status: required_static
     _extract: >
       Derive from DAG topology and control flow annotations.
-        cascading:      linear chain of stages, no fan-out, no loops
+        cascading:      linear chain of stages; no fan-out, no loops
         scatter_gather: fan-out from one task to N parallel instances
                         followed by fan-in to one aggregation task
         iterative:      one or more convergence or time-stepping loops
         pipeline:       stages overlap in time with streaming data
                         (loose coupling throughout)
-        broadcast:      one task provides the same shared input to many
+        broadcast:      one task provides the same shared input to many tasks
         checkpointing:  saves task state for restart/recovery
         conditional:    tasks execute only if a runtime condition is met
         hybrid:         combines two or more of the above at different stages
@@ -890,7 +981,7 @@ workflow_patterns:
   pattern_table_row:
     _status: required_static
     _extract: >
-      Single-row summary matching Table III from the IPDPS '26 paper:
+      Single-row summary matching IPDPS '26 Table III:
       Workflow | #Stages | #Task Instances | P-C Patterns | Workflow-level I/O Patterns
     _value: null
 
@@ -901,7 +992,7 @@ workflow_patterns:
 # DaYu's runtime observations. Gives diagnosis agents a pre-loaded list
 # of suspicions before any profiling has run.
 #
-# Concern vocabulary:
+# Concern vocabulary (v7 adds mpi_io_pattern_risk):
 #   partial_access            task reads only a subset of a file's contents
 #   format_mismatch           layout choice mismatched to access pattern
 #   small_file_overhead       many small files where one larger file would suffice
@@ -909,31 +1000,37 @@ workflow_patterns:
 #   data_reuse                same data read by multiple tasks or re-read intra-task
 #   checkpoint_waste          checkpoints written but not read in normal execution path
 #   metadata_overhead         many datasets or small files causing metadata-heavy I/O
+#   mpi_io_pattern_risk       independent MPI-IO used where collective would improve
+#                             performance (many ranks, shared file, strided access)
 #   unknown                   concern visible but does not fit above categories
 # -----------------------------------------------------------------------------
 io_behavioral_hints:
-  # Agent populates as a list of hint objects matching _hint_schema.
+  # Agent populates as a list of hint objects.
   # Step: re-read task source code looking for each concern type.
   # Requires reading both file-creation code and file-reading code together.
   # An empty list is valid if no concerns are found.
 
-  _hint_schema:
-
-    hint_id:
+  - hint_id:
       _status: required_static
       _extract: >
         Format: hint:<short_name>. Descriptive snake_case label.
-        Example: hint:partial_access_training, hint:unnecessary_serialization
+        E.g., hint:partial_access_training, hint:mpi_io_independent_risk.
       _value: null
 
     description:
       _status: required_static
       _extract: >
         Specific observation. Name the task, name the file/dataset, describe
-        the pattern and why it is a concern. E.g., "The aggregate task opens
-        all 12 simulation output files sequentially but reads only 3 of 4
-        HDF5 datasets from each — potential partial file access waste (~30%
-        of data written and never consumed by downstream tasks)."
+        the pattern and why it is a concern.
+        E.g., "The aggregate task opens all 12 simulation output files
+        sequentially but reads only 3 of 4 HDF5 datasets from each —
+        potential partial file access waste (~30% of data written and never
+        consumed by downstream tasks)."
+        For mpi_io_pattern_risk: "task:sim uses MPI.File.Write (independent)
+        with 128 ranks all writing to the same shared HDF5 file. Each rank
+        opens the file independently, causing metadata storms. Collective
+        MPI-IO (MPI.File.Write_all) with ROMIO aggregators would reduce
+        open() overhead significantly."
       _value: null
 
     affected_tasks:
@@ -949,9 +1046,15 @@ io_behavioral_hints:
     potential_concern:
       _status: required_static
       _allowed_values:
-        [partial_access, format_mismatch, small_file_overhead,
-         unnecessary_serialization, data_reuse, checkpoint_waste,
-         metadata_overhead, unknown]
+        - partial_access
+        - format_mismatch
+        - small_file_overhead
+        - unnecessary_serialization
+        - data_reuse
+        - checkpoint_waste
+        - metadata_overhead
+        - mpi_io_pattern_risk
+        - unknown
       _value: null
 
 
@@ -962,7 +1065,7 @@ io_behavioral_hints:
 # required_task_set is ALWAYS auto-derived — never manually specified.
 # -----------------------------------------------------------------------------
 execution_profiles:
-  # Agent populates as a list of profile objects matching _profile_schema.
+  # Agent populates as a list of profile objects.
   # Proposal protocol:
   #   1. Identify all tasks with output_class = checkpoint.
   #   2. Propose one profile per checkpoint task in topological order,
@@ -971,11 +1074,9 @@ execution_profiles:
   #      I suggest profiles: {proposed_profiles}. Are these meaningful
   #      scientific stopping points? Should any be removed or renamed?"
   #   4. required_task_set MUST be auto-derived by backward DAG traversal
-  #      from terminal_task_id — never manually specified.
+  #      from terminal_task_id — NEVER manually specified.
 
-  _profile_schema:
-
-    profile_name:
+  - profile_name:
       _status: required_static_ask
       _prompt: >
         What should this execution profile be named?
@@ -1001,6 +1102,30 @@ execution_profiles:
         Never manually specified. Recompute whenever workflow_graph changes.
       _value: []
 
+    # NEW IN v7 ---------------------------------------------------------------
+    conditional_inclusions:
+      _status: required_static
+      _extract: >
+        Tasks that are part of this profile's DAG reachability but are only
+        active when a specific EDD parameter takes a certain value.
+        E.g., if task:merge_chr is only run when n_chromosomes > 1, add it
+        here rather than omitting it from required_task_set.
+
+        For each conditionally included task:
+          task_id:   the task_id
+          condition: the EDD parameter condition that activates it
+                     (e.g., "param:n_chromosomes > 1", "param:run_gpu = true")
+                     or "always" if unconditionally in the profile
+
+        Detection: look for "if parameter_name > N: run task" patterns in the
+        orchestration layer, Nextflow conditional channels, Snakemake
+        run: blocks with Python conditions.
+        Empty list if no conditional tasks exist in this profile.
+      _value: []
+      _conditional_task_entry:
+        task_id:   { _value: null }
+        condition: { _value: null }
+
     output_dataset_ids:
       _status: required_static
       _extract: >
@@ -1011,7 +1136,7 @@ execution_profiles:
 
 # -----------------------------------------------------------------------------
 # SECTION I: TRANSLATION METADATA
-# Full provenance of how this WRD was produced.
+# Full provenance of how this WDD was produced.
 # -----------------------------------------------------------------------------
 translation_metadata:
 
@@ -1041,18 +1166,18 @@ translation_metadata:
       List every field that could not be populated from the source, with
       reason. Empty list is valid if all extractable fields were found.
     _value: []
-    _entry_schema:
+    _entry:
       field_path: null
       reason: null
 
   round_trip_gaps:
     _status: required_static
     _extract: >
-      List fields that would be lost if this WRD is compiled back to the
+      List fields that would be lost if this WDD is compiled back to the
       source format (e.g., description has no representation in Pegasus DAX;
       execution_profiles have no Nextflow equivalent).
     _value: []
-    _entry_schema:
+    _entry:
       field_path: null
       note: null
 
@@ -1060,9 +1185,9 @@ translation_metadata:
     _status: required_static
     _extract: >
       List description fields that failed the quality check (<20 words or
-      no domain nouns). These are review flags, not blockers.
+      no domain nouns). Review flags, not blockers.
     _value: []
-    _entry_schema:
+    _entry:
       field_path: null
       warning: null
 
@@ -1070,11 +1195,18 @@ translation_metadata:
     _status: required_static
     _extract: >
       One record for every field the agent inferred rather than extracted
-      directly. At minimum cover: all description fields, all pc_pattern
-      fields, workflow_patterns, io_dominance per task, behavioral_notes
-      per task, all io_behavioral_hints, all execution_profile proposals.
+      directly. At minimum cover:
+        - All description fields (tasks, data_objects, stages)
+        - All pc_pattern fields
+        - workflow_patterns (primary_pattern, secondary_patterns)
+        - io_dominance per task
+        - io_access_type per task          ← NEW in v7
+        - restart_model per task           ← NEW in v7
+        - behavioral_notes per task
+        - All io_behavioral_hints
+        - All execution_profile proposals
     _value: []
-    _entry_schema:
+    _entry:
       field_path: null
       filled_by: null
       confidence_level: null    # high | medium | low | inferred

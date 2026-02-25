@@ -1,60 +1,34 @@
 # =============================================================================
 # WIDGET — Hardware Resource Document (HRD) Agent Template
-# Schema: hrd-5.0  |  Architecture Design: v6
+# Schema: hrd-7.0  |  Architecture Design: v7
+# See WIDGET_conventions.md for ID namespace and field status codes.
 #
 # PURPOSE
-# The HRD describes the physical hardware on which a deployment executes —
-# what the system provides, independent of how any workflow uses it.
+# The HRD describes the physical hardware on which a deployment executes.
 # It defines the physical envelope within which DDD decisions must operate:
 #   - tier_ids referenced in storage tier assignments
 #   - compute_ids referenced in per-task parallelism decisions
 #   - bandwidth ceilings used in DDD feasibility checks
+#   - scheduler configuration used in DDD job script generation  ← NEW v7
 #   - contention models used to evaluate shared-tier risk
 #
 # WHO FILLS THIS DOCUMENT
-# The HRD is authored once per system by HPC facility staff or a system
-# administrator, not per workflow or per run. It should be maintained as
-# a shared resource for all WIDGETs running on that system.
-#
-# The agent's role is to:
-#   1. Prompt the sysadmin/facility contact for each required field
-#   2. Run benchmark tools (IOR, mdtest, OSU) to populate empirical fields
-#   3. Populate derived fields automatically
-#   4. Flag any required_benchmark fields that are still null before DDD use
-#
-# FIELD STATUS LEGEND
-#   required_sysadmin     System documentation or facility staff can provide.
-#                         Agent prompts if missing. DDD cannot be generated
-#                         without these fields.
-#
-#   required_benchmark    Must come from empirical measurement (IOR, mdtest,
-#                         OSU micro-benchmarks, or equivalent). Vendor specs
-#                         are acceptable as initial estimates but should be
-#                         replaced. Agent flags if only vendor spec is present.
-#
-#   optional_benchmark    Useful for diagnosis quality but not required for
-#                         DDD generation. Agent prompts once; proceeds if
-#                         measurement is unavailable.
-#
-#   auto_derived          Agent computes from other fields in this document.
+# Authored once per system by HPC facility staff or sysadmin.
+# Maintained as a shared resource for all WIDGETs on that system.
 #
 # AGENT READINESS GATE
-# Before handing this HRD to the DDD generator, verify:
 #   [ ] All header fields non-null
 #   [ ] At least one compute topology entry with compute_id
 #   [ ] At least one network fabric entry with interconnect_id
 #   [ ] At least one storage tier entry with tier_id, tier_type, persistence,
 #       shared_across_jobs, and contention_model
-#   [ ] All required_benchmark fields have values (even if flagged as vendor
-#       spec estimates)
-#   [ ] All tier_ids follow the tier:<n> naming convention
-#   [ ] All compute_ids follow the compute:<n> naming convention
-#   [ ] All interconnect_ids follow the net:<n> naming convention
+#   [ ] scheduler section filled (at minimum: scheduler_type, default_partition,
+#       max_walltime_per_queue)
+#   [ ] All required_benchmark fields have values (vendor spec acceptable as
+#       initial estimate, flagged accordingly)
+#   [ ] schema_version = "hrd-7.0"
 #
-# ID NAMESPACE
-#   Storage tiers:    tier:<n>       e.g.  tier:burst_buffer, tier:pfs
-#   Compute classes:  compute:<n>    e.g.  compute:cpu_node, compute:gpu_node
-#   Network fabric:   net:<n>        e.g.  net:slingshot, net:infiniband_hdr
+# Field status codes: see WIDGET_conventions.md Section 3.
 # =============================================================================
 
 
@@ -62,459 +36,335 @@
 # SECTION 1: HEADER
 # -----------------------------------------------------------------------------
 header:
+  hrd_id: "hrd:<system_short_name>"
+  # [required_sysadmin] Format: hrd:<system_short_name>
+  # E.g., "hrd:perlmutter_nersc", "hrd:frontier_olcf", "hrd:stampede3_tacc"
+  _value: null
 
-  hrd_id:
-    _status: required_sysadmin
-    _prompt: >
-      I will assign an HRD identifier. What is the short name of this system?
-      (e.g., "perlmutter_nersc", "frontier_olcf", "stampede3_tacc")
-      I will form: hrd:<system_short_name>
-    _format: "hrd:<system_short_name>"
-    _value: null
+  system_name: "<full human-readable name>"
+  # [required_sysadmin]
+  # E.g., "Perlmutter @ NERSC", "Frontier @ OLCF"
+  _value: null
 
-  system_name:
-    _status: required_sysadmin
-    _prompt: >
-      What is the full human-readable name of this system?
-      (e.g., "Perlmutter @ NERSC", "Frontier @ OLCF", "Stampede3 @ TACC")
-    _value: null
+  version: "<semantic version>"
+  # [required_sysadmin] "1.0.0" for initial. Increment on hardware config changes.
+  _value: null
 
-  version:
-    _status: required_sysadmin
-    _prompt: >
-      What version is this HRD? Use "1.0.0" for initial documentation.
-      Increment when hardware configuration changes (node additions,
-      firmware upgrades, filesystem reconfiguration, new storage tier added).
-    _value: null
+  version_notes: "<what this version documents>"
+  # [required_sysadmin]
+  _value: null
 
-  version_notes:
-    _status: required_sysadmin
-    _prompt: >
-      What does this HRD version document? For first version: "Initial
-      documentation of <system_name>". For updates: describe what changed.
-    _value: null
+  facility: "<facility or institution>"
+  # [required_sysadmin]
+  _value: null
 
-  facility:
-    _status: required_sysadmin
-    _prompt: >
-      What facility or institution operates this system?
-      (e.g., "NERSC / Lawrence Berkeley National Laboratory")
-    _value: null
+  schema_version: "hrd-7.0"
+  # [auto_derived]
 
-  schema_version:
-    _status: auto_derived
-    _value: "hrd-5.0"
+  created_at: null      # [auto_derived] ISO 8601
+  last_modified_at: null  # [auto_derived] ISO 8601
 
-  created_at:
-    _status: auto_derived
-    _value: null
-
-  last_modified_at:
-    _status: auto_derived
-    _value: null
-
-  description:
-    _status: required_sysadmin
-    _prompt: >
-      Please provide a 2-4 sentence architectural summary of this system.
-      Include: primary compute architecture, storage hierarchy overview,
-      and any notable performance characteristics.
-      (e.g., "Perlmutter is a CPU+GPU hybrid system at NERSC. Compute nodes
-      are AMD EPYC CPU-only and NVIDIA A100 GPU nodes. Storage consists of
-      node-local NVMe SSD, a Lustre parallel filesystem at 5 TB/s aggregate
-      bandwidth, and HPSS tape archive.")
-    _value: null
+  description: |
+    <2–4 sentence architectural summary: primary compute architecture,
+    storage hierarchy overview, notable performance characteristics.>
+  # [required_sysadmin]
+  _value: null
 
 
 # -----------------------------------------------------------------------------
 # SECTION 2: COMPUTE TOPOLOGY
-# One entry per distinct node class. Agent populates as a list.
+# One entry per distinct node class.
 # -----------------------------------------------------------------------------
 compute_topology:
-  # Prompt: "How many distinct node types does this system have?
+  # Agent prompts: "How many distinct node types does this system have?
   # For each type, I will ask for the specs below."
 
-  _node_class_schema:
+  - compute_id: "compute:<descriptor>"
+    # [required_sysadmin] Format: compute:<descriptor>
+    # E.g., compute:cpu_node, compute:gpu_node, compute:large_memory_node
 
-    compute_id:
-      _status: required_sysadmin
-      _prompt: >
-        What short identifier should I use for this node class?
-        Format: compute:<descriptor>
-        Examples: compute:cpu_node, compute:gpu_node, compute:large_memory_node
-      _format: "compute:<descriptor>"
-      _value: null
+    node_type_description: "<brief description>"
+    # [required_sysadmin] E.g., "GPU-accelerated node with 4x A100 80GB"
 
-    node_type_description:
-      _status: required_sysadmin
-      _prompt: >
-        Brief human-readable description of this node class.
-        (e.g., "Standard CPU compute node", "GPU-accelerated node with 4x A100")
-      _value: null
+    node_count: <integer>
+    # [required_sysadmin] Total nodes of this class on the system.
 
-    node_count:
-      _status: required_sysadmin
-      _prompt: >
-        How many nodes of this class are available in total on the system?
-      _value: null
+    cores_per_node: <integer>
+    # [required_sysadmin]
 
-    cores_per_node:
-      _status: required_sysadmin
-      _prompt: How many physical CPU cores per node of this class?
-      _value: null
+    hardware_threads_per_core: <integer>
+    # [required_sysadmin] 1 if hyperthreading disabled.
 
-    hardware_threads_per_core:
-      _status: required_sysadmin
-      _prompt: >
-        How many hardware threads (hyperthreads / SMT) per physical core?
-        (Typically 1 or 2. Set to 1 if hyperthreading is disabled.)
-      _value: null
+    memory_per_node_gb: <integer>
+    # [required_sysadmin]
 
-    memory_per_node_gb:
-      _status: required_sysadmin
-      _prompt: How many GB of DRAM per node?
-      _value: null
-
-    memory_bandwidth_gbs:
-      _status: required_benchmark
-      _prompt: >
-        What is the peak memory bandwidth per node in GB/s?
-        Vendor spec is acceptable as initial estimate; empirical STREAM
-        benchmark value preferred. Please note which source this is.
-      _benchmark_tool_hint: "STREAM benchmark (stream_c)"
-      _value: null
-      _value_source: null    # "vendor_spec" | "stream_benchmark" | "other"
+    memory_bandwidth_gbs: <number>
+    # [required_benchmark] Source: STREAM benchmark preferred over vendor spec.
+    _value_source: null   # "stream_benchmark" | "vendor_spec" | "other"
 
     accelerators:
-      _status: required_sysadmin
-      _prompt: >
-        Does this node class have accelerators (GPUs, FPGAs)?
-        If yes, provide a list. Each entry: {type, count, memory_gb}
-        Example: [{type: "NVIDIA A100 80GB SXM4", count: 4, memory_gb: 80}]
-        If no accelerators, set to null.
-      _value: null
+      # [required_sysadmin] null if no accelerators.
+      - type: "<e.g., NVIDIA A100 80GB SXM4>"
+        count: <integer>
+        memory_gb: <integer>
 
-    interconnect_id:
-      _status: required_sysadmin
-      _prompt: >
-        Which network fabric entry (from Section 3) do nodes of this class
-        connect to? Provide the net:<n> identifier.
-      _value: null
+    interconnect_id: "net:<descriptor>"
+    # [required_sysadmin] References Section 3.
+
+    # NEW in v7: node-local storage (critical for staging decisions in DDD)
+    node_local_storage:
+      # [required_sysadmin] null if no node-local storage present.
+      type: "<nvme_ssd | hdd | ramdisk | null>"
+      capacity_gb: <number>
+      peak_read_bandwidth_gbs: <number>
+      # [required_benchmark] IOR on node-local device preferred.
+      _value_source: null
+      peak_write_bandwidth_gbs: <number>
+      # [required_benchmark]
+      _value_source: null
+      notes: "<e.g., 'Cleared at job end. Accessible at /tmp or $TMPDIR.'>"
 
 
 # -----------------------------------------------------------------------------
 # SECTION 3: NETWORK FABRIC
-# One entry per distinct interconnect. Agent populates as a list.
+# One entry per distinct interconnect.
 # -----------------------------------------------------------------------------
 network_fabric:
-  # Prompt: "Does the system have one network fabric, or multiple
-  # (e.g., separate compute and storage networks)?"
 
-  _fabric_schema:
+  - interconnect_id: "net:<descriptor>"
+    # [required_sysadmin] Format: net:<descriptor>
+    # E.g., net:slingshot, net:infiniband_hdr, net:omnipath
 
-    interconnect_id:
-      _status: required_sysadmin
-      _format: "net:<descriptor>"
-      _prompt: >
-        Short identifier for this fabric. Format: net:<descriptor>
-        Examples: net:slingshot_11, net:infiniband_hdr, net:omnipath
-      _value: null
+    technology: "<Slingshot-11 | InfiniBand HDR | InfiniBand HDR100 | OmniPath |
+                  Ethernet | other>"
+    # [required_sysadmin]
 
-    interconnect_type:
-      _status: required_sysadmin
-      _allowed_values: [InfiniBand, Slingshot, OmniPath, Ethernet, other]
-      _value: null
+    topology: "<dragonfly | fat_tree | torus | mesh | other>"
+    # [required_sysadmin]
 
-    topology:
-      _status: required_sysadmin
-      _prompt: >
-        What is the network topology?
-      _allowed_values: [dragonfly, fat_tree, torus, mesh, other]
-      _value: null
+    injection_bandwidth_per_node_gbs: <number>
+    # [required_benchmark] Per-node injection bandwidth (not bisection).
+    _value_source: null
 
-    bisection_bandwidth_gbs:
-      _status: required_benchmark
-      _prompt: >
-        What is the bisection bandwidth in GB/s?
-        Vendor spec or facility documentation acceptable.
-      _value: null
+    latency_us: <number>
+    # [required_benchmark] MPI point-to-point latency in microseconds.
+    # Source: OSU micro-benchmarks (osu_latency).
+    _value_source: null   # "osu_benchmark" | "vendor_spec" | "other"
 
-    injection_bandwidth_per_node_gbs:
-      _status: required_sysadmin
-      _prompt: >
-        What is the per-node injection bandwidth into the fabric in GB/s?
-      _value: null
+    mpi_collective_bandwidth_gbs: <number>
+    # [optional_benchmark] All-reduce bandwidth. Source: osu_allreduce.
+    _value_source: null
 
-    latency_us:
-      _status: required_benchmark
-      _prompt: >
-        What is the typical MPI point-to-point latency in microseconds?
-        Empirical value from OSU micro-benchmarks preferred.
-      _benchmark_tool_hint: "OSU micro-benchmarks: osu_latency"
-      _value: null
-      _value_source: null    # "vendor_spec" | "osu_benchmark" | "other"
-
-    notes:
-      _status: optional_benchmark
-      _prompt: >
-        Are there any known network bottlenecks, congestion behaviors, or
-        performance quirks the DDD generator should know about?
-        (e.g., "Dragonfly topology exhibits 2:1 oversubscription on
-        inter-group links; all-to-all communications degrade significantly
-        above 32 nodes per group.")
-      _value: null
+    notes: "<known routing policies, topology-aware placement hints, etc.>"
+    # [optional_benchmark]
 
 
 # -----------------------------------------------------------------------------
 # SECTION 4: STORAGE HIERARCHY
-# One entry per storage tier. These tier_ids are referenced throughout
-# the DDD and IODD. Critical: assign stable tier_ids that will not change
-# when the HRD is versioned.
+# One entry per distinct storage tier accessible to jobs.
 # -----------------------------------------------------------------------------
 storage_hierarchy:
-  # Prompt: "Please list all storage tiers available to jobs on this system.
-  # For each tier I will collect specs, bandwidth, and contention behavior."
-  # Common tiers to ask about:
-  #   - Node-local SSD or NVMe (if present)
-  #   - Burst buffer / flash storage tier (if present)
-  #   - Parallel filesystem (Lustre, GPFS, DAOS, BeeGFS)
-  #   - Object store (if present, e.g., S3-compatible)
-  #   - Archive / tape (HPSS)
 
-  _tier_schema:
+  - tier_id: "tier:<descriptor>"
+    # [required_sysadmin] Format: tier:<descriptor>
+    # E.g., tier:node_local_ssd, tier:burst_buffer, tier:pfs, tier:archive
 
-    tier_id:
-      _status: required_sysadmin
-      _format: "tier:<descriptor>"
-      _prompt: >
-        Short identifier for this storage tier. Format: tier:<descriptor>
-        Examples: tier:node_ssd, tier:burst_buffer, tier:pfs, tier:object_store,
-                  tier:archive, tier:in_memory
-      _value: null
+    tier_type: "<node_local_ssd | node_local_hdd | burst_buffer |
+                 parallel_filesystem | object_store | in_memory | archive>"
+    # [required_sysadmin]
 
-    tier_name:
-      _status: required_sysadmin
-      _prompt: Human-readable tier name (e.g., "Lustre scratch", "DataWarp BB", "Vast NVMe")
-      _value: null
+    filesystem_type: "<Lustre | GPFS | DAOS | BeeGFS | WekaFS | VAST | HPSS | other | null>"
+    # [optional_benchmark]
 
-    tier_type:
-      _status: required_sysadmin
-      _allowed_values:
-        - node_local_ssd
-        - node_local_hdd
-        - burst_buffer
-        - parallel_filesystem
-        - object_store
-        - in_memory
-        - archive
-      _value: null
+    mount_point: "<typical mount path, e.g., /pscratch, /tmp, /bb>"
+    # [required_sysadmin] Used to map Darshan file paths to tier_ids in IODD.
 
-    filesystem_type:
-      _status: optional_benchmark
-      _prompt: >
-        What filesystem software manages this tier?
-        (e.g., Lustre, GPFS/SpectrumScale, DAOS, BeeGFS, WekaFS, VAST, HPSS)
-      _value: null
+    total_capacity_tb: <number>
+    # [required_sysadmin]
 
-    total_capacity_tb:
-      _status: required_sysadmin
-      _prompt: Total capacity of this tier in TB (across the whole system).
-      _value: null
+    per_job_capacity_tb: <number>
+    # [required_sysadmin] May differ from total for shared tiers.
 
-    per_job_capacity_tb:
-      _status: required_sysadmin
-      _prompt: >
-        How much capacity can a single job allocate on this tier in TB?
-        (May differ from total for shared tiers. Set equal to total if
-        the entire tier is typically available to one job.)
-      _value: null
+    peak_read_bandwidth_gbs: <number>
+    # [required_benchmark] IOR measurement preferred.
+    _value_source: null   # "ior_benchmark" | "vendor_spec" | "facility_doc"
+    _benchmark_hint: "IOR: ior -a POSIX -b 1g -t 1m -s 64 -F -C -e"
 
-    peak_read_bandwidth_gbs:
-      _status: required_benchmark
-      _prompt: >
-        Peak read bandwidth for this tier in GB/s.
-        Empirical IOR measurement strongly preferred over vendor spec.
-        Note the measurement conditions (stripe count, transfer size, etc.)
-      _benchmark_tool_hint: "IOR: ior -a POSIX -b 1g -t 1m -s 64 -F -C -e"
-      _value: null
-      _value_source: null    # "ior_benchmark" | "vendor_spec" | "facility_doc"
+    peak_write_bandwidth_gbs: <number>
+    # [required_benchmark]
+    _value_source: null
 
-    peak_write_bandwidth_gbs:
-      _status: required_benchmark
-      _prompt: >
-        Peak write bandwidth for this tier in GB/s (empirical IOR preferred).
-      _value: null
-      _value_source: null
+    metadata_ops_per_sec: <integer>
+    # [required_benchmark] mdtest preferred.
+    _value_source: null   # "mdtest_benchmark" | "vendor_spec" | "facility_doc"
+    _benchmark_hint: "mdtest: mdtest -n 100000 -i 3 -d <mountpoint>"
 
-    metadata_ops_per_sec:
-      _status: required_benchmark
-      _prompt: >
-        Peak metadata operation rate in ops/sec (creates, opens, stats combined).
-        mdtest benchmark preferred.
-      _benchmark_tool_hint: "mdtest: mdtest -n 100000 -i 3 -d <mountpoint>"
-      _value: null
-      _value_source: null    # "mdtest_benchmark" | "vendor_spec" | "facility_doc"
+    access_latency_us: <number>
+    # [required_benchmark] Single small I/O operation latency.
+    _value_source: null
 
-    access_latency_us:
-      _status: required_benchmark
-      _prompt: >
-        Typical access latency for a single small I/O operation on this tier
-        in microseconds. (Distinguish from network latency — this is the
-        storage device access latency.)
-      _value: null
-      _value_source: null
+    persistence: "<volatile | persistent | semi_persistent>"
+    # [required_sysadmin]
+    # volatile:        data deleted at job end
+    # persistent:      data survives until explicitly deleted
+    # semi_persistent: configurable retention (e.g., 30-day scratch policy)
 
-    persistence:
-      _status: required_sysadmin
-      _prompt: >
-        Does data on this tier survive across jobs?
-        volatile:         data is automatically deleted at job end
-        persistent:       data survives indefinitely until explicitly deleted
-        semi_persistent:  configurable retention (e.g., 30-day scratch policy)
-      _allowed_values: [volatile, persistent, semi_persistent]
-      _value: null
+    retention_policy_notes: "<retention policy if semi_persistent, else null>"
+    # [required_sysadmin] Required when persistence = semi_persistent.
 
-    retention_policy_notes:
-      _status: required_sysadmin
-      _required_when: persistence == semi_persistent
-      _prompt: >
-        What is the retention policy for this tier?
-        (e.g., "Files older than 30 days are purged automatically.")
-      _value: null
+    shared_across_jobs: <true | false>
+    # [required_sysadmin]
+    # true = multiple jobs read/write simultaneously; contention possible.
+    # false = dedicated access per job (e.g., node-local SSD).
 
-    shared_across_jobs:
-      _status: required_sysadmin
-      _prompt: >
-        Is this tier shared across concurrently running jobs?
-        (true = multiple jobs read/write simultaneously, contention possible.
-         false = each job gets dedicated access, e.g., node-local SSD.)
-      _value: null    # boolean
+    # NEW in v7: Lustre stripe tuning hints (critical for PFS performance)
+    stripe_tuning:
+      # [required_sysadmin] null if not a Lustre/GPFS filesystem.
+      default_stripe_count: <integer | null>
+      recommended_stripe_count_large_writes: <integer | null>
+      # Prompt: "What stripe count gives best sustained write bandwidth for
+      # large files on this filesystem? (Commonly 4–16 for Lustre.)"
+      recommended_stripe_size_mb: <integer | null>
+      # Prompt: "What stripe size (in MB) gives best sequential bandwidth?
+      # (Commonly 1–4 MB for Lustre.)"
+      notes: "<e.g., 'Default stripe 1 limits single-file write to ~2 GB/s.
+               Use lfs setstripe -c 16 before writing large checkpoint files.'>"
+
+    # NEW in v7: Burst buffer staging directives (Cray DataWarp / equivalent)
+    staging_directives:
+      # [required_sysadmin] null if this tier does not support job-level staging directives.
+      stage_in_directive: "<template for stage-in, e.g., '#DW stage_in source={src} destination={dst} type=directory'>"
+      stage_out_directive: "<template for stage-out>"
+      directive_syntax: "<DataWarp | BurstBuffer | BB_JOB_DIRECTIVE | none>"
+      notes: "<any constraints on staging (e.g., 'stage-in jobs run in separate
+               setup phase before compute job, add ~5 min wall time')>"
 
     contention_model:
-      _status: required_sysadmin
-      _prompt: >
-        How does this tier's performance degrade under concurrent multi-job load?
+      contention_type: "<none | proportional | saturating | unknown>"
+      # [required_sysadmin]
+      # none:          dedicated tier, no contention
+      # proportional:  bandwidth scales linearly down with concurrent jobs
+      # saturating:    near-peak until a threshold, then degrades sharply
 
-      contention_type:
-        _status: required_sysadmin
-        _prompt: >
-          Which best describes the contention behavior of this tier?
-          none:          dedicated tier, no contention possible
-          proportional:  bandwidth scales linearly down with more concurrent jobs
-          saturating:    performance is near-peak until a threshold, then
-                         degrades sharply (common with burst buffers)
-          unknown:       behavior not characterized
-        _allowed_values: [none, proportional, saturating, unknown]
-        _value: null
+      saturation_threshold_jobs: <integer | null>
+      # [optional_benchmark] Required when contention_type = saturating.
 
-      saturation_threshold_jobs:
-        _status: optional_benchmark
-        _required_when: contention_type == saturating
-        _prompt: >
-          Above how many concurrent jobs does performance degrade sharply?
-        _value: null
+      degradation_factor: <number 0.0–1.0 | null>
+      # [required_benchmark] Required when contention_type != none.
+      # Fraction of peak bandwidth available under typical contention.
+      # E.g., 0.4 means 40% of peak available. Empirical measurement preferred.
+      _value_source: null
 
-      degradation_factor:
-        _status: required_benchmark
-        _required_when: contention_type != none
-        _prompt: >
-          Under typical contention load, what fraction of peak bandwidth
-          is available? (e.g., 0.4 means 40% of peak is available.
-          Empirical measurement preferred — run IOR during a busy period.)
-        _value: null
+      qos_guarantees: <true | false>
+      # [required_sysadmin]
 
-      qos_guarantees:
-        _status: required_sysadmin
-        _prompt: >
-          Does this tier offer per-job QoS bandwidth guarantees?
-          (true = yes, bandwidth floor guaranteed per job.
-           false = best-effort only, no guarantees.)
-        _value: null    # boolean
+    notes: "<known quirks, limitations, best practices>"
+    # [optional_benchmark]
 
-    notes:
-      _status: optional_benchmark
-      _prompt: >
-        Are there any known performance quirks, limitations, or best practices
-        for this storage tier?
-        (e.g., "Lustre stripe count must be >= 4 for sustained bandwidth above
-        10 GB/s per client. Default stripe count of 1 limits single-file
-        write to ~2 GB/s.")
-      _value: null
-
-    benchmark_source:
-      _status: required_benchmark
-      _prompt: >
-        What is the source and date of the bandwidth and latency measurements
-        above? (e.g., "IOR benchmark run by NERSC staff, 2024-09-15, Cori
-        scratch FS during light load, 8 nodes, 64 processes")
-      _value: null
+    benchmark_source: "<source, date, and conditions of measurements above>"
+    # [required_benchmark]
 
 
 # -----------------------------------------------------------------------------
-# SECTION 5: EMPIRICAL BENCHMARKS
-# Additional measurements not captured by per-tier or per-fabric fields.
-# One entry per measurement. Populated by sysadmin or benchmark runs.
+# SECTION 5: JOB SCHEDULER
+# NEW in v7. Captures the scheduling layer that mediates access to hardware.
+# Required for DDD job script generation.
+# -----------------------------------------------------------------------------
+scheduler:
+
+  scheduler_type: "<slurm | pbs | lsf | cobalt | flux | other>"
+  # [required_sysadmin]
+
+  scheduler_version: "<version string, e.g., '23.11.1'>"
+  # [required_sysadmin]
+
+  # One entry per queue/partition available to typical workflow users.
+  partitions:
+    - partition_id: "<partition name, e.g., 'regular', 'debug', 'gpu', 'large'>"
+      # [required_sysadmin]
+
+      description: "<when to use this partition>"
+      # [required_sysadmin]
+
+      max_nodes: <integer>
+      # [required_sysadmin]
+
+      max_walltime_hours: <number>
+      # [required_sysadmin]
+
+      max_jobs_per_user: <integer | null>
+      # [required_sysadmin] null if no limit.
+
+      node_classes_available:
+        - "<compute_id>"
+      # [required_sysadmin] Which compute_ids are in this partition.
+
+      charging_model: "<node_hours | core_hours | gpu_hours | null>"
+      # [required_sysadmin] How allocation usage is charged.
+
+      exclusive_node_access: "<always | optional | never>"
+      # [required_sysadmin]
+      # always:   job always gets exclusive node access (no sharing)
+      # optional: operator can request with --exclusive flag
+      # never:    nodes are always shared
+
+      priority_notes: "<e.g., 'debug priority is highest but max 30 min walltime'>"
+      # [optional_benchmark]
+
+  account_required: <true | false>
+  # [required_sysadmin]
+  # true = #SBATCH --account=<project_code> required in every job script.
+
+  account_flag: "<e.g., '--account', '-A', null>"
+  # [required_sysadmin]
+
+  job_array_support: <true | false>
+  # [required_sysadmin] Whether job arrays (--array) are supported.
+
+  dependency_support: <true | false>
+  # [required_sysadmin] Whether job dependencies (--dependency=afterok:) are supported.
+
+  typical_queue_wait_minutes:
+    # [optional_benchmark] Typical wait times by partition for capacity planning.
+    - partition_id: "<partition_id>"
+      light_load_minutes: <integer>
+      heavy_load_minutes: <integer>
+
+  notes: "<any scheduling quirks: reservation requirements, preemption policies,
+           maintenance windows, etc.>"
+  # [optional_benchmark]
+
+
+# -----------------------------------------------------------------------------
+# SECTION 6: EMPIRICAL BENCHMARKS
+# Additional measurements beyond per-tier and per-fabric fields.
 # -----------------------------------------------------------------------------
 empirical_benchmarks:
-  # Prompt: "Are there any additional performance characteristics of this
-  # system that I should know about beyond what we've already documented?
-  # For example: known hot-spot behaviors, stripe tuning recommendations,
-  # specific benchmark results that differ from vendor specs, or known
-  # bottlenecks under specific access patterns."
 
-  _measurement_schema:
+  - measurement_id: "bench:<system_short>:<descriptor>"
+    # [required_sysadmin]
 
-    measurement_id:
-      _status: required_sysadmin
-      _format: "bench:<system_short>:<descriptor>"
-      _value: null
+    measurement_type: "<io_bandwidth | metadata_rate | network_latency |
+                        memory_bandwidth | io_latency | other>"
+    # [required_sysadmin]
 
-    measurement_type:
-      _status: required_sysadmin
-      _allowed_values:
-        - io_bandwidth
-        - metadata_rate
-        - network_latency
-        - memory_bandwidth
-        - io_latency
-        - other
-      _value: null
+    tier_or_component: "<tier_id, interconnect_id, or compute_id>"
+    # [required_sysadmin]
 
-    tier_or_component:
-      _status: required_sysadmin
-      _prompt: >
-        Which tier_id, interconnect_id, or compute_id does this measurement
-        characterize?
-      _value: null
+    measured_value: <number>
+    # [required_benchmark]
 
-    measured_value:
-      _status: required_benchmark
-      _value: null
+    unit: "<GB/s | ops/s | us | GB | other>"
+    # [required_sysadmin]
 
-    unit:
-      _status: required_sysadmin
-      _value: null
+    conditions: "<measurement conditions: node count, ranks, transfer size, load>"
+    # [required_sysadmin]
 
-    conditions:
-      _status: required_sysadmin
-      _prompt: >
-        Describe the conditions under which this measurement was taken.
-        (e.g., "8 nodes, 256 MPI ranks, 1 MiB transfer size, shared filesystem
-        under light concurrent load, no stripe tuning")
-      _value: null
+    benchmark_tool: "<IOR | mdtest | OSU_micro_benchmarks | STREAM | custom | other>"
+    # [required_sysadmin]
 
-    benchmark_tool:
-      _status: required_sysadmin
-      _allowed_values: [IOR, mdtest, OSU_micro_benchmarks, STREAM, custom, other]
-      _value: null
+    measured_at: "<YYYY-MM-DD>"
+    # [required_sysadmin]
 
-    measured_at:
-      _status: required_sysadmin
-      _prompt: Date of measurement (YYYY-MM-DD).
-      _value: null
-
-    notes:
-      _status: optional_benchmark
-      _prompt: >
-        Any caveats, anomalies, or interpretation notes for this measurement?
-      _value: null
+    notes: "<caveats, anomalies, interpretation>"
+    # [optional_benchmark]
