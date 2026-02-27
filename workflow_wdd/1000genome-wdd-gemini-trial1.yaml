@@ -1,0 +1,851 @@
+metadata:
+  workflow_lineage_id:
+    _status: required_static
+    _value: a1b2c3d4-e5f6-7890-1234-567890abcdef # Placeholder UUID
+  version:
+    _status: required_static
+    _value: "1.0.0"
+  version_notes:
+    _status: required_static
+    _value: "Initial WDD compiled from daxgen.py."
+  deprecated:
+    _status: required_static
+    _value: false
+  workflow_name:
+    _status: required_static
+    _value: "1000genome"
+  workflow_description:
+    _status: required_static_ask
+    _prompt: "Please describe this workflow. Include: what scientific problem it solves, what domain it belongs to, what data it starts from, and what results it ultimately produces. (Minimum 2–3 sentences.)"
+    _quality_check: { min_words: 20, must_contain_domain_nouns: true }
+    _value: "The 1000 Genomes workflow identifies mutational overlaps using data from the 1000 genomes project to provide a null distribution for rigorous statistical evaluation of potential disease-related mutations. It fetches, parses, and analyzes data from the 1000 Genomes Project, cross-matches extracted data with mutation sift scores, and performs various analyses including plotting. This workflow belongs to the bioinformatics/genomics domain and ultimately produces insights into genetic variations and their potential impact."
+  source_repository:
+    _status: required_static
+    _value: "/home/mtang11/scripts/workflow-representation-description/workflows_repo/1000genome-workflow"
+  source_commit:
+    _status: required_static
+    _value: unknown # Cannot retrieve without shell access
+  source_format:
+    _status: required_static
+    _value: compiled_from_pegasus_dax
+  source_file:
+    _status: required_static
+    _value: "daxgen.py"
+  schema_version:
+    _status: required_static
+    _value: "wrd-7.0"
+  generated_by:
+    _status: required_static
+    _value: "gemini"
+  generated_at:
+    _status: required_static
+    _value: 2026-02-27T10:00:00.000000Z # Placeholder timestamp
+  last_modified_at:
+    _status: required_static
+    _value: 2026-02-27T10:00:00.000000Z # Placeholder timestamp
+
+stages:
+  - stage_id: stage:individuals_processing
+    name: "Individuals Processing"
+    order: 1
+    description: "Processes individual chromosome data to extract SNP variants."
+    tasks:
+      - task:individuals
+  - stage_id: stage:intermediate_processing
+    name: "Intermediate Processing"
+    order: 2
+    description: "Merges individual processing outputs and computes SIFT scores for SNPs."
+    tasks:
+      - task:individuals_merge
+      - task:sifting
+  - stage_id: stage:final_analysis
+    name: "Final Analysis"
+    order: 3
+    description: "Performs mutation overlap and frequency analyses across populations and chromosomes."
+    tasks:
+      - task:mutation_overlap
+      - task:frequency
+
+tasks:
+  - task_id: task:individuals
+    name: "Individuals"
+    stage: stage:individuals_processing
+    executable: "individuals.py"
+    description: "Fetches and parses Phase3 data from the 1000 genomes project by chromosome. It processes VCF files, extracting SNP variants and creating output files for each individual with mutations on both alleles."
+    behavioral_notes: "Processes VCF files in chunks based on `--individuals-jobs` parameter, producing intermediate tar.gz files per chunk. This indicates a chunked processing pattern rather than loading full datasets at once. Writes output incrementally per chunk."
+    parallelism_model:
+      type: embarrassingly_parallel
+      description: "Each instance processes a distinct chunk of a chromosome's VCF data independently."
+    io_dominance: io_bound
+    io_access_type: python_serial
+    restart_model: checkpoint_restart
+    restart_checkpoint_dataset: data:individuals_output_tar_gz
+    hardware_path:
+      has_conditional_execution: false
+      execution_alternatives: []
+      minimum_resource_assertions: []
+    output_class: intermediate
+    inputs:
+      - data:chromosome_vcf_input
+      - data:columns_txt
+    outputs:
+      - data:individuals_output_tar_gz
+  - task_id: task:individuals_merge
+    name: "Individuals Merge"
+    stage: stage:intermediate_processing
+    executable: "individuals_merge.py"
+    description: "Merges the intermediate output files from multiple 'individuals' tasks for a single chromosome into a single aggregated file."
+    behavioral_notes: "Reads multiple intermediate tar.gz files and combines their contents into a single tar.gz file per chromosome."
+    parallelism_model:
+      type: n_to_1
+      description: "Aggregates outputs from multiple parallel 'individuals' tasks for a single chromosome."
+    io_dominance: io_bound
+    io_access_type: python_serial
+    restart_model: idempotent
+    restart_checkpoint_dataset: null
+    hardware_path:
+      has_conditional_execution: false
+      execution_alternatives: []
+      minimum_resource_assertions: []
+    output_class: intermediate
+    inputs:
+      - data:individuals_output_tar_gz
+    outputs:
+      - data:individuals_merged_tar_gz
+  - task_id: task:sifting
+    name: "Sifting"
+    stage: stage:intermediate_processing
+    executable: "sifting.py"
+    description: "Computes SIFT scores of all SNP variants as computed by the Variant Effect Predictor (VEP). It processes a VEP annotation file, selects SNPs with SIFT scores, and records the score and SNP variant IDs."
+    behavioral_notes: "Reads a VEP annotation VCF-like file, filters and processes it, then writes out a textual file with SIFT scores and SNP IDs."
+    parallelism_model:
+      type: embarrassingly_parallel
+      description: "Each instance processes the SIFTing for a single chromosome independently."
+    io_dominance: balanced
+    io_access_type: python_serial
+    restart_model: idempotent
+    restart_checkpoint_dataset: null
+    hardware_path:
+      has_conditional_execution: false
+      execution_alternatives: []
+      minimum_resource_assertions: []
+    output_class: intermediate
+    inputs:
+      - data:sifting_input_vcf
+    outputs:
+      - data:sifted_snps_txt
+  - task_id: task:mutation_overlap
+    name: "Mutation Overlap"
+    stage: stage:final_analysis
+    executable: "mutation_overlap.py"
+    description: "Measures the overlap in mutations (SNP variants) among pairs of individuals, categorized by population and by chromosome. This task analyzes processed individual data and sifting results."
+    behavioral_notes: "Reads merged individual data, sifting data, and population data to perform cross-matching and calculate mutation overlaps. Outputs a compressed file per chromosome and population."
+    parallelism_model:
+      type: embarrassingly_parallel
+      description: "Each instance computes mutation overlap for a specific chromosome and population combination independently."
+    io_dominance: balanced
+    io_access_type: python_serial
+    restart_model: idempotent
+    restart_checkpoint_dataset: null
+    hardware_path:
+      has_conditional_execution: false
+      execution_alternatives: []
+      minimum_resource_assertions: []
+    output_class: output
+    inputs:
+      - data:individuals_merged_tar_gz
+      - data:sifted_snps_txt
+      - data:population_files
+      - data:columns_txt
+    outputs:
+      - data:mutation_overlap_output_tar_gz
+  - task_id: task:frequency
+    name: "Frequency"
+    stage: stage:final_analysis
+    executable: "frequency.py"
+    description: "Measures the frequency of overlapping mutations by selecting a number of random individuals and all SNP variants, without considering SIFT scores. This analysis is performed per population and per chromosome."
+    behavioral_notes: "Reads merged individual data, sifting data, and population data. Performs statistical analysis on SNP frequencies. Outputs a compressed file per chromosome and population."
+    parallelism_model:
+      type: embarrassingly_parallel
+      description: "Each instance computes mutation frequency for a specific chromosome and population combination independently."
+    io_dominance: balanced
+    io_access_type: python_serial
+    restart_model: idempotent
+    restart_checkpoint_dataset: null
+    hardware_path:
+      has_conditional_execution: false
+      execution_alternatives: []
+      minimum_resource_assertions: []
+    output_class: output
+    inputs:
+      - data:individuals_merged_tar_gz
+      - data:sifted_snps_txt
+      - data:population_files
+      - data:columns_txt
+    outputs:
+      - data:frequency_output_tar_gz
+
+data_objects:
+  - data_id: data:data_csv
+    name: "Data CSV"
+    description: "A CSV file listing input data, including base file names and thresholds for processing. It serves as a manifest for the workflow's primary inputs."
+    category: input
+    persistence: persistent
+    format_hint:
+      container: CSV
+      datasets: []
+      compression: none
+      layout_hint: contiguous
+      typical_request_size_kb: unknown
+    cardinality: "single global file"
+    cardinality_source:
+      type: fixed
+      controlling_parameter: null
+      config_file: null
+      possible_values: "n/a"
+    estimated_size_hint: "small config file, <1 KB"
+    producer_task: null
+    consumer_tasks: [] # Indirectly used by daxgen to generate tasks
+    lifecycle:
+      creation_phase: null
+      last_consumer_phase: null
+      retention_window: null
+      access_frequency_class: once
+      consumer_count: 0
+  - data_id: data:columns_txt
+    name: "Columns Text File"
+    description: "A text file specifying column definitions or headers relevant for parsing the genomic data."
+    category: input
+    persistence: persistent
+    format_hint:
+      container: text
+      datasets: []
+      compression: none
+      layout_hint: contiguous
+      typical_request_size_kb: unknown
+    cardinality: "single global file"
+    cardinality_source:
+      type: fixed
+      controlling_parameter: null
+      config_file: null
+      possible_values: "n/a"
+    estimated_size_hint: "small config file, <1 KB"
+    producer_task: null
+    consumer_tasks:
+      - task:individuals
+      - task:mutation_overlap
+      - task:frequency
+    lifecycle:
+      creation_phase: null
+      last_consumer_phase: task:frequency
+      retention_window: "from workflow start to task:frequency completion"
+      access_frequency_class: few_times
+      consumer_count: 3
+  - data_id: data:population_files
+    name: "Population Files"
+    description: "Individual files, each representing data for a specific human population (e.g., African, European). These are used in downstream analysis to categorize individuals."
+    category: input
+    persistence: persistent
+    format_hint:
+      container: text
+      datasets: []
+      compression: unknown
+      layout_hint: unknown
+      typical_request_size_kb: unknown
+    cardinality: "one per population (6 super populations + ALL)"
+    cardinality_source:
+      type: fixed
+      controlling_parameter: null
+      config_file: null
+      possible_values: "n/a"
+    estimated_size_hint: "small to medium, likely <1MB per file"
+    producer_task: null
+    consumer_tasks:
+      - task:mutation_overlap
+      - task:frequency
+    lifecycle:
+      creation_phase: null
+      last_consumer_phase: task:frequency
+      retention_window: "from workflow start to task:frequency completion"
+      access_frequency_class: few_times
+      consumer_count: 2
+  - data_id: data:chromosome_vcf_input
+    name: "Chromosome VCF Input"
+    description: "VCF (Variant Call Format) files, one for each chromosome, containing raw genetic variation data for individuals. These are the primary genomic inputs for the 'individuals' task."
+    category: input
+    persistence: persistent
+    format_hint:
+      container: text
+      datasets: []
+      compression: gzip
+      layout_hint: contiguous
+      typical_request_size_kb: unknown
+    cardinality: "one per chromosome (e.g., 10 total in example)"
+    cardinality_source:
+      type: runtime_determined
+      controlling_parameter: null
+      config_file: null
+      possible_values: "runtime-determined"
+    estimated_size_hint: "large, ~100MB+ per file"
+    producer_task: null
+    consumer_tasks:
+      - task:individuals
+    lifecycle:
+      creation_phase: null
+      last_consumer_phase: task:individuals
+      retention_window: "from workflow start to task:individuals completion"
+      access_frequency_class: once
+      consumer_count: 1
+  - data_id: data:individuals_output_tar_gz
+    name: "Individuals Output Tar.gz"
+    description: "Intermediate compressed (tar.gz) files produced by the 'individuals' task, each containing processed SNP data for a chunk of a chromosome. These are inputs to the 'individuals_merge' task."
+    category: intermediate
+    persistence: workflow_scoped
+    format_hint:
+      container: tar
+      datasets: []
+      compression: gzip
+      layout_hint: unknown
+      typical_request_size_kb: unknown
+    cardinality: "multiple per chromosome (determined by ind_jobs)"
+    cardinality_source:
+      type: config_determined
+      controlling_parameter: ind_jobs
+      config_file: daxgen.py
+      possible_values: "any positive integer that divides total rows"
+    estimated_size_hint: "medium, ~tens of MB per chunk file"
+    producer_task: task:individuals
+    consumer_tasks:
+      - task:individuals_merge
+    lifecycle:
+      creation_phase: task:individuals
+      last_consumer_phase: task:individuals_merge
+      retention_window: "from task:individuals completion to task:individuals_merge completion"
+      access_frequency_class: once
+      consumer_count: 1
+  - data_id: data:individuals_merged_tar_gz
+    name: "Individuals Merged Tar.gz"
+    description: "Aggregated compressed (tar.gz) files, one per chromosome, containing all processed SNP data for that chromosome after merging outputs from 'individuals' tasks. These serve as inputs to 'mutation_overlap' and 'frequency' tasks."
+    category: intermediate
+    persistence: workflow_scoped
+    format_hint:
+      container: tar
+      datasets: []
+      compression: gzip
+      layout_hint: unknown
+      typical_request_size_kb: unknown
+    cardinality: "one per chromosome"
+    cardinality_source:
+      type: runtime_determined
+      controlling_parameter: null
+      config_file: null
+      possible_values: "runtime-determined"
+    estimated_size_hint: "large, ~hundreds of MB per file"
+    producer_task: task:individuals_merge
+    consumer_tasks:
+      - task:mutation_overlap
+      - task:frequency
+    lifecycle:
+      creation_phase: task:individuals_merge
+      last_consumer_phase: task:frequency
+      retention_window: "from task:individuals_merge completion to task:frequency completion"
+      access_frequency_class: few_times
+      consumer_count: 2
+  - data_id: data:sifting_input_vcf
+    name: "Sifting Input VCF"
+    description: "VEP (Variant Effect Predictor) annotated VCF-like files, one per chromosome, providing raw data for the 'sifting' task to compute SIFT scores."
+    category: input
+    persistence: persistent
+    format_hint:
+      container: text
+      datasets: []
+      compression: unknown
+      layout_hint: contiguous
+      typical_request_size_kb: unknown
+    cardinality: "one per chromosome"
+    cardinality_source:
+      type: runtime_determined
+      controlling_parameter: null
+      config_file: null
+      possible_values: "runtime-determined"
+    estimated_size_hint: "large, ~100MB+ per file"
+    producer_task: null
+    consumer_tasks:
+      - task:sifting
+    lifecycle:
+      creation_phase: null
+      last_consumer_phase: task:sifting
+      retention_window: "from workflow start to task:sifting completion"
+      access_frequency_class: once
+      consumer_count: 1
+  - data_id: data:sifted_snps_txt
+    name: "Sifted SNPs Text File"
+    description: "Text files, one per chromosome, containing the SIFT scores and variant IDs for SNPs. These are the output of the 'sifting' task and input to 'mutation_overlap' and 'frequency' tasks."
+    category: intermediate
+    persistence: workflow_scoped
+    format_hint:
+      container: text
+      datasets: []
+      compression: none
+      layout_hint: contiguous
+      typical_request_size_kb: unknown
+    cardinality: "one per chromosome"
+    cardinality_source:
+      type: runtime_determined
+      controlling_parameter: null
+      config_file: null
+      possible_values: "runtime-determined"
+    estimated_size_hint: "medium, ~tens of MB per file"
+    producer_task: task:sifting
+    consumer_tasks:
+      - task:mutation_overlap
+      - task:frequency
+    lifecycle:
+      creation_phase: task:sifting
+      last_consumer_phase: task:frequency
+      retention_window: "from task:sifting completion to task:frequency completion"
+      access_frequency_class: few_times
+      consumer_count: 2
+  - data_id: data:mutation_overlap_output_tar_gz
+    name: "Mutation Overlap Output Tar.gz"
+    description: "Compressed (tar.gz) files, one for each chromosome-population pair, containing the results of the mutation overlap analysis. These are final scientific outputs of the workflow."
+    category: output
+    persistence: persistent
+    format_hint:
+      container: tar
+      datasets: []
+      compression: gzip
+      layout_hint: unknown
+      typical_request_size_kb: unknown
+    cardinality: "one per chromosome-population pair"
+    cardinality_source:
+      type: runtime_determined
+      controlling_parameter: null
+      config_file: null
+      possible_values: "runtime-determined"
+    estimated_size_hint: "medium, ~several MB per file"
+    producer_task: task:mutation_overlap
+    consumer_tasks: []
+    lifecycle:
+      creation_phase: task:mutation_overlap
+      last_consumer_phase: null
+      retention_window: "from task:mutation_overlap completion to workflow end"
+      access_frequency_class: once
+      consumer_count: 0
+  - data_id: data:frequency_output_tar_gz
+    name: "Frequency Output Tar.gz"
+    description: "Compressed (tar.gz) files, one for each chromosome-population pair, containing the results of the SNP frequency analysis. These are final scientific outputs of the workflow."
+    category: output
+    persistence: persistent
+    format_hint:
+      container: tar
+      datasets: []
+      compression: gzip
+      layout_hint: unknown
+      typical_request_size_kb: unknown
+    cardinality: "one per chromosome-population pair"
+    cardinality_source:
+      type: runtime_determined
+      controlling_parameter: null
+      config_file: null
+      possible_values: "runtime-determined"
+    estimated_size_hint: "medium, ~several MB per file"
+    producer_task: task:frequency
+    consumer_tasks: []
+    lifecycle:
+      creation_phase: task:frequency
+      last_consumer_phase: null
+      retention_window: "from task:frequency completion to workflow end"
+      access_frequency_class: once
+      consumer_count: 0
+
+pc_edges:
+  - edge_id: pc:individuals->individuals_merge:n_to_1
+    producer: task:individuals
+    consumer: task:individuals_merge
+    data_objects:
+      - data:individuals_output_tar_gz
+    pc_pattern: n_to_1
+    pc_pattern_rationale: "Multiple parallel 'individuals' tasks produce chunks for a single chromosome, which are then consumed and merged by a single 'individuals_merge' task for that chromosome."
+    data_flow_description: "Compressed tar.gz files containing processed SNP data chunks flow from multiple 'individuals' tasks to a single 'individuals_merge' task."
+    coupling: tight
+    coupling_rationale: "The 'individuals_merge' task cannot begin until all 'individuals' tasks for a given chromosome have completed their processing and written their output files."
+    communication_pattern: file_per_producer
+    data_volume_class: large
+  - edge_id: pc:sifting->mutation_overlap:1_to_1
+    producer: task:sifting
+    consumer: task:mutation_overlap
+    data_objects:
+      - data:sifted_snps_txt
+    pc_pattern: 1_to_1
+    pc_pattern_rationale: "A single 'sifting' task produces SIFT scores for one chromosome, which is then consumed by a 'mutation_overlap' task for the same chromosome (and a specific population)."
+    data_flow_description: "Text file containing SIFT scores and SNP IDs flows from 'sifting' to 'mutation_overlap'."
+    coupling: tight
+    coupling_rationale: "'mutation_overlap' requires the complete sifted data before it can begin processing."
+    communication_pattern: file_per_producer
+    data_volume_class: medium
+  - edge_id: pc:sifting->frequency:1_to_1
+    producer: task:sifting
+    consumer: task:frequency
+    data_objects:
+      - data:sifted_snps_txt
+    pc_pattern: 1_to_1
+    pc_pattern_rationale: "A single 'sifting' task produces SIFT scores for one chromosome, which is then consumed by a 'frequency' task for the same chromosome (and a specific population)."
+    data_flow_description: "Text file containing SIFT scores and SNP IDs flows from 'sifting' to 'frequency'."
+    coupling: tight
+    coupling_rationale: "'frequency' requires the complete sifted data before it can begin processing."
+    communication_pattern: file_per_producer
+    data_volume_class: medium
+  - edge_id: pc:individuals_merge->mutation_overlap:1_to_1
+    producer: task:individuals_merge
+    consumer: task:mutation_overlap
+    data_objects:
+      - data:individuals_merged_tar_gz
+    pc_pattern: 1_to_1
+    pc_pattern_rationale: "A single 'individuals_merge' task produces merged data for one chromosome, which is then consumed by a 'mutation_overlap' task for the same chromosome (and a specific population)."
+    data_flow_description: "Compressed tar.gz file containing merged SNP data for a chromosome flows from 'individuals_merge' to 'mutation_overlap'."
+    coupling: tight
+    coupling_rationale: "'mutation_overlap' requires the complete merged individual data before it can begin processing."
+    communication_pattern: file_per_producer
+    data_volume_class: large
+  - edge_id: pc:individuals_merge->frequency:1_to_1
+    producer: task:individuals_merge
+    consumer: task:frequency
+    data_objects:
+      - data:individuals_merged_tar_gz
+    pc_pattern: 1_to_1
+    pc_pattern_rationale: "A single 'individuals_merge' task produces merged data for one chromosome, which is then consumed by a 'frequency' task for the same chromosome (and a specific population)."
+    data_flow_description: "Compressed tar.gz file containing merged SNP data for a chromosome flows from 'individuals_merge' to 'frequency'."
+    coupling: tight
+    coupling_rationale: "'frequency' requires the complete merged individual data before it can begin processing."
+    communication_pattern: file_per_producer
+    data_volume_class: large
+
+workflow_graph:
+  integrity_hash:
+    _status: required_static
+    _value: unknown # Cannot compute SHA-256 without shell access
+  last_generated:
+    _status: required_static
+    _value: 2026-02-27T10:00:00.000000Z # Placeholder timestamp
+  dag_edges:
+    _status: required_static
+    _value:
+      - from: task:individuals
+        to: task:individuals_merge
+        via: pc:individuals->individuals_merge:n_to_1
+      - from: task:sifting
+        to: task:mutation_overlap
+        via: pc:sifting->mutation_overlap:1_to_1
+      - from: task:sifting
+        to: task:frequency
+        via: pc:sifting->frequency:1_to_1
+      - from: task:individuals_merge
+        to: task:mutation_overlap
+        via: pc:individuals_merge->mutation_overlap:1_to_1
+      - from: task:individuals_merge
+        to: task:frequency
+        via: pc:individuals_merge->frequency:1_to_1
+  loop_groups:
+    _status: required_static
+    _value: []
+  critical_path_hint:
+    _status: required_static
+    _value: indeterminate from static analysis
+  control_flow:
+    has_iteration:
+      _status: required_static
+      _value: true
+    iteration_description:
+      _status: required_static
+      _value: "The workflow iterates over chromosomes and populations. The number of iterations is determined by the input `data.csv` and the list of population files. Data carries across iterations implicitly via independent file outputs."
+    has_conditional_branches:
+      _status: required_static
+      _value: false
+    conditional_description:
+      _status: required_static
+      _value: null
+  stage_execution_order:
+    _status: required_static
+    _value:
+      - stage:individuals_processing
+      - stage:intermediate_processing
+      - stage:final_analysis
+  cross_reference:
+    _status: required_static
+    _value:
+      task_to_stage:
+        task:individuals: stage:individuals_processing
+        task:individuals_merge: stage:intermediate_processing
+        task:sifting: stage:intermediate_processing
+        task:mutation_overlap: stage:final_analysis
+        task:frequency: stage:final_analysis
+      data_to_producer:
+        data:data_csv: null
+        data:columns_txt: null
+        data:population_files: null
+        data:chromosome_vcf_input: null
+        data:individuals_output_tar_gz: task:individuals
+        data:individuals_merged_tar_gz: task:individuals_merge
+        data:sifting_input_vcf: null
+        data:sifted_snps_txt: task:sifting
+        data:mutation_overlap_output_tar_gz: task:mutation_overlap
+        data:frequency_output_tar_gz: task:frequency
+      data_to_consumers:
+        data:data_csv: []
+        data:columns_txt:
+          - task:individuals
+          - task:mutation_overlap
+          - task:frequency
+        data:population_files:
+          - task:mutation_overlap
+          - task:frequency
+        data:chromosome_vcf_input:
+          - task:individuals
+        data:individuals_output_tar_gz:
+          - task:individuals_merge
+        data:individuals_merged_tar_gz:
+          - task:mutation_overlap
+          - task:frequency
+        data:sifting_input_vcf:
+          - task:sifting
+        data:sifted_snps_txt:
+          - task:mutation_overlap
+          - task:frequency
+        data:mutation_overlap_output_tar_gz: []
+        data:frequency_output_tar_gz: []
+
+workflow_patterns:
+  primary_pattern:
+    _status: required_static
+    _value: hybrid
+  secondary_patterns:
+    _status: required_static
+    _value:
+      - scatter_gather
+      - iterative
+  classification_rationale:
+    _status: required_static
+    _value: "The workflow exhibits a `scatter_gather` pattern in the 'individuals' and 'individuals_merge' tasks, where multiple individual processing tasks fan out and their results are gathered by a merge task per chromosome. It is `iterative` as it processes multiple chromosomes and populations independently. The overall structure combines these patterns, thus classified as `hybrid`."
+  pattern_table_row:
+    _status: required_static
+    _value: "1000genome | 3 | Many (dynamic) | n_to_1, 1_to_1 | Iterative processing of chromosomes and populations, scatter-gather for initial data processing."
+
+io_behavioral_hints:
+  - hint_id: hint:individuals_chunked_io
+    description: "The 'individuals' task processes large VCF files in chunks, writing intermediate tar.gz files. This reduces memory footprint but creates many small to medium-sized intermediate files which need to be merged later."
+    affected_tasks:
+      - task:individuals
+    affected_data:
+      - data:individuals_output_tar_gz
+      - data:chromosome_vcf_input
+    potential_concern: small_file_overhead
+  - hint_id: hint:merged_file_reuse
+    description: "The `individuals_merged_tar_gz` and `sifted_snps_txt` datasets are read by two downstream tasks (`mutation_overlap` and `frequency`). This represents data reuse, implying these files should be accessible by both consumers efficiently."
+    affected_tasks:
+      - task:mutation_overlap
+      - task:frequency
+    affected_data:
+      - data:individuals_merged_tar_gz
+      - data:sifted_snps_txt
+    potential_concern: data_reuse
+
+execution_profiles:
+  - profile_name:
+      _status: required_static_ask
+      _prompt: "What should this execution profile be named? (e.g., 'tracks_only', 'model_checkpoint', 'full')"
+      _value: full_analysis
+    terminal_task_id:
+      _status: required_static
+      _value: task:mutation_overlap
+    description:
+      _status: required_static_ask
+      _prompt: "What scientific results does the 'full_analysis' profile produce? What would a scientist use this stopping point for?"
+      _value: "This profile produces the complete scientific results of the 1000 Genomes workflow, including mutation overlap and frequency analyses across all specified chromosomes and populations."
+    required_task_set:
+      _status: required_static
+      _value:
+        - task:individuals
+        - task:individuals_merge
+        - task:sifting
+        - task:mutation_overlap
+        - task:frequency
+    conditional_inclusions:
+      _status: required_static
+      _value: []
+    output_dataset_ids:
+      _status: required_static
+      _value:
+        - data:mutation_overlap_output_tar_gz
+        - data:frequency_output_tar_gz
+
+translation_metadata:
+  source_format:
+    _status: required_static
+    _value: compiled_from_pegasus_dax
+  source_file:
+    _status: required_static
+    _value: daxgen.py
+  translation_tool:
+    _status: required_static
+    _value: gemini
+  translation_timestamp:
+    _status: required_static
+    _value: 2026-02-27T10:00:00.000000Z # Placeholder timestamp
+  unmapped_fields:
+    _status: required_static
+    _value: []
+  round_trip_gaps:
+    _status: required_static
+    _value: []
+  quality_warnings:
+    _status: required_static
+    _value: []
+  field_confidence_records:
+    _status: required_static
+    _value:
+      - field_path: metadata.workflow_description
+        filled_by: gemini
+        confidence_level: high
+        confidence_reason: "Directly extracted from README.md and validated against task descriptions."
+        requires_human_review: false
+      - field_path: tasks[*].parallelism_model.type
+        filled_by: gemini
+        confidence_level: high
+        confidence_reason: "Inferred from code structure (loops over chromosomes/populations, `--individuals-jobs` parameter) and description in README.md."
+        requires_human_review: false
+      - field_path: tasks[*].parallelism_model.description
+        filled_by: gemini
+        confidence_level: high
+        confidence_reason: "Inferred from code structure and task descriptions."
+        requires_human_review: false
+      - field_path: tasks[*].io_dominance
+        filled_by: gemini
+        confidence_level: medium
+        confidence_reason: "Inferred from task descriptions (e.g., 'heavy file parsing', 'reads multiple files') but without direct profiling or code analysis of I/O calls vs. compute."
+        requires_human_review: false
+      - field_path: tasks[*].io_access_type
+        filled_by: gemini
+        confidence_level: high
+        confidence_reason: "Inferred from Python executables (assuming standard Python file I/O) and lack of explicit MPI/HDF5 parallel I/O calls in `daxgen.py`."
+        requires_human_review: false
+      - field_path: tasks[*].restart_model
+        filled_by: gemini
+        confidence_level: medium
+        confidence_reason: "Inferred from common workflow patterns (e.g., chunked processing for 'checkpoint_restart', output file existence for 'idempotent'). No explicit restart logic found in `daxgen.py`."
+        requires_human_review: false
+      - field_path: tasks[*].behavioral_notes
+        filled_by: gemini
+        confidence_level: medium
+        confidence_reason: "Inferred from task descriptions and observed I/O patterns (e.g., chunking, merging). Could be more precise with detailed code analysis."
+        requires_human_review: false
+      - field_path: data_objects[*].description
+        filled_by: gemini
+        confidence_level: high
+        confidence_reason: "Derived from file names, usage in tasks, and descriptions in README.md."
+        requires_human_review: false
+      - field_path: data_objects[*].format_hint
+        filled_by: gemini
+        confidence_level: medium
+        confidence_reason: "Inferred from file extensions (.csv, .txt, .tar.gz, .vcf) and general knowledge. Specific internal details (e.g., datasets within tar.gz) are not fully known without deeper inspection."
+        requires_human_review: false
+      - field_path: data_objects[*].cardinality
+        filled_by: gemini
+        confidence_level: high
+        confidence_reason: "Inferred from workflow's processing logic (e.g., one per chromosome, multiple per chunk, one per population)."
+        requires_human_review: false
+      - field_path: data_objects[*].cardinality_source
+        filled_by: gemini
+        confidence_level: high
+        confidence_reason: "Explicitly mentioned in `daxgen.py` parameters (`ind_jobs`) or implied by input `data.csv`."
+        requires_human_review: false
+      - field_path: data_objects[*].estimated_size_hint
+        filled_by: gemini
+        confidence_level: low
+        confidence_reason: "Very rough estimates based on typical genomic data sizes and problem context, not from code analysis."
+        requires_human_review: true
+      - field_path: pc_edges[*].pc_pattern
+        filled_by: gemini
+        confidence_level: high
+        confidence_reason: "Clearly derived from the number of producer/consumer task instances and data flow."
+        requires_human_review: false
+      - field_path: pc_edges[*].pc_pattern_rationale
+        filled_by: gemini
+        confidence_level: high
+        confidence_reason: "Directly explains the derived pattern based on task relationships."
+        requires_human_review: false
+      - field_path: pc_edges[*].data_flow_description
+        filled_by: gemini
+        confidence_level: medium
+        confidence_reason: "Inferred from task descriptions and data object types. Specific access details (e.g., partial read) are inferred."
+        requires_human_review: false
+      - field_path: pc_edges[*].coupling
+        filled_by: gemini
+        confidence_level: high
+        confidence_reason: "Inferred from typical dependencies in scientific workflows (e.g., merge tasks wait for all inputs)."
+        requires_human_review: false
+      - field_path: pc_edges[*].coupling_rationale
+        filled_by: gemini
+        confidence_level: high
+        confidence_reason: "Justifies the coupling type based on inferred task synchronization."
+        requires_human_review: false
+      - field_path: pc_edges[*].communication_pattern
+        filled_by: gemini
+        confidence_level: high
+        confidence_reason: "Derived from how files are named and passed between tasks (e.g., per-producer files)."
+        requires_human_review: false
+      - field_path: pc_edges[*].data_volume_class
+        filled_by: gemini
+        confidence_level: medium
+        confidence_reason: "Estimated based on `estimated_size_hint` and cardinality, which themselves are estimates."
+        requires_human_review: false
+      - field_path: workflow_graph.integrity_hash
+        filled_by: gemini
+        confidence_level: low
+        confidence_reason: "Cannot compute SHA-256 without shell access."
+        requires_human_review: true
+      - field_path: workflow_graph.critical_path_hint
+        filled_by: gemini
+        confidence_level: low
+        confidence_reason: "Cannot accurately determine without profiling or advanced static analysis of control flow and task runtimes."
+        requires_human_review: true
+      - field_path: workflow_patterns.primary_pattern
+        filled_by: gemini
+        confidence_level: high
+        confidence_reason: "Derived from observed DAG topology (scatter-gather, iterative loops)."
+        requires_human_review: false
+      - field_path: workflow_patterns.secondary_patterns
+        filled_by: gemini
+        confidence_level: high
+        confidence_reason: "Derived from observed sub-patterns within the workflow."
+        requires_human_review: false
+      - field_path: workflow_patterns.classification_rationale
+        filled_by: gemini
+        confidence_level: high
+        confidence_reason: "Justifies the pattern classification based on concrete workflow features."
+        requires_human_review: false
+      - field_path: workflow_patterns.pattern_table_row
+        filled_by: gemini
+        confidence_level: medium
+        confidence_reason: "Manual summarization of workflow characteristics."
+        requires_human_review: false
+      - field_path: io_behavioral_hints
+        filled_by: gemini
+        confidence_level: medium
+        confidence_reason: "Identified based on typical I/O concerns in such workflows and explicit mentions of chunking/merging. Could be more exhaustive with deeper code analysis."
+        requires_human_review: false
+      - field_path: execution_profiles[*].profile_name
+        filled_by: gemini
+        confidence_level: high
+        confidence_reason: "Proposed based on terminal output tasks, a standard approach."
+        requires_human_review: false
+      - field_path: execution_profiles[*].description
+        filled_by: gemini
+        confidence_level: high
+        confidence_reason: "Described based on the scientific outcomes of the terminal tasks."
+        requires_human_review: false
+      - field_path: execution_profiles[*].required_task_set
+        filled_by: gemini
+        confidence_level: high
+        confidence_reason: "Auto-derived by backward traversal from the terminal task."
+        requires_human_review: false

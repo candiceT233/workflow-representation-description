@@ -1,0 +1,1 @@
+python3 -c "import json,hashlib; edges=[...]; print(hashlib.sha256(json.dumps(edges,sort_keys=True,separators=(',',':')).encode()).hexdigest())"

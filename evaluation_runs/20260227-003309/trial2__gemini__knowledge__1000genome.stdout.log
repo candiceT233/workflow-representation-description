@@ -1,0 +1,70 @@
+# Workflow Knowledge Report for 1000genome
+
+This document captures the static analysis of the `1000genome` workflow, focusing on its logical structure, data dependencies, and code-derivable I/O patterns, independent of any specific deployment or execution environment.
+
+- **Workflow Name**: `1000genome`
+- **Agent Name**: `gemini`
+- **Analysis Method**: Static code analysis of the workflow repository.
+
+## 1. Workflow Stages and Tasks
+
+The workflow is organized into four main logical stages, processing data for one or more chromosomes.
+
+| Stage | Task Name | Description |
+| :--- | :--- | :--- |
+| **1. Scatter-Processing** | `task:individuals` | Scatters a large chromosome VCF file into smaller chunks and processes each chunk to extract individual mutation data. |
+| **2. Gather** | `task:individuals_merge` | Gathers the processed chunks from `task:individuals` and merges them into a single compressed archive for the chromosome. |
+| **3. Sifting** | `task:sifting` | Processes a Variant Effect Predictor (VEP) file to extract SIFT scores for SNP variants for a given chromosome. Runs in parallel with stages 1 and 2. |
+| **4. Analysis** | `task:mutation_overlap` | Measures the overlap in mutations among pairs of individuals for a specific population and chromosome, using the sifted scores. |
+| **4. Analysis** | `task:frequency` | Measures the frequency of overlapping mutations for a specific population and chromosome. |
+
+## 2. Data Object Registry
+
+The following data objects are produced and consumed by the workflow tasks.
+
+| Data ID | Description | Format/Notes |
+| :--- | :--- | :--- |
+| `data:source_vcf_chrX` | Input VCF file for a specific chromosome (`X`). | VCF, large text file. |
+| `data:vep_sift_input_chrX` | Input file containing SIFT scores from VEP for a chromosome. | Text file. |
+| `data:population_file_P` | Input file defining individuals belonging to a specific population (`P`). | Text file. |
+| `data:columns_file` | A shared configuration file defining column layouts. | Text file. |
+| `data:individuals_chunk_chrX_N` | Intermediate output from an `individuals` task for chunk `N` of chromosome `X`. | `tar.gz` |
+| `data:merged_individuals_chrX` | Merged output for a full chromosome from the `individuals_merge` task. | `tar.gz` |
+| `data:sift_scores_chrX` | Output file containing filtered SIFT scores for a chromosome. | `sifted.SIFT.chrX.txt` |
+| `data:mutation_overlap_result`| Final output from the `mutation_overlap` task. | `tar.gz` |
+| `data:frequency_result` | Final output from the `frequency` task. | `tar.gz` |
+
+## 3. Producer-Consumer Edge List
+
+The dependencies between tasks and data objects define the workflow's DAG.
+
+| Edge ID | Producer | Consumer | Data Object | Pattern | Rationale |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| `pc:input->individuals` | (workflow input) | `task:individuals` | `data:source_vcf_chrX` | `scatter` | The main VCF file is chunked and processed in parallel by many `individuals` jobs. |
+| `pc:individuals->merge` | `task:individuals` | `task:individuals_merge` | `data:individuals_chunk_chrX_N` | `gather` | Many intermediate chunks are collected by a single merge task. |
+| `pc:merge->analysis` | `task:individuals_merge` | `task:mutation_overlap`, `task:frequency` | `data:merged_individuals_chrX` | `fan-out` | The merged data is used by multiple downstream analysis tasks. |
+| `pc:input->sifting` | (workflow input) | `task:sifting` | `data:vep_sift_input_chrX` | `pipeline` | A single input is processed to produce a single output. |
+| `pc:sifting->analysis` | `task:sifting` | `task:mutation_overlap`, `task:frequency` | `data:sift_scores_chrX` | `fan-out` | The sifted scores are used by multiple downstream analysis tasks. |
+| `pc:input->analysis` | (workflow input) | `task:mutation_overlap`, `task:frequency` | `data:population_file_P` | `parameter` | The population file is a parameter for the analysis tasks. |
+
+## 4. Workflow-Level Pattern Analysis
+
+**Pattern: Hybrid (Scatter-Gather followed by Fan-Out)**
+
+The workflow's structure per chromosome is a clear `hybrid` pattern:
+1.  **Scatter-Gather:** It begins with a `scatter-gather` phase where `task:individuals` processes chunks of a large file in parallel, and `task:individuals_merge` collects the results. This is a classic pattern for breaking down a large data processing task.
+2.  **Parallel Pipeline:** Concurrently, `task:sifting` runs as a simple `pipeline` stage.
+3.  **Fan-Out/Scatter:** The outputs from the first two stages (`data:merged_individuals_chrX` and `data:sift_scores_chrX`) are then broadcast to a set of analysis jobs (`mutation_overlap`, `frequency`) for each population, representing a `fan-out` or `scatter` pattern.
+
+This hybrid structure is designed to maximize parallelism, first at the data-chunk level and then at the analysis-parameter level.
+
+## 5. Static I/O Behavioral Hints
+
+The source code and workflow definition provide several hints about its I/O behavior.
+
+- **Small-File Overhead Concern:** The `README.md` explicitly warns against setting the number of `individuals` jobs too high, as it would create a very large number of small files and be "extremely inefficient." This indicates a known sensitivity to producing an excessive number of intermediate files.
+- **Intermediate Data Management:** The `daxgen.py` script configures the intermediate outputs from `task:individuals` with `stage_out=False`, indicating these files are consumed by `task:individuals_merge` on the execution site and do not need to be moved to a final output location, thus avoiding unnecessary data movement.
+- **Data Compression:** The workflow uses `.tar.gz` for intermediate merged data and final outputs. This shows a clear intent to reduce the storage footprint and network transfer volume of its data products.
+- **Chunk-based Processing:** The core `individuals` scatter-gather pattern is a direct implementation of chunk-based processing to handle a source file that is presumably too large or slow to process monolithically.
+
+STATUS: success | OUTPUT: /home/mtang11/scripts/workflow-representation-description/workflow_knowledge/1000genome-knowledge-gemini-trial2.md
