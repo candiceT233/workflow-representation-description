@@ -1,0 +1,152 @@
+TASK: Generate a Workflow Definition Document (WDD) (Schema: wrd-7.0)
+You are a Claude terminal agent analyzing a scientific workflow codebase to produce a Workflow Definition Document (WDD) using only `template_separate_docs/template_WDD.yml` as the schema source of truth.
+
+PURPOSE
+The WDD captures workflow logical structure only (what the workflow is), independent of deployment/hardware/runtime behavior.
+
+CRITICAL CONSTRAINTS
+- Use static code analysis only.
+- Do not include deployment decisions (node counts, storage tiers, placement policies, hardware constraints, runtime performance targets).
+- If a value cannot be determined from code, use `unknown` and explain why.
+- Mark assumptions with `[ASSUMPTION]` and add matching confidence records in `translation_metadata.field_confidence_records`.
+
+WORKFLOW TARGET
+- `workflow_name`: `1000genome`
+
+OUTPUT
+Produce exactly one YAML file with agent suffix:
+- Path: `workflow_wdd/1000genome-wdd-<agent_name>.yaml`
+- Example (Gemini): `workflow_wdd/1000genome-wdd-gemini.yaml`
+- Example (Claude): `workflow_wdd/1000genome-wdd-claude.yaml`
+
+REQUIRED TOP-LEVEL SECTIONS (all required)
+1. metadata
+2. stages
+3. tasks
+4. data_objects
+5. pc_edges
+6. workflow_graph
+7. workflow_patterns
+8. io_behavioral_hints
+9. execution_profiles
+10. translation_metadata
+
+REQUIRED ID CONVENTIONS
+- stage_id: `stage:<descriptor>`
+- task_id: `task:<descriptor>`
+- data_id: `data:<descriptor>`
+- edge_id: `pc:<producer_task>-><consumer_task>:<pattern>`
+- hint_id: `hint:<short_name>`
+
+SCHEMA-CRITICAL ENUMS (must match exactly)
+- `pc_edges[].pc_pattern`: `1_to_1 | 1_to_n | n_to_1 | n_to_n`
+- `pc_edges[].coupling`: `tight | loose`
+- `pc_edges[].communication_pattern`: `shared_file | file_per_producer | in_memory | streaming_channel`
+- `pc_edges[].data_volume_class`: `small | medium | large`
+- `workflow_patterns.primary_pattern`: `cascading | iterative | scatter_gather | pipeline | broadcast | checkpointing | conditional | hybrid`
+- `tasks[].parallelism_model.type`: `serial | embarrassingly_parallel | data_parallel | task_parallel`
+- `tasks[].io_dominance`: `compute_bound | io_bound | balanced | unknown`
+- `tasks[].io_access_type`: `posix_independent | mpi_io_collective | mpi_io_independent | hdf5_parallel | netcdf4_parallel | python_serial | unknown`
+- `tasks[].restart_model`: `idempotent | checkpoint_restart | non_restartable | unknown`
+- `tasks[].output_class`: `intermediate | checkpoint`
+- `data_objects[].category`: `input | intermediate | output | checkpoint | config`
+- `data_objects[].persistence`: `transient | stage_scoped | workflow_scoped | persistent`
+- `data_objects[].cardinality_source.type`: `fixed | config_determined | runtime_determined`
+- `io_behavioral_hints[].potential_concern`: `partial_access | format_mismatch | small_file_overhead | unnecessary_serialization | data_reuse | checkpoint_waste | metadata_overhead | mpi_io_pattern_risk | unknown`
+
+REQUIRED METADATA FIELDS
+`metadata` must include:
+`workflow_lineage_id`, `version`, `version_notes`, `deprecated`, `workflow_name`,
+`workflow_description`, `source_repository`, `source_commit`, `source_format`,
+`source_file`, `schema_version` (must be `wrd-7.0`), `generated_by`, `generated_at`,
+`last_modified_at`.
+
+SPECIAL REQUIREMENTS FROM TEMPLATE
+- One producer-consumer task pair should use one edge with `pc_edges[].data_objects` as a list (no one-edge-per-dataset duplication).
+- Populate all v7 task fields: `io_access_type`, `restart_model`, `restart_checkpoint_dataset`, and `hardware_path`.
+- Populate `data_objects[].cardinality_source` fields: `type`, `controlling_parameter`, `config_file`, `possible_values`.
+- `workflow_graph` must include: `integrity_hash`, `last_generated`, `dag_edges`, `loop_groups`, `critical_path_hint`, `control_flow`, `stage_execution_order`, `cross_reference`.
+- `execution_profiles[].required_task_set` must be auto-derived by backward DAG traversal from `terminal_task_id`.
+- Populate `execution_profiles[].conditional_inclusions` when tasks are conditionally active by parameter value.
+
+REQUIRED HUMAN-ASK FIELDS (required_static_ask)
+If not reliably inferable from code, ask and record:
+- `metadata.workflow_description`
+- `tasks[].description`
+- `tasks[].output_class`
+- `data_objects[].description`
+- `execution_profiles[].profile_name`
+- `execution_profiles[].description`
+
+MINIMUM CONFIDENCE TRACKING REQUIREMENTS
+`translation_metadata.field_confidence_records` must include at least:
+- all description fields (tasks, data_objects, stages)
+- all `pc_pattern` fields
+- `workflow_patterns` classification fields
+- each task: `io_dominance`, `io_access_type`, `restart_model`, `behavioral_notes`
+- all `io_behavioral_hints`
+- all execution profile proposals
+
+GENERATION PROCEDURE
+Follow this sequence. Do not skip steps.
+
+Step 1 — Survey codebase structure
+Read top-level files, README, and orchestration files (Makefile, shell scripts, Nextflow, Pegasus DAX, Parsl, Snakemake, Slurm, Swift/T). Identify entry point, task definition mechanism, and key config files.
+
+Step 2 — Identify stages and tasks
+Enumerate all distinct executable units and stage membership. Record each task's inputs/outputs and executable.
+
+Step 3 — Classify `io_access_type`
+Infer from imports and API calls:
+- MPI collective file I/O (`Read_all`/`Write_all`) -> `mpi_io_collective`
+- MPI independent file I/O (`Read`/`Write`) -> `mpi_io_independent`
+- h5py `driver='mpio'` -> `hdf5_parallel`
+- netCDF4 `parallel=True` -> `netcdf4_parallel`
+- Python file I/O without MPI -> `python_serial`
+- direct POSIX style -> `posix_independent`
+Else `unknown` with confidence record.
+
+Step 4 — Classify `restart_model`
+Look for checkpoint resume logic, resume flags, and idempotent output guards.
+Set `restart_checkpoint_dataset` when `restart_model = checkpoint_restart`.
+
+Step 5 — Build data object registry
+Deduplicate data objects, classify category/persistence, extract format details (datasets/dtypes/shapes where visible), populate `cardinality_source`, and derive lifecycle fields from DAG.
+
+Step 6 — Build producer-consumer edges
+Map producers/consumers per data object. Classify pattern, coupling, communication_pattern, and data_volume_class with rationale.
+
+Step 7 — Build workflow graph and patterns
+Build `workflow_graph` including integrity hash and cross-reference tables. Classify workflow patterns and provide rationale.
+
+Step 8 — Extract I/O behavioral hints
+Identify hints: `partial_access`, `format_mismatch`, `small_file_overhead`, `unnecessary_serialization`, `data_reuse`, `checkpoint_waste`, `metadata_overhead`, `mpi_io_pattern_risk`, `unknown`.
+
+Step 9 — Build execution profiles
+Propose profiles from checkpoint tasks plus full profile. Confirm with scientist. Auto-derive `required_task_set` from `terminal_task_id`. Fill `conditional_inclusions` and `output_dataset_ids`.
+
+Step 10 — Assemble translation metadata
+Fill source metadata, unmapped fields, round-trip gaps, quality warnings, and confidence records.
+
+Step 11 — Validate before finalizing
+- Completeness: every file read/written is represented in `data_objects`.
+- Consistency: all references resolve across tasks/data/edges/stages.
+- Pattern accuracy: producer/consumer cardinalities match `pc_pattern`.
+- No deployment leakage.
+- Cross-reference integrity matches body.
+- Stage ordering matches DAG.
+- `workflow_graph.integrity_hash` matches `pc_edges`.
+- Every `[ASSUMPTION]` has a confidence record.
+- Multi-dataset edges correctly use `pc_edges[].data_objects`.
+- Every task has non-null `io_access_type` and `restart_model` (or `unknown` + confidence record).
+
+REFERENCE: PATTERN TAXONOMY
+
+P-C Patterns (per-edge)
+- `1_to_1`: one producer, one consumer
+- `1_to_n`: one producer, many consumers
+- `n_to_1`: many producers, one consumer
+- `n_to_n`: many producers, many consumers
+
+Workflow-Level Patterns
+- `cascading`, `iterative`, `scatter_gather`, `pipeline`, `broadcast`, `checkpointing`, `conditional`, `hybrid`

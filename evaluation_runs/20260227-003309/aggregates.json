@@ -1,0 +1,30 @@
+{
+  "gemini__knowledge": {
+    "n": 3,
+    "duration_mean_s": 166.328,
+    "duration_std_s": 49.35,
+    "validation_mean": 0.0,
+    "validation_pass_rate": 0.0
+  },
+  "claude__wdd": {
+    "n": 3,
+    "duration_mean_s": 4.78,
+    "duration_std_s": 0.255,
+    "validation_mean": 0.0,
+    "validation_pass_rate": 0.0
+  },
+  "claude__knowledge": {
+    "n": 3,
+    "duration_mean_s": 4.447,
+    "duration_std_s": 0.432,
+    "validation_mean": 0.0,
+    "validation_pass_rate": 0.0
+  },
+  "gemini__wdd": {
+    "n": 3,
+    "duration_mean_s": 146.072,
+    "duration_std_s": 24.616,
+    "validation_mean": 0.0,
+    "validation_pass_rate": 0.0
+  }
+}

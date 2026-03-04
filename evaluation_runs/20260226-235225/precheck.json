@@ -1,0 +1,22 @@
+{
+  "api": {
+    "gemini": {
+      "configured": true,
+      "env_var": "GEMINI_API_KEY"
+    },
+    "claude": {
+      "configured": true,
+      "env_var": "ANTHROPIC_API_KEY"
+    }
+  },
+  "cli": {
+    "gemini": {
+      "ok": true,
+      "info": "/home/mtang11/.npm-global/bin/gemini"
+    },
+    "claude": {
+      "ok": true,
+      "info": "/home/mtang11/.npm-global/bin/claude"
+    }
+  }
+}

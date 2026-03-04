@@ -1,0 +1,476 @@
+{
+  "run_started_at": "2026-02-27T05:52:04.776440+00:00",
+  "run_finished_at": "2026-02-27T05:52:04.806385+00:00",
+  "trials": 3,
+  "random_seed": 20260223,
+  "records": [
+    {
+      "task_id": "trial2__gemini__knowledge__1000genome",
+      "trial": 2,
+      "agent": "gemini",
+      "mode": "knowledge",
+      "workflow": "1000genome",
+      "status": "skipped",
+      "started_at": "2026-02-27T05:52:04.805619+00:00",
+      "finished_at": "2026-02-27T05:52:04.805659+00:00",
+      "duration_s": 0.0,
+      "exit_code": null,
+      "error": "GEMINI_API_KEY placeholder not replaced",
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "total_tokens": null
+      },
+      "validation": {
+        "valid": false,
+        "score": 0.0,
+        "issues": [
+          "skipped_no_api_key"
+        ]
+      },
+      "output_metrics": {
+        "exists": false,
+        "bytes": 0,
+        "lines": 0,
+        "words": 0,
+        "chars": 0
+      },
+      "model_control": {
+        "model": "<SET_GEMINI_MODEL>",
+        "temperature": "<SET_TEMP>",
+        "seed": "<SET_SEED>",
+        "max_tokens": "<SET_MAX_TOKENS>",
+        "cmd_template": "gemini -p {prompt}"
+      }
+    },
+    {
+      "task_id": "trial3__gemini__knowledge__1000genome",
+      "trial": 3,
+      "agent": "gemini",
+      "mode": "knowledge",
+      "workflow": "1000genome",
+      "status": "skipped",
+      "started_at": "2026-02-27T05:52:04.805763+00:00",
+      "finished_at": "2026-02-27T05:52:04.805774+00:00",
+      "duration_s": 0.0,
+      "exit_code": null,
+      "error": "GEMINI_API_KEY placeholder not replaced",
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "total_tokens": null
+      },
+      "validation": {
+        "valid": false,
+        "score": 0.0,
+        "issues": [
+          "skipped_no_api_key"
+        ]
+      },
+      "output_metrics": {
+        "exists": false,
+        "bytes": 0,
+        "lines": 0,
+        "words": 0,
+        "chars": 0
+      },
+      "model_control": {
+        "model": "<SET_GEMINI_MODEL>",
+        "temperature": "<SET_TEMP>",
+        "seed": "<SET_SEED>",
+        "max_tokens": "<SET_MAX_TOKENS>",
+        "cmd_template": "gemini -p {prompt}"
+      }
+    },
+    {
+      "task_id": "trial2__claude__wdd__1000genome",
+      "trial": 2,
+      "agent": "claude",
+      "mode": "wdd",
+      "workflow": "1000genome",
+      "status": "skipped",
+      "started_at": "2026-02-27T05:52:04.805822+00:00",
+      "finished_at": "2026-02-27T05:52:04.805832+00:00",
+      "duration_s": 0.0,
+      "exit_code": null,
+      "error": "ANTHROPIC_API_KEY placeholder not replaced",
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "total_tokens": null
+      },
+      "validation": {
+        "valid": false,
+        "score": 0.0,
+        "issues": [
+          "skipped_no_api_key"
+        ]
+      },
+      "output_metrics": {
+        "exists": false,
+        "bytes": 0,
+        "lines": 0,
+        "words": 0,
+        "chars": 0
+      },
+      "model_control": {
+        "model": "<SET_CLAUDE_MODEL>",
+        "temperature": "<SET_TEMP>",
+        "seed": "<SET_SEED>",
+        "max_tokens": "<SET_MAX_TOKENS>",
+        "cmd_template": "claude -p {prompt}"
+      }
+    },
+    {
+      "task_id": "trial2__claude__knowledge__1000genome",
+      "trial": 2,
+      "agent": "claude",
+      "mode": "knowledge",
+      "workflow": "1000genome",
+      "status": "skipped",
+      "started_at": "2026-02-27T05:52:04.805882+00:00",
+      "finished_at": "2026-02-27T05:52:04.805893+00:00",
+      "duration_s": 0.0,
+      "exit_code": null,
+      "error": "ANTHROPIC_API_KEY placeholder not replaced",
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "total_tokens": null
+      },
+      "validation": {
+        "valid": false,
+        "score": 0.0,
+        "issues": [
+          "skipped_no_api_key"
+        ]
+      },
+      "output_metrics": {
+        "exists": false,
+        "bytes": 0,
+        "lines": 0,
+        "words": 0,
+        "chars": 0
+      },
+      "model_control": {
+        "model": "<SET_CLAUDE_MODEL>",
+        "temperature": "<SET_TEMP>",
+        "seed": "<SET_SEED>",
+        "max_tokens": "<SET_MAX_TOKENS>",
+        "cmd_template": "claude -p {prompt}"
+      }
+    },
+    {
+      "task_id": "trial3__claude__wdd__1000genome",
+      "trial": 3,
+      "agent": "claude",
+      "mode": "wdd",
+      "workflow": "1000genome",
+      "status": "skipped",
+      "started_at": "2026-02-27T05:52:04.805940+00:00",
+      "finished_at": "2026-02-27T05:52:04.805950+00:00",
+      "duration_s": 0.0,
+      "exit_code": null,
+      "error": "ANTHROPIC_API_KEY placeholder not replaced",
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "total_tokens": null
+      },
+      "validation": {
+        "valid": false,
+        "score": 0.0,
+        "issues": [
+          "skipped_no_api_key"
+        ]
+      },
+      "output_metrics": {
+        "exists": false,
+        "bytes": 0,
+        "lines": 0,
+        "words": 0,
+        "chars": 0
+      },
+      "model_control": {
+        "model": "<SET_CLAUDE_MODEL>",
+        "temperature": "<SET_TEMP>",
+        "seed": "<SET_SEED>",
+        "max_tokens": "<SET_MAX_TOKENS>",
+        "cmd_template": "claude -p {prompt}"
+      }
+    },
+    {
+      "task_id": "trial1__claude__wdd__1000genome",
+      "trial": 1,
+      "agent": "claude",
+      "mode": "wdd",
+      "workflow": "1000genome",
+      "status": "skipped",
+      "started_at": "2026-02-27T05:52:04.805998+00:00",
+      "finished_at": "2026-02-27T05:52:04.806009+00:00",
+      "duration_s": 0.0,
+      "exit_code": null,
+      "error": "ANTHROPIC_API_KEY placeholder not replaced",
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "total_tokens": null
+      },
+      "validation": {
+        "valid": false,
+        "score": 0.0,
+        "issues": [
+          "skipped_no_api_key"
+        ]
+      },
+      "output_metrics": {
+        "exists": false,
+        "bytes": 0,
+        "lines": 0,
+        "words": 0,
+        "chars": 0
+      },
+      "model_control": {
+        "model": "<SET_CLAUDE_MODEL>",
+        "temperature": "<SET_TEMP>",
+        "seed": "<SET_SEED>",
+        "max_tokens": "<SET_MAX_TOKENS>",
+        "cmd_template": "claude -p {prompt}"
+      }
+    },
+    {
+      "task_id": "trial3__gemini__wdd__1000genome",
+      "trial": 3,
+      "agent": "gemini",
+      "mode": "wdd",
+      "workflow": "1000genome",
+      "status": "skipped",
+      "started_at": "2026-02-27T05:52:04.806055+00:00",
+      "finished_at": "2026-02-27T05:52:04.806066+00:00",
+      "duration_s": 0.0,
+      "exit_code": null,
+      "error": "GEMINI_API_KEY placeholder not replaced",
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "total_tokens": null
+      },
+      "validation": {
+        "valid": false,
+        "score": 0.0,
+        "issues": [
+          "skipped_no_api_key"
+        ]
+      },
+      "output_metrics": {
+        "exists": false,
+        "bytes": 0,
+        "lines": 0,
+        "words": 0,
+        "chars": 0
+      },
+      "model_control": {
+        "model": "<SET_GEMINI_MODEL>",
+        "temperature": "<SET_TEMP>",
+        "seed": "<SET_SEED>",
+        "max_tokens": "<SET_MAX_TOKENS>",
+        "cmd_template": "gemini -p {prompt}"
+      }
+    },
+    {
+      "task_id": "trial3__claude__knowledge__1000genome",
+      "trial": 3,
+      "agent": "claude",
+      "mode": "knowledge",
+      "workflow": "1000genome",
+      "status": "skipped",
+      "started_at": "2026-02-27T05:52:04.806112+00:00",
+      "finished_at": "2026-02-27T05:52:04.806122+00:00",
+      "duration_s": 0.0,
+      "exit_code": null,
+      "error": "ANTHROPIC_API_KEY placeholder not replaced",
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "total_tokens": null
+      },
+      "validation": {
+        "valid": false,
+        "score": 0.0,
+        "issues": [
+          "skipped_no_api_key"
+        ]
+      },
+      "output_metrics": {
+        "exists": false,
+        "bytes": 0,
+        "lines": 0,
+        "words": 0,
+        "chars": 0
+      },
+      "model_control": {
+        "model": "<SET_CLAUDE_MODEL>",
+        "temperature": "<SET_TEMP>",
+        "seed": "<SET_SEED>",
+        "max_tokens": "<SET_MAX_TOKENS>",
+        "cmd_template": "claude -p {prompt}"
+      }
+    },
+    {
+      "task_id": "trial1__gemini__wdd__1000genome",
+      "trial": 1,
+      "agent": "gemini",
+      "mode": "wdd",
+      "workflow": "1000genome",
+      "status": "skipped",
+      "started_at": "2026-02-27T05:52:04.806173+00:00",
+      "finished_at": "2026-02-27T05:52:04.806184+00:00",
+      "duration_s": 0.0,
+      "exit_code": null,
+      "error": "GEMINI_API_KEY placeholder not replaced",
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "total_tokens": null
+      },
+      "validation": {
+        "valid": false,
+        "score": 0.0,
+        "issues": [
+          "skipped_no_api_key"
+        ]
+      },
+      "output_metrics": {
+        "exists": false,
+        "bytes": 0,
+        "lines": 0,
+        "words": 0,
+        "chars": 0
+      },
+      "model_control": {
+        "model": "<SET_GEMINI_MODEL>",
+        "temperature": "<SET_TEMP>",
+        "seed": "<SET_SEED>",
+        "max_tokens": "<SET_MAX_TOKENS>",
+        "cmd_template": "gemini -p {prompt}"
+      }
+    },
+    {
+      "task_id": "trial2__gemini__wdd__1000genome",
+      "trial": 2,
+      "agent": "gemini",
+      "mode": "wdd",
+      "workflow": "1000genome",
+      "status": "skipped",
+      "started_at": "2026-02-27T05:52:04.806230+00:00",
+      "finished_at": "2026-02-27T05:52:04.806240+00:00",
+      "duration_s": 0.0,
+      "exit_code": null,
+      "error": "GEMINI_API_KEY placeholder not replaced",
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "total_tokens": null
+      },
+      "validation": {
+        "valid": false,
+        "score": 0.0,
+        "issues": [
+          "skipped_no_api_key"
+        ]
+      },
+      "output_metrics": {
+        "exists": false,
+        "bytes": 0,
+        "lines": 0,
+        "words": 0,
+        "chars": 0
+      },
+      "model_control": {
+        "model": "<SET_GEMINI_MODEL>",
+        "temperature": "<SET_TEMP>",
+        "seed": "<SET_SEED>",
+        "max_tokens": "<SET_MAX_TOKENS>",
+        "cmd_template": "gemini -p {prompt}"
+      }
+    },
+    {
+      "task_id": "trial1__claude__knowledge__1000genome",
+      "trial": 1,
+      "agent": "claude",
+      "mode": "knowledge",
+      "workflow": "1000genome",
+      "status": "skipped",
+      "started_at": "2026-02-27T05:52:04.806286+00:00",
+      "finished_at": "2026-02-27T05:52:04.806296+00:00",
+      "duration_s": 0.0,
+      "exit_code": null,
+      "error": "ANTHROPIC_API_KEY placeholder not replaced",
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "total_tokens": null
+      },
+      "validation": {
+        "valid": false,
+        "score": 0.0,
+        "issues": [
+          "skipped_no_api_key"
+        ]
+      },
+      "output_metrics": {
+        "exists": false,
+        "bytes": 0,
+        "lines": 0,
+        "words": 0,
+        "chars": 0
+      },
+      "model_control": {
+        "model": "<SET_CLAUDE_MODEL>",
+        "temperature": "<SET_TEMP>",
+        "seed": "<SET_SEED>",
+        "max_tokens": "<SET_MAX_TOKENS>",
+        "cmd_template": "claude -p {prompt}"
+      }
+    },
+    {
+      "task_id": "trial1__gemini__knowledge__1000genome",
+      "trial": 1,
+      "agent": "gemini",
+      "mode": "knowledge",
+      "workflow": "1000genome",
+      "status": "skipped",
+      "started_at": "2026-02-27T05:52:04.806342+00:00",
+      "finished_at": "2026-02-27T05:52:04.806352+00:00",
+      "duration_s": 0.0,
+      "exit_code": null,
+      "error": "GEMINI_API_KEY placeholder not replaced",
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "total_tokens": null
+      },
+      "validation": {
+        "valid": false,
+        "score": 0.0,
+        "issues": [
+          "skipped_no_api_key"
+        ]
+      },
+      "output_metrics": {
+        "exists": false,
+        "bytes": 0,
+        "lines": 0,
+        "words": 0,
+        "chars": 0
+      },
+      "model_control": {
+        "model": "<SET_GEMINI_MODEL>",
+        "temperature": "<SET_TEMP>",
+        "seed": "<SET_SEED>",
+        "max_tokens": "<SET_MAX_TOKENS>",
+        "cmd_template": "gemini -p {prompt}"
+      }
+    }
+  ]
+}

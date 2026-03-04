@@ -1,0 +1,13 @@
+(node:1370569) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:1370660) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+Loaded cached credentials.
+Server 'jarvis-mcp' supports tool updates. Listening for changes...
+Error executing tool read_file: File path '/mnt/common/mtang11/scripts/workflow-representation-description/workflows_repo/1000genome-workflow/README.md' is ignored by configured ignore patterns.
+Error executing tool read_file: File path '/mnt/common/mtang11/scripts/workflow-representation-description/workflows_repo/1000genome-workflow/ares_1kgenome_parallel.sbatch' is ignored by configured ignore patterns.
+Error executing tool read_file: File path '/mnt/common/mtang11/scripts/workflow-representation-description/workflows_repo/1000genome-workflow/prepare_input.sh' is ignored by configured ignore patterns.
+Error executing tool read_file: File path '/mnt/common/mtang11/scripts/workflow-representation-description/workflows_repo/1000genome-workflow/daxgen.py' is ignored by configured ignore patterns.
+Error executing tool write_file: Tool "write_file" not found. Did you mean one of: "read_file", "write_todos", "cli_help"?
+Error executing tool run_shell_command: Tool "run_shell_command" not found. Did you mean one of: "run_pipeline", "jm_save_config", "grep_search"?
+Error executing tool run_shell_command: Tool "run_shell_command" not found. Did you mean one of: "run_pipeline", "jm_save_config", "grep_search"?
