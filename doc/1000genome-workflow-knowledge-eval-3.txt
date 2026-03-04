@@ -1,0 +1,155 @@
+WORKFLOW KNOWLEDGE EVALUATION PROMPTS — 1000 Genomes
+Source: Updated Knowledge Base Document
+Format: Question / Answer pairs for evaluating domain knowledge of the workflow.
+
+# ================================================================================
+SECTION 1: SCIENTIFIC PURPOSE AND BIOLOGICAL SEMANTICS
+
+Q: What is a primary objective of the contemporary genomic era as demonstrated by this project?
+
+A: The characterization of human genetic variation stands as a primary objective in the contemporary genomic era. 
+
+---
+
+Q: How many individuals and distinct populations were successfully mapped by the 1000 Genomes Project?
+
+A: The project successfully mapped the genetic diversity of 2,504 individuals across 26 distinct global populations. 
+
+---
+
+Q: What were the sequencing coverages and sample targets used during the project's pilot phase?
+
+A: The pilot phase utilized low-coverage whole-genome sequencing (2–4X) of 180 samples and high-coverage sequencing (20–60X) of two mother-father-child trios. 
+
+---
+
+Q: What frequency threshold did the pilot phase establish as feasible for identifying genetic variants?
+
+A: The early efforts of the pilot phase established the feasibility of identifying variants with frequencies as low as 1% by combining data across multiple samples. 
+
+---
+
+Q: What was the sample count and sequencing technology utilized during Phase 1 of the project?
+
+A: Phase 1 processed 1,092 samples using a mixed-platform approach that included Illumina, ABI SOLiD, and 454 technologies to produce integrated bi-allelic SNPs and INDELs. 
+
+---
+
+Q: Which project phase represents the definitive call set, and what specific sequencing technology did it rely on?
+
+A: Phase 3 remains the definitive call set for the project, and it relied solely on Illumina platform data with read lengths of 70 base pairs or longer. 
+
+---
+
+Q: Why did the project shift away from the multi-platform approach used in Phase 1?
+
+A: The strategic shift to an Illumina-only approach in Phase 3 was driven by the need for higher-quality variant calling and more consistent error profiles. 
+
+---
+
+Q: What types of complex genetic variants were newly introduced for calling in Phase 3?
+
+A: Phase 3 introduced multi-allelic variant calling, which encompasses single nucleotide polymorphisms (SNPs), insertions/deletions (INDELs), and complex structural variants (SVs). 
+
+---
+
+Q: Which organization facilitated the critical transition to the GRCh38 human genome assembly?
+
+A: The transition to the GRCh38 human genome assembly was facilitated by the International Genome Sample Resource (IGSR). 
+
+---
+
+Q: In what specific ways did the GRCh38 assembly improve upon the previous GRCh37 assembly?
+
+A: The GRCh38 assembly corrected over 1,000 issues found in the GRCh37 assembly and incorporated alternative loci to better reflect global genetic diversity. 
+
+---
+
+Q: What software tools were integrated to perform the multi-caller approach during the Phase 3 analysis?
+
+A: The Phase 3 analysis pipeline integrated variant calling results from GATK, FreeBayes, and BCFtools. 
+
+---
+
+Q: Which software tools were utilized specifically for the imputation and phasing of the genomic data in Phase 3?
+
+A: The pipeline utilized Beagle and SHAPEIT2 for data imputation and phasing. 
+
+---
+
+Q: What were the key technical specifications and outputs of the high-coverage phase conducted by the New York Genome Center (NYGC)?
+
+A: The NYGC phase utilized Illumina 30X technology to sequence 3,202 samples, outputting GRCh38 realignment and structural variants (SVs). 
+
+# ================================================================================
+SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES
+
+Q: What is the overarching purpose of the pipeline's computational workflow in relation to disease research?
+
+A: The pipeline is implemented to manage the immense computational burden required to identify mutational overlaps and establish statistical null distributions for disease-related research. 
+
+---
+
+Q: How does the workflow's dependency structure contribute to the biological analysis?
+
+A: The dependency structure ensures that biological insights are derived through a systematic pipeline of data refinement. 
+
+---
+
+Q: How many core task classes make up the sequential data retrieval and analysis of the workflow?
+
+A: The 1000 Genomes workflow consists of five core task classes. 
+
+---
+
+Q: What is the primary function of the "Individuals" task at the very start of the pipeline?
+
+A: The "Individuals" task is responsible for fetching and parsing Phase 3 VCF data by chromosome to identify SNPs and determine which individuals possess mutations on both alleles. 
+
+---
+
+Q: Why must the chromosome VCF files be divided into manageable chunks during the first step?
+
+A: The files must be divided because human chromosomes contain hundreds of thousands of variants, making the VCF files exceptionally large. 
+
+---
+
+Q: What design pattern is utilized to effectively manage the sheer scale of the genomic releases during the Individuals task?
+
+A: The workflow uses the Scatter/Gather pattern, which remains the most effective strategy for managing the massive scale of the data by executing multiple Individuals jobs in parallel. 
+
+---
+
+Q: What is the specific function of the "Individuals_Merge" task within the pipeline's logic?
+
+A: The "Individuals_Merge" task acts as a synchronization point, gathering the outputs of the parallel chunks and merging them into a single mutations file per chromosome. 
+
+---
+
+Q: What necessary categorical framework does the "Populations" task provide for the analysis?
+
+A: The "Populations" task downloads demographic metadata for the 26 global populations, providing the categorical framework needed for downstream analysis. 
+
+---
+
+Q: What biological function does the "Sifting" task evaluate, and what specific predictive tool does it utilize?
+
+A: The "Sifting" task utilizes the Variant Effect Predictor (VEP) to compute SIFT scores. SIFT is a sequence homology-based tool that predicts whether an amino acid substitution will impact protein function. 
+
+---
+
+Q: When adding the functional annotation layer, what specific data fields does the "Sifting" task record?
+
+A: The "Sifting" task specifically filters for variants with SIFT scores and records their rs numbers and gene IDs. 
+
+---
+
+Q: How does the "Mutations_Overlap" task categorize the shared mutation frequencies it calculates?
+
+A: The task calculates the frequency of shared mutations among pairs of individuals, categorizing them by their population and chromosome. 
+
+---
+
+Q: How is the statistical baseline established in the "Frequency" task to help distinguish common variations from disease-associated mutations?
+
+A: The "Frequency" task establishes a null distribution by selecting random individuals and analyzing variants without regard for their functional SIFT scores.

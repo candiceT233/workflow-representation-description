@@ -1,0 +1,191 @@
+WORKFLOW KNOWLEDGE EVALUATION PROMPTS — 1000 Genomes (Pegasus)
+Source: 1000genome-project-description-by-geminiDR.md
+Format: Question / Answer pairs for evaluating domain knowledge of the workflow.
+
+# ================================================================================
+SECTION 1: SCIENTIFIC PURPOSE AND BIOLOGICAL SEMANTICS
+
+Q: What is the primary scientific objective of the 1000 Genomes workflow?
+
+A: The primary objective is to process petascale genomic datasets to identify mutational overlaps and establish statistical null distributions for disease-related research. It successfully mapped the genetic diversity of 2,504 individuals across 26 distinct global populations.
+
+---
+
+Q: Why did the project transition to using only the Illumina platform with 70 base pair read lengths during Phase 3?
+
+A: This strategic shift from the multi-platform approach of Phase 1 was driven by the need for higher-quality variant calling and more consistent error profiles across the data.
+
+---
+
+Q: What types of genetic variants are included in the Phase 3 multi-allelic variant calling?
+
+A: Phase 3 introduced multi-allelic variant calling that encompasses single nucleotide polymorphisms (SNPs), insertions/deletions (INDELs), and complex structural variants (SVs).
+
+---
+
+Q: What is the significance of "phasing" in the context of this genomic data?
+
+A: Phasing is a critical component of the data semantics that allows researchers to determine the parental origin of alleles and calculate genotype dosage values.
+
+---
+
+Q: How is the genotype dosage mathematically calculated to represent confidence in a genotype call?
+
+A: The dosage, which represents the predicted number of non-reference alleles, is calculated using the relationship $Dosage = Pr(Het|Data) + 2 \times Pr(Alt|Data)$. This value is derived from imputation engines and complements standard genotype likelihoods.
+
+---
+
+Q: Why was the transition to the GRCh38 human genome assembly considered a critical development for this data?
+
+A: The GRCh38 assembly corrected over 1,000 issues found in the previous GRCh37 assembly. It also incorporated alternative loci to better reflect global genetic diversity.
+
+---
+
+Q: What is the biological function of the "SIFT" scores computed during the workflow?
+
+A: SIFT stands for "Sorts Intolerant From Tolerant," and it is a sequence homology-based tool that predicts whether an amino acid substitution will impact protein function.
+
+# ================================================================================
+SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES
+
+Q: What are the five core task classes that make up the sequence of this workflow?
+
+A: The workflow consists of five core task classes: Individuals, Individuals_Merge, Populations, Sifting, Mutations_Overlap, and Frequency.
+
+---
+
+Q: What is the specific role of the "Individuals" task at the start of the pipeline?
+
+A: The "Individuals" task is the first and most intensive step, responsible for fetching and parsing Phase 3 VCF data by chromosome to identify SNPs and determine which individuals possess mutations on both alleles.
+
+---
+
+Q: How does the workflow architecture handle the massive scale of individual chromosome VCF files?
+
+A: The workflow employs a Scatter/Gather pattern. The large input file is divided into manageable chunks, and multiple "Individuals" jobs are executed in parallel to process these chunks.
+
+---
+
+Q: What task acts as the synchronization barrier after the parallel VCF parsing is complete?
+
+A: The "Individuals_Merge" task acts as the synchronization point. It gathers the outputs of the parallel chunks and merges them into a single mutations file per chromosome, which is then used for subsequent analytical steps.
+
+---
+
+Q: How does the workflow establish the categorical framework necessary for analyzing different demographic groups?
+
+A: The "Populations" task runs simultaneously to the parsing steps and downloads demographic metadata for the 26 global populations.
+
+---
+
+Q: What are the direct dependencies required before the "Mutations_Overlap" task can begin execution?
+
+A: The "Mutations_Overlap" task depends on the successful completion of both the "Individuals_Merge" task and the "Populations" task.
+
+---
+
+Q: How does the pipeline generate the baseline data needed to distinguish common variations from disease-associated mutations?
+
+A: The "Frequency" task establishes a null distribution. It does this by selecting random individuals and analyzing variants without regard for their SIFT scores.
+
+---
+
+Q: What specific data fields does the "Sifting" task record when filtering variants?
+
+A: The "Sifting" task specifically filters for variants with SIFT scores and records their rs numbers, ENSEMBL GEN IDs, and HGNC IDs.
+
+# ================================================================================
+SECTION 3: REPOSITORY USAGE AND SYSTEM MECHANICS
+
+Q: Where is the official repository hosted for the bioinformatics workflow that identifies these mutational overlaps?
+
+A: The repository is hosted on GitHub under "pegasus-isi/1000genome-workflow".
+
+---
+
+Q: Which script within the implementation is responsible for the dynamic generation of workflow dependencies?
+
+A: The `daxgen.py` script governs the dynamic generation of dependencies, particularly handling the transition between parallelized VCF chunks and the synchronized merge task.
+
+---
+
+Q: When evaluating the workflow components, how are the logical file names defined in the workflow mapped to actual data locations?
+
+A: The workflow uses a Replica Catalog (RC) to map the logical file names (LFNs) used in the abstract workflow to their physical file locations (PFNs) on the storage systems.
+
+---
+
+Q: How does the system locate the specific software executables needed to run the repository's tasks on a remote execution site?
+
+A: The Transformation Catalog (TC) identifies the physical locations of the software executables required for each task, specifying if they are already installed remotely or need to be staged in.
+
+---
+
+Q: What mechanism is used by the workflow engine to maintain strict scientific provenance for every executed task script?
+
+A: Every job is wrapped in a "kickstart" executable. This wrapper captures comprehensive runtime information, including the exact software versions used, hardware metrics, and the specific command-line arguments passed to the scripts.
+
+---
+
+# ================================================================================
+SECTION 4: INPUT FILES, OUTPUT FILES, AND DATA FORMATS
+
+Q: What is the primary input file format consumed by the workflow?
+
+A: The primary input format is VCF (Variant Call Format). Phase 3 VCF files are fetched per chromosome from the IGSR (International Genome Sample Resource) FTP server. Each chromosomal VCF file can exceed 250,000 lines and contains variant records for all 2,504 individuals.
+
+---
+
+Q: Where does the workflow retrieve its primary genomic input data from?
+
+A: The workflow fetches Phase 3 VCF data from the IGSR FTP mirrors. The "Individuals" task is responsible for downloading and parsing these files by chromosome.
+
+---
+
+Q: What secondary input file does the workflow use to provide population-level demographic context?
+
+A: The "Populations" task downloads demographic metadata for the 26 global populations from the IGSR. This metadata maps individual sample IDs to their population and super-population categories (AFR, AMR, EAS, EUR, SAS, GBR).
+
+---
+
+Q: What is the role of the data.csv file in the repository, and what does it contain?
+
+A: The data.csv file acts as the workflow's input manifest. It specifies exactly which input data files are available and should be included in the run — effectively a "shopping list" that tells daxgen.py which chromosomes and files to process.
+
+---
+
+Q: What setup must be done before the workflow can process any input data, and which script handles it?
+
+A: The prepare_input.sh script must be run first. It unzips the included data and sets up the local environment so that the workflow has the necessary files in place to begin execution.
+
+---
+
+Q: What intermediate data format is passed between the "Individuals" tasks and the "Individuals_Merge" task?
+
+A: The "Individuals" tasks produce chunked SNP lists — partial mutation files, one per VCF chunk, each identifying which individuals possess mutations on both alleles for a set of rs numbers. These chunks are the direct input to "Individuals_Merge".
+
+---
+
+Q: What does the "Individuals_Merge" task produce, and what tasks consume it?
+
+A: "Individuals_Merge" produces a single merged mutations file per chromosome, consolidating all parallel chunk outputs. This merged file is consumed by both the "Mutations_Overlap" task and the "Frequency" task.
+
+---
+
+Q: What output does the "Sifting" task produce, and which downstream task consumes it?
+
+A: The "Sifting" task produces phased SIFT score annotations — a filtered list of variants with their rs numbers and gene IDs annotated with functional impact predictions. This output is consumed by the "Frequency" task.
+
+---
+
+Q: What are the final output files produced by the workflow?
+
+A: The workflow produces two final outputs: (1) overlap metrics from the "Mutations_Overlap" task, recording shared mutation frequencies between pairs of individuals categorized by population and chromosome; and (2) a null distribution from the "Frequency" task, representing the baseline rate of random variant sharing used for statistical comparison.
+
+---
+
+Q: Where are the core executable scripts that perform the actual genomic analysis located in the repository?
+
+A: The core executables and Python scripts that perform the calculations for sifting, overlapping, and merging are located in the bin/ directory of the repository. These are the scripts the workflow engine calls for each task.
+
+---
