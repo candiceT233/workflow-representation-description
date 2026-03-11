@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-04T15:11:55.642018",
+  "qid": "q005",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 1: SCIENTIFIC PURPOSE AND BIOLOGICAL SEMANTICS",
+  "question": "How is the genotype dosage mathematically calculated to represent confidence in a genotype call?",
+  "reference_answer": "The dosage, which represents the predicted number of non-reference alleles, is calculated using the relationship $Dosage = Pr(Het|Data) + 2 \\times Pr(Alt|Data)$. This value is derived from imputation engines and complements standard genotype likelihoods.",
+  "agent": "claude",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "The provided WDD YAML does not contain any information about genotype dosage or its mathematical calculation. The document describes the workflow structure, tasks, data flow, and execution patterns of the 1000 Genomes workflow, but does not detail the scientific/mathematical methods used within the individual scripts (such as how genotype calls are computed).",
+  "duration_s": 6.83,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 1.0,
+  "correctness": 1.0
+}

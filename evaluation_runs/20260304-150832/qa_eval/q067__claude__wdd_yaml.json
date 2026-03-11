@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-04T16:04:25.718649",
+  "qid": "q067",
+  "source_file": "1000genome-workflow-knowledge-eval-3.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "Why must the chromosome VCF files be divided into manageable chunks during the first step?",
+  "reference_answer": "The files must be divided because human chromosomes contain hundreds of thousands of variants, making the VCF files exceptionally large.",
+  "agent": "claude",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "The WDD does not explicitly state *why* chunking is required. It only describes *that* it occurs and its effect:\n\n- `task:individuals` \"processes a chunk of a VCF file\" (behavioral note)\n- The parallelism model is `embarrassingly_parallel`: \"Multiple instances process different chunks of the same chromosome, or different chromosomes, in parallel.\"\n- The number of chunks is controlled by the `ind_jobs` configuration parameter in `daxgen.py`\n\nThe implied reason is to enable parallel execution — chunking allows multiple `task:individuals` instances to run simultaneously rather than processing an entire chromosome sequentially. However, the WDD does not provide an explicit rationale (e.g., memory limits, file size constraints) for why chunking is necessary.",
+  "duration_s": 14.79,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 2.0,
+  "correctness": 2.0
+}

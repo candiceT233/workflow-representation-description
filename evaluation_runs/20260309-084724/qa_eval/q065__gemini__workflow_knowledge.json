@@ -1,0 +1,23 @@
+{
+  "timestamp": "2026-03-09T11:38:02.394114",
+  "qid": "q065",
+  "source_file": "1000genome-workflow-knowledge-eval-3.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "How many core task classes make up the sequential data retrieval and analysis of the workflow?",
+  "reference_answer": "The 1000 Genomes workflow consists of five core task classes.",
+  "agent": "gemini",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "There are 5 core task classes: `individuals`, `individuals_merge`, `sifting`, `mutation_overlap`, and `frequency`.",
+  "duration_s": 32.16,
+  "total_tokens": 12722,
+  "input_tokens": 1022,
+  "output_tokens": 0,
+  "tokens": {
+    "total": 12722,
+    "input": 1022,
+    "output": 0
+  },
+  "judge_score": 5.0,
+  "correctness": 5.0
+}

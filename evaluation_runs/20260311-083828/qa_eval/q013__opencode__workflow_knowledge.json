@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T08:49:09.151843",
+  "qid": "q013",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "What are the direct dependencies required before the \"Mutations_Overlap\" task can begin execution?",
+  "reference_answer": "The \"Mutations_Overlap\" task depends on the successful completion of both the \"Individuals_Merge\" task and the \"Populations\" task.",
+  "agent": "opencode",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "{\"type\":\"step_start\",\"timestamp\":1773236953711,\"sessionID\":\"ses_322d766b7ffeWrAJQo8fUd8Rwo\",\"part\":{\"id\":\"prt_cdd28a261001WDq53xyWU9nEQr\",\"sessionID\":\"ses_322d766b7ffeWrAJQo8fUd8Rwo\",\"messageID\":\"msg_cdd289a15001w57rgGGEDtJr44\",\"type\":\"step-start\",\"snapshot\":\"ac4970fd6f528b9b2ac3465b5fd9e4db3bc49307\"}}\n{\"type\":\"text\",\"timestamp\":1773236964933,\"sessionID\":\"ses_322d766b7ffeWrAJQo8fUd8Rwo\",\"part\":{\"id\":\"prt_cdd28c60a001HQZwhRdDstJ4J6\",\"sessionID\":\"ses_322d766b7ffeWrAJQo8fUd8Rwo\",\"messageID\":\"msg_cdd289a15001w57rgGGEDtJr44\",\"type\":\"text\",\"text\":\"Based on the workflow knowledge, the **mutation_overlap** task requires the following direct dependencies:\\n\\n1. **individuals_merge** - produces `chr{X}n.tar.gz` (merged individual data per chromosome)\\n2. **sifting** - produces `sifted.SIFT.chr{X}.txt` (filtered SIFT scores per chromosome)\\n3. **columns.txt** - static input file listing individual IDs\\n4. **Population files** (AFR, AMR, EAS, EUR, GBR, SAS, ALL) - static input files for population membership\\n\\nAll four must be complete before mutation_overlap can begin execution.\",\"time\":{\"start\":1773236964928,\"end\":1773236964928}}}\n{\"type\":\"step_finish\",\"timestamp\":1773236965242,\"sessionID\":\"ses_322d766b7ffeWrAJQo8fUd8Rwo\",\"part\":{\"id\":\"prt_cdd28ce6700156IpOnE5QwPU2Z\",\"sessionID\":\"ses_322d766b7ffeWrAJQo8fUd8Rwo\",\"messageID\":\"msg_cdd289a15001w57rgGGEDtJr44\",\"type\":\"step-finish\",\"reason\":\"stop\",\"snapshot\":\"ac4970fd6f528b9b2ac3465b5fd9e4db3bc49307\",\"cost\":0,\"tokens\":{\"total\":14094,\"input\":78,\"output\":551,\"reasoning\":0,\"cache\":{\"read\":11282,\"write\":2183}}}}",
+  "duration_s": 16.35,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 5.0,
+  "correctness": 5.0
+}

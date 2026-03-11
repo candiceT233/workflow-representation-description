@@ -1,0 +1,23 @@
+{
+  "timestamp": "2026-03-09T09:19:28.574438",
+  "qid": "q013",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "What are the direct dependencies required before the \"Mutations_Overlap\" task can begin execution?",
+  "reference_answer": "The \"Mutations_Overlap\" task depends on the successful completion of both the \"Individuals_Merge\" task and the \"Populations\" task.",
+  "agent": "gemini",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "The `task:mutation_overlap` directly depends on the following data objects:\n\n*   `data:merged_individual_mutation_data_tar_gz` (produced by `task:individuals_merge`)\n*   `data:sifted_data_txt` (produced by `task:sifting`)\n*   `data:population_file` (an input)\n*   `data:columns_file` (an input)",
+  "duration_s": 56.9,
+  "total_tokens": 24815,
+  "input_tokens": 844,
+  "output_tokens": 0,
+  "tokens": {
+    "total": 24815,
+    "input": 844,
+    "output": 0
+  },
+  "judge_score": 3.0,
+  "correctness": 3.0
+}

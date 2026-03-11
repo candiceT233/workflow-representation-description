@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T09:13:46.498902",
+  "qid": "q038",
+  "source_file": "1000genome-workflow-knowledge-eval-2.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "How does the workflow manage the exceptionally large size of the Phase 3 chromosome VCF files?",
+  "reference_answer": "The workflow handles this scale by dividing the input file into manageable chunks. Multiple \"Individuals\" jobs are then executed in parallel to identify SNPs and determine which individuals possess mutations on both alleles.",
+  "agent": "opencode",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "{\"type\":\"step_start\",\"timestamp\":1773238430788,\"sessionID\":\"ses_322c0dc27ffegQAHqwXtBevJQD\",\"part\":{\"id\":\"prt_cdd3f2c37001AN4ANI3zx6DUg2\",\"sessionID\":\"ses_322c0dc27ffegQAHqwXtBevJQD\",\"messageID\":\"msg_cdd3f24a6001CON8CvQFuDLbO7\",\"type\":\"step-start\",\"snapshot\":\"284c9f0c307362e786507df2dd8e9085fcfb7f07\"}}\n{\"type\":\"text\",\"timestamp\":1773238439990,\"sessionID\":\"ses_322c0dc27ffegQAHqwXtBevJQD\",\"part\":{\"id\":\"prt_cdd3f4415001JgjTTEW3VJdulh\",\"sessionID\":\"ses_322c0dc27ffegQAHqwXtBevJQD\",\"messageID\":\"msg_cdd3f24a6001CON8CvQFuDLbO7\",\"type\":\"text\",\"text\":\"The workflow manages large Phase 3 VCF files through **chunking and parallel processing**:\\n\\n1. **Chunk-based processing**: Each chromosome VCF file is split into multiple chunks (default 250 chunks per chromosome via the `ind_jobs` parameter). Each task instance processes one chromosome chunk independently.\\n\\n2. **Parallel execution**: The `task:individuals` uses an \\\"embarrassingly_parallel\\\" parallelism model, where multiple chromosome-chunk combinations run in parallel with no inter-task communication.\\n\\n3. **Memory management**: The task requires a minimum of 2.93 GB host memory, as it \\\"Reads entire VCF file into memory at startup\\\" and \\\"Memory usage scales with chromosome size (~250k lines).\\\"\\n\\n4. **N-to-1 merge pattern**: After parallel chunk processing, `task:individuals_merge` gathers all chunks for a chromosome and merges them into a single consolidated output.\\n\\nThis design allows the workflow to handle the ~50-200 MB compressed VCF files per chromosome by distributing the load across multiple parallel tasks.\",\"time\":{\"start\":1773238439985,\"end\":1773238439985}}}\n{\"type\":\"step_finish\",\"timestamp\":1773238440206,\"sessionID\":\"ses_322c0dc27ffegQAHqwXtBevJQD\",\"part\":{\"id\":\"prt_cdd3f50580014jNb49050U4Eq0\",\"sessionID\":\"ses_322c0dc27ffegQAHqwXtBevJQD\",\"messageID\":\"msg_cdd3f24a6001CON8CvQFuDLbO7\",\"type\":\"step-finish\",\"reason\":\"stop\",\"snapshot\":\"284c9f0c307362e786507df2dd8e9085fcfb7f07\",\"cost\":0,\"tokens\":{\"total\":18571,\"input\":78,\"output\":576,\"reasoning\":0,\"cache\":{\"read\":11282,\"write\":6635}}}}",
+  "duration_s": 13.96,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 4.0,
+  "correctness": 4.0
+}

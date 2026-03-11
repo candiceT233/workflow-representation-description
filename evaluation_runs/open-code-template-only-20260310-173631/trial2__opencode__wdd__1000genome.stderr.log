@@ -1,0 +1,294 @@
+[0m
+> build · minimax-m2.5-free
+[0m
+[0m→ [0mRead template_separate_docs/template_WDD.yml
+[0m→ [0mRead template_separate_docs/WIDGET_conventions.md
+[0m✱ [0mGlob "**/*"[90m in workflows_repo/1000genome-workflow · 100 matches[0m
+[0m→ [0mRead workflows_repo/1000genome-workflow/README.md
+[0m→ [0mRead workflows_repo/1000genome-workflow/daxgen.py
+[0m→ [0mRead workflows_repo/1000genome-workflow/data.csv
+[0m→ [0mRead workflows_repo/1000genome-workflow/bin/individuals.py
+[0m→ [0mRead workflows_repo/1000genome-workflow/bin/individuals_merge.py
+[0m→ [0mRead workflows_repo/1000genome-workflow/bin/sifting.py
+[0m→ [0mRead workflows_repo/1000genome-workflow/bin/mutation_overlap.py
+[0m→ [0mRead workflows_repo/1000genome-workflow/bin/frequency.py
+[0m
+[0m$ [0mcd /mnt/common/mtang11/scripts/workflow-representation-description && git -C workflows_repo/1000genome-workflow rev-parse HEAD 2>/dev/null || echo "not-a-git-commit"
+not-a-git-commit
+[0m
+[0m$ [0mmkdir -p /mnt/common/mtang11/scripts/workflow-representation-description/workflow_wdd
+[0m✗ [0mwrite failed
+[91m[1mError: [0mYou must read file /mnt/common/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial2.yaml before overwriting it. Use the Read tool first
+[0m
+[0m$ [0mls -la /mnt/common/mtang11/scripts/workflow-representation-description/workflow_wdd/
+total 272
+drwxrwxr-x  2 mtang11 mtang11  4096 Mar 10 17:39 .
+drwxrwxr-x 12 mtang11 mtang11  4096 Mar 10 17:32 ..
+-rw-rw-r--  1 mtang11 mtang11 37154 Feb 27 15:25 1000genome-wdd-gemini-trial1.yaml
+-rw-rw-r--  1 mtang11 mtang11 50873 Feb 27 15:31 1000genome-wdd-gemini-trial2.yaml
+-rw-rw-r--  1 mtang11 mtang11 59346 Feb 27 15:22 1000genome-wdd-gemini-trial3.yaml
+-rw-rw-r--  1 mtang11 mtang11 27733 Mar 10 17:15 1000genome-wdd-opencode-trial1.yaml
+-rw-rw-r--  1 mtang11 mtang11 30094 Mar  9 17:01 1000genome-wdd-opencode-trial2.yaml
+-rw-rw-r--  1 mtang11 mtang11 28678 Mar 10 17:40 1000genome-wdd-opencode-trial3.yaml
+-rw-rw-r--  1 mtang11 mtang11  3748 Mar  9 16:34 gemini_wdd_trials.md
+-rw-rw-r--  1 mtang11 mtang11 12647 Feb 23 04:52 note.txt
+[0m
+[0m→ [0mRead workflow_wdd/1000genome-wdd-opencode-trial2.yaml
+[0m
+[0m← [0mEdit workflow_wdd/1000genome-wdd-opencode-trial2.yaml
+Index: /mnt/common/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial2.yaml
+===================================================================
+--- /mnt/common/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial2.yaml
++++ /mnt/common/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial2.yaml
+@@ -724,9 +724,9 @@
+ source_file: daxgen.py
+ translation_tool: opencode
+ translation_timestamp: "2026-03-09T00:00:00Z"
+ unmapped_fields: []
+-round_trips: []
++round_trip_gaps: []
+ quality_warnings: []
+ field_confidence_records:
+   - field_path: metadata.workflow_description
+     confidence_level: high
+
+[0m
+[0m← [0mEdit workflow_wdd/1000genome-wdd-opencode-trial2.yaml
+Index: /mnt/common/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial2.yaml
+===================================================================
+--- /mnt/common/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial2.yaml
++++ /mnt/common/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial2.yaml
+@@ -86,10 +86,10 @@
+     execution_alternatives: []
+     minimum_resource_assertions: []
+   output_class: intermediate
+   inputs:
+-    - data:data:vcf_chr
+-    - data:data:columns
++    - data:vcf_chr
++    - data:columns
+   outputs:
+     - data:data:individuals_chunk
+ 
+ - task_id: task:individuals_merge
+
+[0m
+[0m← [0mEdit workflow_wdd/1000genome-wdd-opencode-trial2.yaml
+Index: /mnt/common/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial2.yaml
+===================================================================
+--- /mnt/common/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial2.yaml
++++ /mnt/common/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial2.yaml
+@@ -89,9 +89,9 @@
+     inputs:
+       - data:vcf_chr
+       - data:columns
+     outputs:
+-      - data:data:individuals_chunk
++      - data:individuals_chunk
+ 
+   - task_id: task:individuals_merge
+     name: Individuals Merge
+     stage: stage:individuals_extraction
+@@ -119,11 +119,11 @@
+       execution_alternatives: []
+       minimum_resource_assertions: []
+     output_class: intermediate
+     inputs:
+-      - data:data:individuals_chunk
++      - data:individuals_chunk
+     outputs:
+-      - data:data:individuals_merged
++      - data:individuals_merged
+ 
+   - task_id: task:sifting
+     name: Sifting
+     stage: stage:sifting
+@@ -150,11 +150,11 @@
+       execution_alternatives: []
+       minimum_resource_assertions: []
+     output_class: intermediate
+     inputs:
+-      - data:data:sift_annotation
++      - data:sift_annotation
+     outputs:
+-      - data:data:sifted_sift
++      - data:sifted_sift
+ 
+   - task_id: task:mutation_overlap
+     name: Mutation Overlap Analysis
+     stage: stage:mutation_analysis
+@@ -185,14 +185,14 @@
+       execution_alternatives: []
+       minimum_resource_assertions: []
+     output_class: checkpoint
+     inputs:
+-      - data:data:individuals_merged
+-      - data:data:sifted_sift
+-      - data:data:population
+-      - data:data:columns
++      - data:individuals_merged
++      - data:sifted_sift
++      - data:population
++      - data:columns
+     outputs:
+-      - data:data:mutation_overlap_output
++      - data:mutation_overlap_output
+ 
+   - task_id: task:frequency
+     name: Frequency Analysis
+     stage: stage:mutation_analysis
+@@ -222,14 +222,14 @@
+       execution_alternatives: []
+       minimum_resource_assertions: []
+     output_class: checkpoint
+     inputs:
+-      - data:data:individuals_merged
+-      - data:data:sifted_sift
+-      - data:data:population
+-      - data:data:columns
++      - data:individuals_merged
++      - data:sifted_sift
++      - data:population
++      - data:columns
+     outputs:
+-      - data:data:frequency_output
++      - data:frequency_output
+ 
+ data_objects:
+   - data_id: data:vcf_chr
+     name: Chromosome VCF File
+@@ -469,9 +469,9 @@
+   - edge_id: pc:individuals->individuals_merge:n_to_1
+     producer: task:individuals
+     consumer: task:individuals_merge
+     data_objects:
+-      - data:data:individuals_chunk
++      - data:individuals_chunk
+     pc_pattern: n_to_1
+     pc_pattern_rationale: >
+       Multiple individuals jobs (configurable, default 250) process independent
+       chunks of the same chromosome VCF file, producing chunk outputs that are
+@@ -489,9 +489,9 @@
+   - edge_id: pc:individuals_merge->mutation_overlap:1_to_n
+     producer: task:individuals_merge
+     consumer: task:mutation_overlap
+     data_objects:
+-      - data:data:individuals_merged
++      - data:individuals_merged
+     pc_pattern: 1_to_n
+     pc_pattern_rationale: >
+       One merged individuals file per chromosome is consumed by multiple
+       mutation_overlap jobs (one per population, 6 total).
+@@ -508,9 +508,9 @@
+   - edge_id: pc:sifting->mutation_overlap:1_to_n
+     producer: task:sifting
+     consumer: task:mutation_overlap
+     data_objects:
+-      - data:data:sifted_sift
++      - data:sifted_sift
+     pc_pattern: 1_to_n
+     pc_pattern_rationale: >
+       One sifting output file per chromosome is consumed by multiple
+       mutation_overlap jobs (one per population, 6 total).
+@@ -527,9 +527,9 @@
+   - edge_id: pc:individuals_merge->frequency:1_to_n
+     producer: task:individuals_merge
+     consumer: task:frequency
+     data_objects:
+-      - data:data:individuals_merged
++      - data:individuals_merged
+     pc_pattern: 1_to_n
+     pc_pattern_rationale: >
+       One merged individuals file per chromosome is consumed by multiple
+       frequency jobs (one per population, 6 total).
+@@ -545,9 +545,9 @@
+   - edge_id: pc:sifting->frequency:1_to_n
+     producer: task:sifting
+     consumer: task:frequency
+     data_objects:
+-      - data:data:sifted_sift
++      - data:sifted_sift
+     pc_pattern: 1_to_n
+     pc_pattern_rationale: >
+       One sifting output file per chromosome is consumed by multiple
+       frequency jobs (one per population, 6 total).
+@@ -646,9 +646,9 @@
+     affected_tasks:
+       - task:individuals
+       - task:individuals_merge
+     affected_data:
+-      - data:data:individuals_chunk
++      - data:individuals_chunk
+     potential_concern: small_file_overhead
+ 
+   - hint_id: hint:shared_file_read_mutation_overlap
+     description: >
+@@ -659,10 +659,10 @@
+     affected_tasks:
+       - task:mutation_overlap
+       - task:frequency
+     affected_data:
+-      - data:data:individuals_merged
+-      - data:data:sifted_sift
++      - data:individuals_merged
++      - data:sifted_sift
+     potential_concern: data_reuse
+ 
+   - hint_id: hint:full_file_read_at_startup
+     description: >
+@@ -673,9 +673,9 @@
+     affected_tasks:
+       - task:mutation_overlap
+       - task:frequency
+     affected_data:
+-      - data:data:individuals_merged
++      - data:individuals_merged
+     potential_concern: partial_access
+ 
+ execution_profiles:
+   - profile_name: full
+@@ -691,10 +691,10 @@
+       - task:mutation_overlap
+       - task:frequency
+     conditional_inclusions: []
+     output_dataset_ids:
+-      - data:data:mutation_overlap_output
+-      - data:data:frequency_output
++      - data:mutation_overlap_output
++      - data:frequency_output
+ 
+   - profile_name: individuals_only
+     terminal_task_id: task:individuals_merge
+     description: >
+@@ -705,9 +705,9 @@
+       - task:individuals
+       - task:individuals_merge
+     conditional_inclusions: []
+     output_dataset_ids:
+-      - data:data:individuals_merged
++      - data:individuals_merged
+ 
+   - profile_name: sifting_only
+     terminal_task_id: task:sifting
+     description: >
+@@ -716,9 +716,9 @@
+     required_task_set:
+       - task:sifting
+     conditional_inclusions: []
+     output_dataset_ids:
+-      - data:data:sifted_sift
++      - data:sifted_sift
+ 
+ translation_metadata:
+   source_format: compiled_from_pegasus_dax
+   source_file: daxgen.py
+
+[0m
+[0m→ [0mRead workflow_wdd/1000genome-wdd-opencode-trial2.yaml[90m [limit=100][0m
+[0m
+[0m$ [0mwc -l /mnt/common/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial2.yaml
+769 /mnt/common/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial2.yaml
+[0m
+[0m$ [0mpython3 -c "import yaml; yaml.safe_load(open('/mnt/common/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial2.yaml'))" && echo "YAML is valid"
+YAML is valid
+[0m

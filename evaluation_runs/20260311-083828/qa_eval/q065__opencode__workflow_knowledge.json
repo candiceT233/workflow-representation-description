@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T09:38:28.324118",
+  "qid": "q065",
+  "source_file": "1000genome-workflow-knowledge-eval-3.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "How many core task classes make up the sequential data retrieval and analysis of the workflow?",
+  "reference_answer": "The 1000 Genomes workflow consists of five core task classes.",
+  "agent": "opencode",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "{\"type\":\"step_start\",\"timestamp\":1773239912161,\"sessionID\":\"ses_322aa3f9fffe9QYA3p0LTDlaew\",\"part\":{\"id\":\"prt_cdd55c6d6001x95sw93gBNZuIC\",\"sessionID\":\"ses_322aa3f9fffe9QYA3p0LTDlaew\",\"messageID\":\"msg_cdd55c11c001Ztf9vYbtpmrdvf\",\"type\":\"step-start\",\"snapshot\":\"931cd8d664f3448665ef54f0cfceb32901308074\"}}\n{\"type\":\"text\",\"timestamp\":1773239915420,\"sessionID\":\"ses_322aa3f9fffe9QYA3p0LTDlaew\",\"part\":{\"id\":\"prt_cdd55d390001Ph2CiXIOLDP5uz\",\"sessionID\":\"ses_322aa3f9fffe9QYA3p0LTDlaew\",\"messageID\":\"msg_cdd55c11c001Ztf9vYbtpmrdvf\",\"type\":\"text\",\"text\":\"5\",\"time\":{\"start\":1773239915415,\"end\":1773239915415}}}\n{\"type\":\"step_finish\",\"timestamp\":1773239915621,\"sessionID\":\"ses_322aa3f9fffe9QYA3p0LTDlaew\",\"part\":{\"id\":\"prt_cdd55d3af001xTc8HtuS9I8iI1\",\"sessionID\":\"ses_322aa3f9fffe9QYA3p0LTDlaew\",\"messageID\":\"msg_cdd55c11c001Ztf9vYbtpmrdvf\",\"type\":\"step-finish\",\"reason\":\"stop\",\"snapshot\":\"931cd8d664f3448665ef54f0cfceb32901308074\",\"cost\":0,\"tokens\":{\"total\":13751,\"input\":78,\"output\":210,\"reasoning\":0,\"cache\":{\"read\":510,\"write\":12953}}}}",
+  "duration_s": 7.53,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 3.0,
+  "correctness": 3.0
+}

@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T09:11:35.792905",
+  "qid": "q035",
+  "source_file": "1000genome-workflow-knowledge-eval-2.txt",
+  "section": "SECTION 1: SCIENTIFIC PURPOSE AND BIOLOGICAL SEMANTICS",
+  "question": "How did the GRCh38 human genome assembly improve upon the previous assembly?",
+  "reference_answer": "The GRCh38 assembly corrected over 1,000 issues found in the previous GRCh37 assembly. It also incorporated alternative loci to better reflect global genetic diversity.",
+  "agent": "opencode",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "{\"type\":\"step_start\",\"timestamp\":1773238305252,\"sessionID\":\"ses_322c2da99ffeujP4zu3WD6w5CO\",\"part\":{\"id\":\"prt_cdd3d41d6001CgCsc1vpON5Ajo\",\"sessionID\":\"ses_322c2da99ffeujP4zu3WD6w5CO\",\"messageID\":\"msg_cdd3d262c0019KyWtU2le34y5U\",\"type\":\"step-start\",\"snapshot\":\"b28acd9866cfc6c44e150e674ca56fa3d132949c\"}}\n{\"type\":\"text\",\"timestamp\":1773238305931,\"sessionID\":\"ses_322c2da99ffeujP4zu3WD6w5CO\",\"part\":{\"id\":\"prt_cdd3d43f10016kOPPfkkZqDMg8\",\"sessionID\":\"ses_322c2da99ffeujP4zu3WD6w5CO\",\"messageID\":\"msg_cdd3d262c0019KyWtU2le34y5U\",\"type\":\"text\",\"text\":\"The context does not contain information about GRCh38 human genome assembly improvements.\",\"time\":{\"start\":1773238305925,\"end\":1773238305925}}}\n{\"type\":\"step_finish\",\"timestamp\":1773238306114,\"sessionID\":\"ses_322c2da99ffeujP4zu3WD6w5CO\",\"part\":{\"id\":\"prt_cdd3d44a5001d01wdk6B6u5iOq\",\"sessionID\":\"ses_322c2da99ffeujP4zu3WD6w5CO\",\"messageID\":\"msg_cdd3d262c0019KyWtU2le34y5U\",\"type\":\"step-finish\",\"reason\":\"stop\",\"snapshot\":\"b28acd9866cfc6c44e150e674ca56fa3d132949c\",\"cost\":0,\"tokens\":{\"total\":18070,\"input\":78,\"output\":79,\"reasoning\":0,\"cache\":{\"read\":11282,\"write\":6631}}}}",
+  "duration_s": 10.59,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 1.0,
+  "correctness": 1.0
+}

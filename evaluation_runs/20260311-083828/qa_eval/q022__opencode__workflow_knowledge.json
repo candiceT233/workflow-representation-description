@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T08:57:58.649078",
+  "qid": "q022",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 4: INPUT FILES, OUTPUT FILES, AND DATA FORMATS",
+  "question": "Where does the workflow retrieve its primary genomic input data from?",
+  "reference_answer": "The workflow fetches Phase 3 VCF data from the IGSR FTP mirrors. The \"Individuals\" task is responsible for downloading and parsing these files by chromosome.",
+  "agent": "opencode",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "{\"type\":\"step_start\",\"timestamp\":1773237494859,\"sessionID\":\"ses_322cf5293ffewYTPAfmGJNFfFz\",\"part\":{\"id\":\"prt_cdd30e43d001jYIlElZfWKLFoo\",\"sessionID\":\"ses_322cf5293ffewYTPAfmGJNFfFz\",\"messageID\":\"msg_cdd30ae29001OQN0oGknJI8cWU\",\"type\":\"step-start\",\"snapshot\":\"a0a7cbb079ad23491c6d65e181176de92fd74916\"}}\n{\"type\":\"text\",\"timestamp\":1773237499921,\"sessionID\":\"ses_322cf5293ffewYTPAfmGJNFfFz\",\"part\":{\"id\":\"prt_cdd30f3ce001AKFlsMKzmAGAXW\",\"sessionID\":\"ses_322cf5293ffewYTPAfmGJNFfFz\",\"messageID\":\"msg_cdd30ae29001OQN0oGknJI8cWU\",\"type\":\"text\",\"text\":\"The primary genomic input data (VCF files) is retrieved from the `data/20130502/` directory. Specifically, the workflow uses:\\n- `ALL.chr{1-10}.250000.vcf` (Phase3 variant call data)\\n- `ALL.chr{1-10}.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.annotation.vcf` (VEP functional annotations with SIFT scores)\",\"time\":{\"start\":1773237499916,\"end\":1773237499916}}}\n{\"type\":\"step_finish\",\"timestamp\":1773237500135,\"sessionID\":\"ses_322cf5293ffewYTPAfmGJNFfFz\",\"part\":{\"id\":\"prt_cdd30f830001fb2sNWrH6iGpP1\",\"sessionID\":\"ses_322cf5293ffewYTPAfmGJNFfFz\",\"messageID\":\"msg_cdd30ae29001OQN0oGknJI8cWU\",\"type\":\"step-finish\",\"reason\":\"stop\",\"snapshot\":\"a0a7cbb079ad23491c6d65e181176de92fd74916\",\"cost\":0,\"tokens\":{\"total\":13855,\"input\":78,\"output\":319,\"reasoning\":0,\"cache\":{\"read\":11282,\"write\":2176}}}}",
+  "duration_s": 21.75,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 3.0,
+  "correctness": 3.0
+}

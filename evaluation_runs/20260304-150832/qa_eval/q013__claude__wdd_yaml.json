@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-04T15:18:30.134128",
+  "qid": "q013",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "What are the direct dependencies required before the \"Mutations_Overlap\" task can begin execution?",
+  "reference_answer": "The \"Mutations_Overlap\" task depends on the successful completion of both the \"Individuals_Merge\" task and the \"Populations\" task.",
+  "agent": "claude",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "Based on the WDD, `task:mutation_overlap` requires the following direct dependencies before execution:\n\n**Input Data Objects:**\n1. `data:individuals_merged_archive` — produced by `task:individuals_merge` (which itself depends on `task:individuals` completing all chunks)\n2. `data:sifted_scores_txt` — produced by `task:sifting`\n3. `data:population_file` — external workflow input (no producer task)\n4. `data:columns_config` — external workflow input (no producer task)\n\n**Upstream Tasks that must complete:**\n- `task:individuals_merge` (tight coupling; full merged archive must be present)\n- `task:sifting` (tight coupling; full sifted scores file must be present)\n\nAll four inputs are coupled tightly, meaning `task:mutation_overlap` cannot start until all of them are fully available.",
+  "duration_s": 14.12,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 2.0,
+  "correctness": 2.0
+}

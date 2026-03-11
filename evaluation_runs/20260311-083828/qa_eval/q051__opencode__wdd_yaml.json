@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T09:24:54.396541",
+  "qid": "q051",
+  "source_file": "1000genome-workflow-knowledge-eval-3.txt",
+  "section": "SECTION 1: SCIENTIFIC PURPOSE AND BIOLOGICAL SEMANTICS",
+  "question": "How many individuals and distinct populations were successfully mapped by the 1000 Genomes Project?",
+  "reference_answer": "The project successfully mapped the genetic diversity of 2,504 individuals across 26 distinct global populations.",
+  "agent": "opencode",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "{\"type\":\"step_start\",\"timestamp\":1773239103456,\"sessionID\":\"ses_322b6aae3ffeu3fmqYbdYtN58f\",\"part\":{\"id\":\"prt_cdd496fd3001PFfnsvmx2DnoFq\",\"sessionID\":\"ses_322b6aae3ffeu3fmqYbdYtN58f\",\"messageID\":\"msg_cdd4955d900100DZbrLr59AEWD\",\"type\":\"step-start\",\"snapshot\":\"3a07827d17c19a93d0818a455aa86edd022dbe52\"}}\n{\"type\":\"text\",\"timestamp\":1773239117334,\"sessionID\":\"ses_322b6aae3ffeu3fmqYbdYtN58f\",\"part\":{\"id\":\"prt_cdd49a0a9001QYIMVqET4Wv2MA\",\"sessionID\":\"ses_322b6aae3ffeu3fmqYbdYtN58f\",\"messageID\":\"msg_cdd4955d900100DZbrLr59AEWD\",\"type\":\"text\",\"text\":\"Based on the wdd_yaml context:\\n\\n- **2,504 individuals** - as stated in the `data:columns_file` description: \\\"Tab-separated file listing all 2,504 individual genome IDs from the 1000 genomes dataset.\\\"\\n- **7 distinct populations** - as stated in the `data:population_file` description: \\\"Seven super populations: ALL (all individuals), AFR (African), AMR (Mixed American), EAS (East Asian), EUR (European), GBR (British), SAS (South Asian).\\\"\",\"time\":{\"start\":1773239117329,\"end\":1773239117329}}}\n{\"type\":\"step_finish\",\"timestamp\":1773239117521,\"sessionID\":\"ses_322b6aae3ffeu3fmqYbdYtN58f\",\"part\":{\"id\":\"prt_cdd49a633001V29pX3osBYueO5\",\"sessionID\":\"ses_322b6aae3ffeu3fmqYbdYtN58f\",\"messageID\":\"msg_cdd4955d900100DZbrLr59AEWD\",\"type\":\"step-finish\",\"reason\":\"stop\",\"snapshot\":\"3a07827d17c19a93d0818a455aa86edd022dbe52\",\"cost\":0,\"tokens\":{\"total\":18260,\"input\":78,\"output\":266,\"reasoning\":0,\"cache\":{\"read\":510,\"write\":17406}}}}",
+  "duration_s": 23.37,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 3.0,
+  "correctness": 3.0
+}

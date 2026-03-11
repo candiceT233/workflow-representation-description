@@ -1,0 +1,23 @@
+{
+  "timestamp": "2026-03-09T11:56:57.118910",
+  "qid": "q074",
+  "source_file": "1000genome-workflow-knowledge-eval-3.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "How is the statistical baseline established in the \"Frequency\" task to help distinguish common variations from disease-associated mutations?",
+  "reference_answer": "The \"Frequency\" task establishes a null distribution by selecting random individuals and analyzing variants without regard for their functional SIFT scores.",
+  "agent": "gemini",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "The provided workflow knowledge does not contain enough information to explain how the statistical baseline is established in the \"Frequency\" task to distinguish common variations from disease-associated mutations, beyond mentioning that it involves \"sampling random individuals.\"",
+  "duration_s": 28.47,
+  "total_tokens": 12025,
+  "input_tokens": 1027,
+  "output_tokens": 0,
+  "tokens": {
+    "total": 12025,
+    "input": 1027,
+    "output": 0
+  },
+  "judge_score": 2.0,
+  "correctness": 2.0
+}

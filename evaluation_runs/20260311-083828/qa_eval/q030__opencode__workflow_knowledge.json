@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T09:06:37.239206",
+  "qid": "q030",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 4: INPUT FILES, OUTPUT FILES, AND DATA FORMATS",
+  "question": "Where are the core executable scripts that perform the actual genomic analysis located in the repository?",
+  "reference_answer": "The core executables and Python scripts that perform the calculations for sifting, overlapping, and merging are located in the bin/ directory of the repository. These are the scripts the workflow engine calls for each task.",
+  "agent": "opencode",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "{\"type\":\"step_start\",\"timestamp\":1773238005947,\"sessionID\":\"ses_322c768e0ffeMVOeVvqGD9rf4y\",\"part\":{\"id\":\"prt_cdd38b0af001L6O2cZ8FT0rBxL\",\"sessionID\":\"ses_322c768e0ffeMVOeVvqGD9rf4y\",\"messageID\":\"msg_cdd3897ed001u1kgnUFx6nmsLU\",\"type\":\"step-start\",\"snapshot\":\"efc4ba38eb64530659cfc7e78bfbfb4438c9f144\"}}\n{\"type\":\"text\",\"timestamp\":1773238009594,\"sessionID\":\"ses_322c768e0ffeMVOeVvqGD9rf4y\",\"part\":{\"id\":\"prt_cdd38b84d001ei4gB6ohZTRInZ\",\"sessionID\":\"ses_322c768e0ffeMVOeVvqGD9rf4y\",\"messageID\":\"msg_cdd3897ed001u1kgnUFx6nmsLU\",\"type\":\"text\",\"text\":\"The core executable scripts are located in the `bin/` directory:\\n\\n- `bin/individuals.py` - parses VCF files per chromosome\\n- `bin/individuals_merge.py` - merges per-chunk individual files\\n- `bin/sifting.py` - filters VEP annotation files for SIFT scores\\n- `bin/mutation_overlap.py` - measures mutation overlap among individuals\\n- `bin/frequency.py` - measures frequency of overlapping mutations\",\"time\":{\"start\":1773238009589,\"end\":1773238009589}}}\n{\"type\":\"step_finish\",\"timestamp\":1773238009769,\"sessionID\":\"ses_322c768e0ffeMVOeVvqGD9rf4y\",\"part\":{\"id\":\"prt_cdd38bf15001kQn8ARiG4apc9l\",\"sessionID\":\"ses_322c768e0ffeMVOeVvqGD9rf4y\",\"messageID\":\"msg_cdd3897ed001u1kgnUFx6nmsLU\",\"type\":\"step-finish\",\"reason\":\"stop\",\"snapshot\":\"efc4ba38eb64530659cfc7e78bfbfb4438c9f144\",\"cost\":0,\"tokens\":{\"total\":13741,\"input\":78,\"output\":200,\"reasoning\":0,\"cache\":{\"read\":11282,\"write\":2181}}}}",
+  "duration_s": 12.77,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 5.0,
+  "correctness": 5.0
+}

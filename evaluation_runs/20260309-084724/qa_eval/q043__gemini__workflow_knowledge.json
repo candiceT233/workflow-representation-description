@@ -1,0 +1,23 @@
+{
+  "timestamp": "2026-03-09T10:40:36.382129",
+  "qid": "q043",
+  "source_file": "1000genome-workflow-knowledge-eval-2.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "What specific data fields does the \"Sifting\" task record for the variants it filters?",
+  "reference_answer": "The \"Sifting\" task specifically records the variants' rs numbers and gene IDs.",
+  "agent": "gemini",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "The \"Sifting\" task extracts and formats \"SIFT scores\" and \"associated variant identifiers\" for the variants it filters. The specific data fields beyond these are not detailed in the provided context.",
+  "duration_s": 29.32,
+  "total_tokens": 11954,
+  "input_tokens": 1023,
+  "output_tokens": 0,
+  "tokens": {
+    "total": 11954,
+    "input": 1023,
+    "output": 0
+  },
+  "judge_score": 3.0,
+  "correctness": 3.0
+}

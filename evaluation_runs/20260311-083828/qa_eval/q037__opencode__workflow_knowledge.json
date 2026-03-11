@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T09:12:44.863821",
+  "qid": "q037",
+  "source_file": "1000genome-workflow-knowledge-eval-2.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "What are the five core task classes that perform the workflow's sequential analysis?",
+  "reference_answer": "The workflow consists of five core task classes: Individuals, Individuals_Merge, Populations, Sifting, and Mutations_Overlap/Frequency.",
+  "agent": "opencode",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "{\"type\":\"step_start\",\"timestamp\":1773238368835,\"sessionID\":\"ses_322c1cc9fffee2ArYMUKLY1ufG\",\"part\":{\"id\":\"prt_cdd3e3a39001LhEtF8zpbD99K6\",\"sessionID\":\"ses_322c1cc9fffee2ArYMUKLY1ufG\",\"messageID\":\"msg_cdd3e341f001qJSqNPHYdvd2Jt\",\"type\":\"step-start\",\"snapshot\":\"42943846dd1b3926528f8e761e5b4ca9e1831baf\"}}\n{\"type\":\"text\",\"timestamp\":1773238374536,\"sessionID\":\"ses_322c1cc9fffee2ArYMUKLY1ufG\",\"part\":{\"id\":\"prt_cdd3e4a29001nS3L8F01Ycg57E\",\"sessionID\":\"ses_322c1cc9fffee2ArYMUKLY1ufG\",\"messageID\":\"msg_cdd3e341f001qJSqNPHYdvd2Jt\",\"type\":\"text\",\"text\":\"Based on the workflow knowledge provided, the five core task classes are:\\n\\n1. **individuals** - Parses VCF files per chromosome and extracts SNP data for each individual\\n2. **individuals_merge** - Merges per-chunk individual files into a single chromosome archive\\n3. **sifting** - Filters VEP annotation files for SNPs with SIFT scores\\n4. **mutation_overlap** - Measures mutation overlap among pairs of individuals by population and chromosome\\n5. **frequency** - Measures frequency of overlapping mutations through random sampling iterations\",\"time\":{\"start\":1773238374531,\"end\":1773238374531}}}\n{\"type\":\"step_finish\",\"timestamp\":1773238374732,\"sessionID\":\"ses_322c1cc9fffee2ArYMUKLY1ufG\",\"part\":{\"id\":\"prt_cdd3e50a500116wzQ0Z1k0u3Aj\",\"sessionID\":\"ses_322c1cc9fffee2ArYMUKLY1ufG\",\"messageID\":\"msg_cdd3e341f001qJSqNPHYdvd2Jt\",\"type\":\"step-finish\",\"reason\":\"stop\",\"snapshot\":\"42943846dd1b3926528f8e761e5b4ca9e1831baf\",\"cost\":0,\"tokens\":{\"total\":13885,\"input\":78,\"output\":346,\"reasoning\":0,\"cache\":{\"read\":510,\"write\":12951}}}}",
+  "duration_s": 10.12,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 4.0,
+  "correctness": 4.0
+}

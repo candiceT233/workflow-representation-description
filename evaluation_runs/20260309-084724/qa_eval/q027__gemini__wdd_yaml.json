@@ -1,0 +1,23 @@
+{
+  "timestamp": "2026-03-09T09:59:25.004936",
+  "qid": "q027",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 4: INPUT FILES, OUTPUT FILES, AND DATA FORMATS",
+  "question": "What does the \"Individuals_Merge\" task produce, and what tasks consume it?",
+  "reference_answer": "\"Individuals_Merge\" produces a single merged mutations file per chromosome, consolidating all parallel chunk outputs. This merged file is consumed by both the \"Mutations_Overlap\" task and the \"Frequency\" task.",
+  "agent": "gemini",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "The \"Individuals_Merge\" task produces `data:merged_individual_mutation_data_tar_gz` (Merged Individual Mutation Data Archive). This data object is consumed by the tasks `task:mutation_overlap` and `task:frequency`.",
+  "duration_s": 29.72,
+  "total_tokens": 24886,
+  "input_tokens": 843,
+  "output_tokens": 0,
+  "tokens": {
+    "total": 24886,
+    "input": 843,
+    "output": 0
+  },
+  "judge_score": 5.0,
+  "correctness": 5.0
+}

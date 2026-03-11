@@ -1,0 +1,23 @@
+{
+  "timestamp": "2026-03-09T11:42:07.657161",
+  "qid": "q067",
+  "source_file": "1000genome-workflow-knowledge-eval-3.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "Why must the chromosome VCF files be divided into manageable chunks during the first step?",
+  "reference_answer": "The files must be divided because human chromosomes contain hundreds of thousands of variants, making the VCF files exceptionally large.",
+  "agent": "gemini",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "The chromosome VCF files must be divided into manageable chunks because the `individuals` task splits the processing of large VCF files into multiple parallel jobs. Each job then processes a specific range of lines from the input file.",
+  "duration_s": 27.72,
+  "total_tokens": 11956,
+  "input_tokens": 5125,
+  "output_tokens": 0,
+  "tokens": {
+    "total": 11956,
+    "input": 5125,
+    "output": 0
+  },
+  "judge_score": 4.0,
+  "correctness": 4.0
+}

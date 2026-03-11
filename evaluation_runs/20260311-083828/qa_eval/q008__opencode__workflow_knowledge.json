@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T08:44:25.789507",
+  "qid": "q008",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "What are the five core task classes that make up the sequence of this workflow?",
+  "reference_answer": "The workflow consists of five core task classes: Individuals, Individuals_Merge, Populations, Sifting, Mutations_Overlap, and Frequency.",
+  "agent": "opencode",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "{\"type\":\"step_start\",\"timestamp\":1773236673848,\"sessionID\":\"ses_322dbb9d5ffe8YiCWKvEfj0ovQ\",\"part\":{\"id\":\"prt_cdd245d2c001l1ObmgSuWFJguJ\",\"sessionID\":\"ses_322dbb9d5ffe8YiCWKvEfj0ovQ\",\"messageID\":\"msg_cdd2446ee0010UxybYLa8cfZ3m\",\"type\":\"step-start\",\"snapshot\":\"aad3891feea5fb196f999d63b758f90f2065d0b9\"}}\n{\"type\":\"text\",\"timestamp\":1773236679886,\"sessionID\":\"ses_322dbb9d5ffe8YiCWKvEfj0ovQ\",\"part\":{\"id\":\"prt_cdd246b61001oL6vk3CDhK6thP\",\"sessionID\":\"ses_322dbb9d5ffe8YiCWKvEfj0ovQ\",\"messageID\":\"msg_cdd2446ee0010UxybYLa8cfZ3m\",\"type\":\"text\",\"text\":\"Based on the workflow knowledge provided, the five core task classes are:\\n\\n1. **individuals** - Parses VCF files per chromosome, extracts SNP data for each individual\\n2. **individuals_merge** - Merges per-chunk individual files into a single chromosome archive\\n3. **sifting** - Filters VEP annotation files for SNPs with SIFT scores\\n4. **mutation_overlap** - Measures mutation overlap among pairs of individuals by population and chromosome\\n5. **frequency** - Measures frequency of overlapping mutations by random sampling\",\"time\":{\"start\":1773236679881,\"end\":1773236679881}}}\n{\"type\":\"step_finish\",\"timestamp\":1773236680096,\"sessionID\":\"ses_322dbb9d5ffe8YiCWKvEfj0ovQ\",\"part\":{\"id\":\"prt_cdd2474e90014ZigCfVXNDNhjo\",\"sessionID\":\"ses_322dbb9d5ffe8YiCWKvEfj0ovQ\",\"messageID\":\"msg_cdd2446ee0010UxybYLa8cfZ3m\",\"type\":\"step-finish\",\"reason\":\"stop\",\"snapshot\":\"aad3891feea5fb196f999d63b758f90f2065d0b9\",\"cost\":0,\"tokens\":{\"total\":13836,\"input\":78,\"output\":296,\"reasoning\":0,\"cache\":{\"read\":11282,\"write\":2180}}}}",
+  "duration_s": 14.55,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 3.0,
+  "correctness": 3.0
+}

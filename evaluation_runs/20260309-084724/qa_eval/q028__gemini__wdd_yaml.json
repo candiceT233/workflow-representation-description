@@ -1,0 +1,23 @@
+{
+  "timestamp": "2026-03-09T10:01:57.399439",
+  "qid": "q028",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 4: INPUT FILES, OUTPUT FILES, AND DATA FORMATS",
+  "question": "What output does the \"Sifting\" task produce, and which downstream task consumes it?",
+  "reference_answer": "The \"Sifting\" task produces phased SIFT score annotations — a filtered list of variants with their rs numbers and gene IDs annotated with functional impact predictions. This output is consumed by the \"Frequency\" task.",
+  "agent": "gemini",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "The \"Sifting\" task produces `data:sifted_data_txt`. This output is consumed by `task:mutation_overlap` and `task:frequency`.",
+  "duration_s": 31.01,
+  "total_tokens": 24853,
+  "input_tokens": 843,
+  "output_tokens": 0,
+  "tokens": {
+    "total": 24853,
+    "input": 843,
+    "output": 0
+  },
+  "judge_score": 3.0,
+  "correctness": 3.0
+}

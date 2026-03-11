@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T08:46:14.815736",
+  "qid": "q010",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "How does the workflow architecture handle the massive scale of individual chromosome VCF files?",
+  "reference_answer": "The workflow employs a Scatter/Gather pattern. The large input file is divided into manageable chunks, and multiple \"Individuals\" jobs are executed in parallel to process these chunks.",
+  "agent": "opencode",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "{\"type\":\"step_start\",\"timestamp\":1773236782271,\"sessionID\":\"ses_322da1008ffen9IniBky1hYH25\",\"part\":{\"id\":\"prt_cdd2604b1001HD7D8oRpNvdx2s\",\"sessionID\":\"ses_322da1008ffen9IniBky1hYH25\",\"messageID\":\"msg_cdd25f0a6001UHmcSoouuUgMVc\",\"type\":\"step-start\",\"snapshot\":\"26cca5c1291dadcd6a680ce52cec7f81cd42f98f\"}}\n{\"type\":\"text\",\"timestamp\":1773236792750,\"sessionID\":\"ses_322da1008ffen9IniBky1hYH25\",\"part\":{\"id\":\"prt_cdd261d1f001Gw2Z5zji2qBkXq\",\"sessionID\":\"ses_322da1008ffen9IniBky1hYH25\",\"messageID\":\"msg_cdd25f0a6001UHmcSoouuUgMVc\",\"type\":\"text\",\"text\":\"The workflow handles massive VCF file scale through **three-level parallelism**:\\n\\n1. **Chromosome-level parallelism**: Each chromosome (1-10) processed independently\\n2. **Chunk-level parallelism**: Each chromosome split into N parallel `individuals` jobs (default 250) that process different line ranges `[counter:stop]`\\n3. **Population-level parallelism**: 7 analysis tasks per chromosome (one per population)\\n\\nThe pipeline breaks VCF processing into manageable chunks—each `individuals` job processes only a subset of lines (not the entire file), then `individuals_merge` combines results into a single `chr{X}n.tar.gz` per chromosome before downstream analysis.\",\"time\":{\"start\":1773236792745,\"end\":1773236792745}}}\n{\"type\":\"step_finish\",\"timestamp\":1773236793030,\"sessionID\":\"ses_322da1008ffen9IniBky1hYH25\",\"part\":{\"id\":\"prt_cdd262dcf001v44N6clC1OvsLE\",\"sessionID\":\"ses_322da1008ffen9IniBky1hYH25\",\"messageID\":\"msg_cdd25f0a6001UHmcSoouuUgMVc\",\"type\":\"step-finish\",\"reason\":\"stop\",\"snapshot\":\"26cca5c1291dadcd6a680ce52cec7f81cd42f98f\",\"cost\":0,\"tokens\":{\"total\":13921,\"input\":78,\"output\":381,\"reasoning\":0,\"cache\":{\"read\":11282,\"write\":2180}}}}",
+  "duration_s": 18.45,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 4.0,
+  "correctness": 4.0
+}

@@ -1,0 +1,23 @@
+{
+  "timestamp": "2026-03-09T11:31:57.872522",
+  "qid": "q062",
+  "source_file": "1000genome-workflow-knowledge-eval-3.txt",
+  "section": "SECTION 1: SCIENTIFIC PURPOSE AND BIOLOGICAL SEMANTICS",
+  "question": "What were the key technical specifications and outputs of the high-coverage phase conducted by the New York Genome Center (NYGC)?",
+  "reference_answer": "The NYGC phase utilized Illumina 30X technology to sequence 3,202 samples, outputting GRCh38 realignment and structural variants (SVs).",
+  "agent": "gemini",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "The provided context does not contain information about the key technical specifications and outputs of the high-coverage phase conducted by the New York Genome Center (NYGC).",
+  "duration_s": 73.03,
+  "total_tokens": 24886,
+  "input_tokens": 850,
+  "output_tokens": 0,
+  "tokens": {
+    "total": 24886,
+    "input": 850,
+    "output": 0
+  },
+  "judge_score": 1.0,
+  "correctness": 1.0
+}

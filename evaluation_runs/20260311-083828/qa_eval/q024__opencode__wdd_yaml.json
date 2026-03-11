@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T09:00:08.078890",
+  "qid": "q024",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 4: INPUT FILES, OUTPUT FILES, AND DATA FORMATS",
+  "question": "What is the role of the data.csv file in the repository, and what does it contain?",
+  "reference_answer": "The data.csv file acts as the workflow's input manifest. It specifies exactly which input data files are available and should be included in the run — effectively a \"shopping list\" that tells daxgen.py which chromosomes and files to process.",
+  "agent": "opencode",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "{\"type\":\"step_start\",\"timestamp\":1773237612145,\"sessionID\":\"ses_322cd58d6ffeF0vHk4VSBoeMYE\",\"part\":{\"id\":\"prt_cdd32ae62001D2hEYFXT5HzH7S\",\"sessionID\":\"ses_322cd58d6ffeF0vHk4VSBoeMYE\",\"messageID\":\"msg_cdd32a7e9001qRL4ia1OJD8ec5\",\"type\":\"step-start\",\"snapshot\":\"e37be75643e390293ba4123d15efa28d38f38ab7\"}}\n{\"type\":\"text\",\"timestamp\":1773237625152,\"sessionID\":\"ses_322cd58d6ffeF0vHk4VSBoeMYE\",\"part\":{\"id\":\"prt_cdd32d092001eWIZlQJrTcKHF0\",\"sessionID\":\"ses_322cd58d6ffeF0vHk4VSBoeMYE\",\"messageID\":\"msg_cdd32a7e9001qRL4ia1OJD8ec5\",\"type\":\"text\",\"text\":\"Based on the wdd_yaml context, the **data.csv** file serves as a **configuration file that controls which chromosomes the workflow processes**.\\n\\nIt is referenced multiple times as the controlling parameter for cardinality:\\n\\n- **`data:chr_vcf`**: `controlling_parameter: data.csv`, possible values: \\\"1-22 chromosomes, default 10 chromosomes (chr1-chr10)\\\"\\n- **`data:sift_annotation_vcf`**: `controlling_parameter: data.csv`, possible values: \\\"matches chromosome count in data.csv, default 10\\\"\\n- **`data:individuals_merged_output`**: `controlling_parameter: data.csv`, possible values: \\\"one per chromosome in data.csv, default 10\\\"\\n- **`data:sifted_output`**: `controlling_parameter: data.csv`, possible values: \\\"one per chromosome in data.csv, default 10\\\"\\n\\nThe workflow graph also notes: *\\\"One iteration per chromosome in data.csv. Default 10 chromosomes.\\\"*\\n\\n**In summary:** The data.csv file contains a list of chromosomes to process in the workflow. It determines the number of chromosome-specific tasks and outputs (defaulting to 10 chromosomes: chr1-chr10, but configurable from 1-22 chromosomes).\",\"time\":{\"start\":1773237625146,\"end\":1773237625146}}}\n{\"type\":\"step_finish\",\"timestamp\":1773237625370,\"sessionID\":\"ses_322cd58d6ffeF0vHk4VSBoeMYE\",\"part\":{\"id\":\"prt_cdd32e15e001f4I88EiYV1mfAR\",\"sessionID\":\"ses_322cd58d6ffeF0vHk4VSBoeMYE\",\"messageID\":\"msg_cdd32a7e9001qRL4ia1OJD8ec5\",\"type\":\"step-finish\",\"reason\":\"stop\",\"snapshot\":\"e37be75643e390293ba4123d15efa28d38f38ab7\",\"cost\":0,\"tokens\":{\"total\":18691,\"input\":78,\"output\":696,\"reasoning\":0,\"cache\":{\"read\":510,\"write\":17407}}}}",
+  "duration_s": 17.56,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 4.0,
+  "correctness": 4.0
+}

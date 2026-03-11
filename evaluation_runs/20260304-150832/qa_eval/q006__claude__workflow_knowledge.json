@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-04T15:12:07.993391",
+  "qid": "q006",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 1: SCIENTIFIC PURPOSE AND BIOLOGICAL SEMANTICS",
+  "question": "Why was the transition to the GRCh38 human genome assembly considered a critical development for this data?",
+  "reference_answer": "The GRCh38 assembly corrected over 1,000 issues found in the previous GRCh37 assembly. It also incorporated alternative loci to better reflect global genetic diversity.",
+  "agent": "claude",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "The context does not contain information about the GRCh38 human genome assembly or any transition to it. The workflow knowledge provided focuses solely on the computational structure of the 1000 Genomes workflow (tasks, data flow, I/O patterns), not on the biological or scientific significance of specific genome assemblies.",
+  "duration_s": 5.89,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 1.0,
+  "correctness": 1.0
+}

@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-04T15:27:03.093051",
+  "qid": "q023",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 4: INPUT FILES, OUTPUT FILES, AND DATA FORMATS",
+  "question": "What secondary input file does the workflow use to provide population-level demographic context?",
+  "reference_answer": "The \"Populations\" task downloads demographic metadata for the 26 global populations from the IGSR. This metadata maps individual sample IDs to their population and super-population categories (AFR, AMR, EAS, EUR, SAS, GBR).",
+  "agent": "claude",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "The **Population File** (`data:population_file`) serves this role. It contains information about specific human populations and is used in the mutation overlap and frequency analyses. There are 7 population files (one per super population), consumed by both `task:mutation_overlap` and `task:frequency`.",
+  "duration_s": 11.61,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 2.0,
+  "correctness": 2.0
+}

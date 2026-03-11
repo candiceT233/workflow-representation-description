@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-04T15:29:31.761183",
+  "qid": "q026",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 4: INPUT FILES, OUTPUT FILES, AND DATA FORMATS",
+  "question": "What intermediate data format is passed between the \"Individuals\" tasks and the \"Individuals_Merge\" task?",
+  "reference_answer": "The \"Individuals\" tasks produce chunked SNP lists — partial mutation files, one per VCF chunk, each identifying which individuals possess mutations on both alleles for a set of rs numbers. These chunks are the direct input to \"Individuals_Merge\".",
+  "agent": "claude",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "Based on the provided workflow knowledge, the intermediate data format is listed as **`unknown`**.\n\nThe context notes that `data:individual_results` has an unspecified format, and explicitly states the report was produced **without access to file contents** due to tool limitations — all findings are assumptions based on file names and directory structure alone.",
+  "duration_s": 7.36,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 1.0,
+  "correctness": 1.0
+}

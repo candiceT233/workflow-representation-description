@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T08:38:28.601139",
+  "qid": "q001",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 1: SCIENTIFIC PURPOSE AND BIOLOGICAL SEMANTICS",
+  "question": "What is the primary scientific objective of the 1000 Genomes workflow?",
+  "reference_answer": "The primary objective is to process petascale genomic datasets to identify mutational overlaps and establish statistical null distributions for disease-related research. It successfully mapped the genetic diversity of 2,504 individuals across 26 distinct global populations.",
+  "agent": "opencode",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "{\"type\":\"step_start\",\"timestamp\":1773236316600,\"sessionID\":\"ses_322e121cdffeq1bTFh3Lvpy6vN\",\"part\":{\"id\":\"prt_cdd1ee9a1001trq2OJbDKd96C9\",\"sessionID\":\"ses_322e121cdffeq1bTFh3Lvpy6vN\",\"messageID\":\"msg_cdd1edefa001vKdqduPcPzdtqx\",\"type\":\"step-start\",\"snapshot\":\"8656a57d7fd1f529285567d972feb7fe5f04b5b6\"}}\n{\"type\":\"text\",\"timestamp\":1773236319119,\"sessionID\":\"ses_322e121cdffeq1bTFh3Lvpy6vN\",\"part\":{\"id\":\"prt_cdd1ef2e9001nw3m5RP5jxhJJo\",\"sessionID\":\"ses_322e121cdffeq1bTFh3Lvpy6vN\",\"messageID\":\"msg_cdd1edefa001vKdqduPcPzdtqx\",\"type\":\"text\",\"text\":\"Based on the provided context, the primary scientific objective of the 1000 Genomes workflow is to **identify mutational overlaps using data from the 1000 Genomes Project to provide a null distribution for rigorous statistical evaluation of potential disease-related mutations** (Section 1, Overview).\",\"time\":{\"start\":1773236319113,\"end\":1773236319113}}}\n{\"type\":\"step_finish\",\"timestamp\":1773236319319,\"sessionID\":\"ses_322e121cdffeq1bTFh3Lvpy6vN\",\"part\":{\"id\":\"prt_cdd1ef3ae001wfZF0TLyOXqnVs\",\"sessionID\":\"ses_322e121cdffeq1bTFh3Lvpy6vN\",\"messageID\":\"msg_cdd1edefa001vKdqduPcPzdtqx\",\"type\":\"step-finish\",\"reason\":\"stop\",\"snapshot\":\"8656a57d7fd1f529285567d972feb7fe5f04b5b6\",\"cost\":0,\"tokens\":{\"total\":13788,\"input\":78,\"output\":249,\"reasoning\":0,\"cache\":{\"read\":510,\"write\":12951}}}}",
+  "duration_s": 10.98,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 4.0,
+  "correctness": 4.0
+}

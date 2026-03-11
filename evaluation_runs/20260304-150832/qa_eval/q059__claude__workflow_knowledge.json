@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-04T15:57:38.053587",
+  "qid": "q059",
+  "source_file": "1000genome-workflow-knowledge-eval-3.txt",
+  "section": "SECTION 1: SCIENTIFIC PURPOSE AND BIOLOGICAL SEMANTICS",
+  "question": "In what specific ways did the GRCh38 assembly improve upon the previous GRCh37 assembly?",
+  "reference_answer": "The GRCh38 assembly corrected over 1,000 issues found in the GRCh37 assembly and incorporated alternative loci to better reflect global genetic diversity.",
+  "agent": "claude",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "The provided workflow knowledge context does not contain any information about GRCh38 or GRCh37 assemblies. The context is limited to static analysis of the 1000 Genomes workflow's code structure, tasks, and data flow — it does not cover genomics reference assembly details.",
+  "duration_s": 6.86,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 1.0,
+  "correctness": 1.0
+}

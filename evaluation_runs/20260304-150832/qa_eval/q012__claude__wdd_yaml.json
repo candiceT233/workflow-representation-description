@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-04T15:17:55.588133",
+  "qid": "q012",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "How does the workflow establish the categorical framework necessary for analyzing different demographic groups?",
+  "reference_answer": "The \"Populations\" task runs simultaneously to the parsing steps and downloads demographic metadata for the 26 global populations.",
+  "agent": "claude",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "The workflow establishes its demographic categorical framework through **pre-existing population files** (`data:population_file`):\n\n- **Cardinality**: Fixed at **7 files** — one per super population.\n- **Distribution**: These files are broadcast via a `1_to_n` PC pattern (`pc:population_file->mutation_overlap:1_to_n` and `pc:population_file->frequency:1_to_n`) to all instances of `task:mutation_overlap` and `task:frequency`.\n- **Iteration**: The `loop:population_analysis` loop group drives parallel execution — for each chromosome, both analysis tasks run independently **per population**, using the population file to categorize results.\n\nIn short: the population files serve as the static categorical input that partitions all downstream analyses by demographic group. The workflow does not derive or construct these categories dynamically; it reads them as fixed external inputs.",
+  "duration_s": 16.97,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 1.0,
+  "correctness": 1.0
+}

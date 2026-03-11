@@ -1,0 +1,16 @@
+{
+  "opencode__wdd": {
+    "n": 3,
+    "duration_mean_s": 300.708,
+    "duration_std_s": 64.206,
+    "validation_mean": 1.0,
+    "validation_pass_rate": 1.0
+  },
+  "opencode__knowledge": {
+    "n": 3,
+    "duration_mean_s": 125.743,
+    "duration_std_s": 26.193,
+    "validation_mean": 1.0,
+    "validation_pass_rate": 1.0
+  }
+}

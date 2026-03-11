@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-04T15:26:08.934230",
+  "qid": "q022",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 4: INPUT FILES, OUTPUT FILES, AND DATA FORMATS",
+  "question": "Where does the workflow retrieve its primary genomic input data from?",
+  "reference_answer": "The workflow fetches Phase 3 VCF data from the IGSR FTP mirrors. The \"Individuals\" task is responsible for downloading and parsing these files by chromosome.",
+  "agent": "claude",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "Based on the provided workflow knowledge, the context does not contain enough information to answer this specifically. The report notes that the `prepare_input` task's inputs are listed as `unknown`, and the analysis was performed **without access to file contents** — it relied solely on file names and directory structure. No information about the actual data source (e.g., URLs, databases, file paths) is available in this context.",
+  "duration_s": 8.48,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 1.0,
+  "correctness": 1.0
+}

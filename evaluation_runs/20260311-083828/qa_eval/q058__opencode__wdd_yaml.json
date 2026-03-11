@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T09:32:10.454288",
+  "qid": "q058",
+  "source_file": "1000genome-workflow-knowledge-eval-3.txt",
+  "section": "SECTION 1: SCIENTIFIC PURPOSE AND BIOLOGICAL SEMANTICS",
+  "question": "Which organization facilitated the critical transition to the GRCh38 human genome assembly?",
+  "reference_answer": "The transition to the GRCh38 human genome assembly was facilitated by the International Genome Sample Resource (IGSR).",
+  "agent": "opencode",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "{\"type\":\"step_start\",\"timestamp\":1773239534261,\"sessionID\":\"ses_322b00397ffe4xCU3I5ceiEDnd\",\"part\":{\"id\":\"prt_cdd5002a9001OwvGL5F5JuJXyk\",\"sessionID\":\"ses_322b00397ffe4xCU3I5ceiEDnd\",\"messageID\":\"msg_cdd4ffd41001LRApSqslv1ywGq\",\"type\":\"step-start\",\"snapshot\":\"e4499ca7958422a39370292bbdd1996ffb56f2a1\"}}\n{\"type\":\"text\",\"timestamp\":1773239538433,\"sessionID\":\"ses_322b00397ffe4xCU3I5ceiEDnd\",\"part\":{\"id\":\"prt_cdd501233001LPKRqRVQtxVm6U\",\"sessionID\":\"ses_322b00397ffe4xCU3I5ceiEDnd\",\"messageID\":\"msg_cdd4ffd41001LRApSqslv1ywGq\",\"type\":\"text\",\"text\":\"The context does not contain information about the GRCh38 human genome assembly transition.\",\"time\":{\"start\":1773239538428,\"end\":1773239538428}}}\n{\"type\":\"step_finish\",\"timestamp\":1773239538612,\"sessionID\":\"ses_322b00397ffe4xCU3I5ceiEDnd\",\"part\":{\"id\":\"prt_cdd5013170012uFTQGuQ40Z2CU\",\"sessionID\":\"ses_322b00397ffe4xCU3I5ceiEDnd\",\"messageID\":\"msg_cdd4ffd41001LRApSqslv1ywGq\",\"type\":\"step-finish\",\"reason\":\"stop\",\"snapshot\":\"e4499ca7958422a39370292bbdd1996ffb56f2a1\",\"cost\":0,\"tokens\":{\"total\":18206,\"input\":78,\"output\":215,\"reasoning\":0,\"cache\":{\"read\":11282,\"write\":6631}}}}",
+  "duration_s": 8.4,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 2.0,
+  "correctness": 2.0
+}

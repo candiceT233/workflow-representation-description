@@ -1,0 +1,72 @@
+[0m
+> build · minimax-m2.5-free
+[0m
+[0m✱ [0mGlob "**/*"[90m in ../../../../../home/mtang11/scripts/workflow-representation-description/workflows_repo/1000genome-workflow · 100 matches[0m
+[0m→ [0mRead ../../../../../home/mtang11/scripts/workflow-representation-description/workflows_repo/1000genome-workflow/README.md
+[0m→ [0mRead ../../../../../home/mtang11/scripts/workflow-representation-description/workflows_repo/1000genome-workflow/daxgen.py
+[0m→ [0mRead ../../../../../home/mtang11/scripts/workflow-representation-description/workflows_repo/1000genome-workflow/bin/individuals.py
+[0m→ [0mRead ../../../../../home/mtang11/scripts/workflow-representation-description/workflows_repo/1000genome-workflow/bin/individuals_merge.py
+[0m→ [0mRead ../../../../../home/mtang11/scripts/workflow-representation-description/workflows_repo/1000genome-workflow/bin/sifting.py
+[0m→ [0mRead ../../../../../home/mtang11/scripts/workflow-representation-description/workflows_repo/1000genome-workflow/bin/mutation_overlap.py
+[0m→ [0mRead ../../../../../home/mtang11/scripts/workflow-representation-description/workflows_repo/1000genome-workflow/bin/frequency.py
+[0m→ [0mRead ../../../../../home/mtang11/scripts/workflow-representation-description/workflows_repo/1000genome-workflow/data.csv
+[0m→ [0mRead ../../../../../home/mtang11/scripts/workflow-representation-description/workflows_repo/1000genome-workflow/prepare_input.sh
+[0m
+[0m$ [0mmkdir -p /home/mtang11/scripts/workflow-representation-description/workflow_knowledge
+[0m
+[0m← [0mWrite ../../../../../home/mtang11/scripts/workflow-representation-description/workflow_knowledge/1000genome-knowledge-opencode-trial1.md
+Wrote file successfully.
+
+LSP errors detected in other files:
+<diagnostics file="/home/mtang11/scripts/workflow-representation-description/workflows_repo/1000genome-workflow/daxgen.py">
+ERROR [11:6] Import "Pegasus.api" could not be resolved
+ERROR [55:24] "File" is not defined
+ERROR [85:19] "File" is not defined
+ERROR [125:19] "SiteCatalog" is not defined
+ERROR [106:22] "Properties" is not defined
+ERROR [94:20] "write" is not a known attribute of "None"
+ERROR [177:19] "TransformationCatalog" is not defined
+ERROR [95:17] "write" is not a known attribute of "None"
+ERROR [347:19] "ReplicaCatalog" is not defined
+ERROR [96:17] "write" is not a known attribute of "None"
+ERROR [359:19] "Workflow" is not defined
+ERROR [97:17] "write" is not a known attribute of "None"
+ERROR [101:21] "graph" is not a known attribute of "None"
+ERROR [101:92] Operator "+" not supported for "None"
+ERROR [127:17] "Site" is not defined
+ERROR [128:13] "Directory" is not defined
+ERROR [128:23] "Directory" is not defined
+ERROR [129:17] "FileServer" is not defined
+ERROR [129:65] "Operation" is not defined
+ERROR [131:13] "Directory" is not defined
+... and 63 more
+</diagnostics>
+
+LSP errors detected in other files:
+<diagnostics file="/home/mtang11/scripts/workflow-representation-description/workflows_repo/1000genome-workflow/bin/frequency.py">
+ERROR [6:8] Import "numpy" could not be resolved
+ERROR [7:8] Import "numpy.ma" could not be resolved
+ERROR [10:8] Import "matplotlib" could not be resolved
+ERROR [13:8] Import "matplotlib.pyplot" could not be resolved
+ERROR [14:8] Import "matplotlib.colors" could not be resolved
+ERROR [15:8] Import "matplotlib.cm" could not be resolved
+ERROR [20:6] Import "mpl_toolkits.axes_grid1" could not be resolved
+ERROR [23:6] Import "pylab" could not be resolved
+ERROR [24:6] Import "matplotlib" could not be resolved
+ERROR [25:8] Import "matplotlib" could not be resolved
+</diagnostics>
+
+LSP errors detected in other files:
+<diagnostics file="/home/mtang11/scripts/workflow-representation-description/workflows_repo/1000genome-workflow/bin/mutation_overlap.py">
+ERROR [6:8] Import "numpy" could not be resolved
+ERROR [7:8] Import "numpy.ma" could not be resolved
+ERROR [11:8] Import "matplotlib" could not be resolved
+ERROR [13:8] Import "matplotlib.pyplot" could not be resolved
+ERROR [14:8] Import "matplotlib.colors" could not be resolved
+ERROR [15:8] Import "matplotlib.cm" could not be resolved
+ERROR [16:6] Import "mpl_toolkits.axes_grid1" could not be resolved
+ERROR [20:6] Import "pylab" could not be resolved
+ERROR [21:6] Import "matplotlib" could not be resolved
+ERROR [22:8] Import "matplotlib" could not be resolved
+</diagnostics>
+[0m

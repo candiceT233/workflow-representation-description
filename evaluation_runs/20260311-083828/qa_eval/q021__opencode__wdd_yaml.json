@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T08:57:25.605853",
+  "qid": "q021",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 4: INPUT FILES, OUTPUT FILES, AND DATA FORMATS",
+  "question": "What is the primary input file format consumed by the workflow?",
+  "reference_answer": "The primary input format is VCF (Variant Call Format). Phase 3 VCF files are fetched per chromosome from the IGSR (International Genome Sample Resource) FTP server. Each chromosomal VCF file can exceed 250,000 lines and contains variant records for all 2,504 individuals.",
+  "agent": "opencode",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "{\"type\":\"step_start\",\"timestamp\":1773237449735,\"sessionID\":\"ses_322cfd36effe51itA5q3gYbLad\",\"part\":{\"id\":\"prt_cdd3033fa001MLrQpaJasz3kDZ\",\"sessionID\":\"ses_322cfd36effe51itA5q3gYbLad\",\"messageID\":\"msg_cdd302d510017DV7K7ja7hG0dX\",\"type\":\"step-start\",\"snapshot\":\"cecf0e88e5261d40b53f40e93df1dabfd8ded7ca\"}}\n{\"type\":\"text\",\"timestamp\":1773237469700,\"sessionID\":\"ses_322cfd36effe51itA5q3gYbLad\",\"part\":{\"id\":\"prt_cdd307de3001UGS49idwUuzaz2\",\"sessionID\":\"ses_322cfd36effe51itA5q3gYbLad\",\"messageID\":\"msg_cdd302d510017DV7K7ja7hG0dX\",\"type\":\"text\",\"text\":\"VCF (Variant Call Format) - specifically the Phase 3 VCF files from the 1000 Genomes Project, which are gzip-compressed and contain SNP variant positions, allele information, and genotypes for all 2,504 individuals.\",\"time\":{\"start\":1773237469696,\"end\":1773237469696}}}\n{\"type\":\"step_finish\",\"timestamp\":1773237469891,\"sessionID\":\"ses_322cfd36effe51itA5q3gYbLad\",\"part\":{\"id\":\"prt_cdd30821f00147b7wt8LN8cY1K\",\"sessionID\":\"ses_322cfd36effe51itA5q3gYbLad\",\"messageID\":\"msg_cdd302d510017DV7K7ja7hG0dX\",\"type\":\"step-finish\",\"reason\":\"stop\",\"snapshot\":\"cecf0e88e5261d40b53f40e93df1dabfd8ded7ca\",\"cost\":0,\"tokens\":{\"total\":18503,\"input\":78,\"output\":515,\"reasoning\":0,\"cache\":{\"read\":11282,\"write\":6628}}}}",
+  "duration_s": 24.53,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 4.0,
+  "correctness": 4.0
+}

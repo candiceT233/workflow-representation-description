@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T09:03:05.386802",
+  "qid": "q026",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 4: INPUT FILES, OUTPUT FILES, AND DATA FORMATS",
+  "question": "What intermediate data format is passed between the \"Individuals\" tasks and the \"Individuals_Merge\" task?",
+  "reference_answer": "The \"Individuals\" tasks produce chunked SNP lists — partial mutation files, one per VCF chunk, each identifying which individuals possess mutations on both alleles for a set of rs numbers. These chunks are the direct input to \"Individuals_Merge\".",
+  "agent": "opencode",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "{\"type\":\"step_start\",\"timestamp\":1773237788953,\"sessionID\":\"ses_322caa493ffeKc2dwvIDQcqkg1\",\"part\":{\"id\":\"prt_cdd35610c001Xpak0gfyah6qkF\",\"sessionID\":\"ses_322caa493ffeKc2dwvIDQcqkg1\",\"messageID\":\"msg_cdd355c1f001836WEkzVGFaiH3\",\"type\":\"step-start\",\"snapshot\":\"91cb4efb7a87f919a2e05ced737f1770fc719590\"}}\n{\"type\":\"text\",\"timestamp\":1773237794397,\"sessionID\":\"ses_322caa493ffeKc2dwvIDQcqkg1\",\"part\":{\"id\":\"prt_cdd3573a3001hVG3Ku3MY0aJ7P\",\"sessionID\":\"ses_322caa493ffeKc2dwvIDQcqkg1\",\"messageID\":\"msg_cdd355c1f001836WEkzVGFaiH3\",\"type\":\"text\",\"text\":\"The intermediate data passed between the \\\"Individuals\\\" and \\\"Individuals_Merge\\\" tasks is a **tar.gz archive** (format_hint: container: tar, compression: gzip) containing per-individual mutation data files.\",\"time\":{\"start\":1773237794391,\"end\":1773237794391}}}\n{\"type\":\"step_finish\",\"timestamp\":1773237794615,\"sessionID\":\"ses_322caa493ffeKc2dwvIDQcqkg1\",\"part\":{\"id\":\"prt_cdd35767c001OuvDF04O17KiQP\",\"sessionID\":\"ses_322caa493ffeKc2dwvIDQcqkg1\",\"messageID\":\"msg_cdd355c1f001836WEkzVGFaiH3\",\"type\":\"step-finish\",\"reason\":\"stop\",\"snapshot\":\"91cb4efb7a87f919a2e05ced737f1770fc719590\",\"cost\":0,\"tokens\":{\"total\":18268,\"input\":78,\"output\":271,\"reasoning\":0,\"cache\":{\"read\":11282,\"write\":6637}}}}",
+  "duration_s": 9.47,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 3.0,
+  "correctness": 3.0
+}

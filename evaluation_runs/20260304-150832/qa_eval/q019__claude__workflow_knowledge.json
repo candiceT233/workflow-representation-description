@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-04T15:23:19.943577",
+  "qid": "q019",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 3: REPOSITORY USAGE AND SYSTEM MECHANICS",
+  "question": "How does the system locate the specific software executables needed to run the repository's tasks on a remote execution site?",
+  "reference_answer": "The Transformation Catalog (TC) identifies the physical locations of the software executables required for each task, specifying if they are already installed remotely or need to be staged in.",
+  "agent": "claude",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "The provided workflow knowledge context does not contain information about how the system locates software executables on remote execution sites. The report explicitly notes it is based only on static analysis of file names and directory structure, with no runtime or deployment details included.",
+  "duration_s": 6.55,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 1.0,
+  "correctness": 1.0
+}

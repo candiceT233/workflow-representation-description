@@ -1,0 +1,23 @@
+{
+  "timestamp": "2026-03-09T11:52:48.625363",
+  "qid": "q072",
+  "source_file": "1000genome-workflow-knowledge-eval-3.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "When adding the functional annotation layer, what specific data fields does the \"Sifting\" task record?",
+  "reference_answer": "The \"Sifting\" task specifically filters for variants with SIFT scores and records their rs numbers and gene IDs.",
+  "agent": "gemini",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "The \"Sifting\" task records \"filtered SIFT scores and associated variant identifiers.\" The specific names of other extracted fields are not detailed in the provided context.",
+  "duration_s": 28.05,
+  "total_tokens": 11924,
+  "input_tokens": 204,
+  "output_tokens": 0,
+  "tokens": {
+    "total": 11924,
+    "input": 204,
+    "output": 0
+  },
+  "judge_score": 4.0,
+  "correctness": 4.0
+}

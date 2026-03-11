@@ -1,0 +1,23 @@
+{
+  "timestamp": "2026-03-09T09:17:01.034742",
+  "qid": "q013",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "What are the direct dependencies required before the \"Mutations_Overlap\" task can begin execution?",
+  "reference_answer": "The \"Mutations_Overlap\" task depends on the successful completion of both the \"Individuals_Merge\" task and the \"Populations\" task.",
+  "agent": "gemini",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "The direct dependencies required before the \"mutation_overlap\" task can begin execution are:\n\n-   `data:chr<C>n.tar.gz` (Merged individual mutation data from `individuals_merge` task)\n-   `data:sifted.SIFT.chr<C>.txt` (SIFT scores for the chromosome from `sifting` task)\n-   `data:<POP>` (A file containing a list of individuals in a specific population)\n-   `data:columns.txt` (A file listing all sample IDs)",
+  "duration_s": 29.0,
+  "total_tokens": 11865,
+  "input_tokens": 1024,
+  "output_tokens": 0,
+  "tokens": {
+    "total": 11865,
+    "input": 1024,
+    "output": 0
+  },
+  "judge_score": 3.0,
+  "correctness": 3.0
+}

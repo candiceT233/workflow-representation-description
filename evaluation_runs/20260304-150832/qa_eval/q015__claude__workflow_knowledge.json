@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-04T15:20:07.456956",
+  "qid": "q015",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "What specific data fields does the \"Sifting\" task record when filtering variants?",
+  "reference_answer": "The \"Sifting\" task specifically filters for variants with SIFT scores and records their rs numbers, ENSEMBL GEN IDs, and HGNC IDs.",
+  "agent": "claude",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "The provided context does not contain enough information to answer this. The `task:sifting` entry only describes that it filters results based on `data:frequencies` and `data:overlaps` inputs, producing `data:sifted_results` — but no specific data fields or filtering criteria are mentioned. The analysis was also explicitly performed without access to file contents (including `bin/sifting.py`), so field-level details are unavailable.",
+  "duration_s": 9.73,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 1.0,
+  "correctness": 1.0
+}

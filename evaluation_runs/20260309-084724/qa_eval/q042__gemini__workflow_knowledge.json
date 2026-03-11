@@ -1,0 +1,23 @@
+{
+  "timestamp": "2026-03-09T10:38:21.237839",
+  "qid": "q042",
+  "source_file": "1000genome-workflow-knowledge-eval-2.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "How does the workflow establish a baseline or \"null distribution\" to compare against disease-associated cohorts?",
+  "reference_answer": "The \"Frequency\" task establishes a null distribution by selecting random individuals and analyzing variants without regard for their SIFT scores. This task depends on the completion of the Merge and Sifting tasks.",
+  "agent": "gemini",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "The provided context does not contain enough information to describe how the workflow establishes a baseline or \"null distribution\" to compare against disease-associated cohorts. It only mentions the `frequency` task analyzing overlapping mutations by sampling random individuals, but does not explicitly state this is for establishing a null distribution for disease comparison.",
+  "duration_s": 30.34,
+  "total_tokens": 12128,
+  "input_tokens": 204,
+  "output_tokens": 0,
+  "tokens": {
+    "total": 12128,
+    "input": 204,
+    "output": 0
+  },
+  "judge_score": 2.0,
+  "correctness": 2.0
+}

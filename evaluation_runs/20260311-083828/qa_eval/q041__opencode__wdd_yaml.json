@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T09:16:33.819721",
+  "qid": "q041",
+  "source_file": "1000genome-workflow-knowledge-eval-2.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "Which two prior tasks must complete before the \"Mutations_Overlap\" task can calculate shared mutation frequencies?",
+  "reference_answer": "The \"Mutations_Overlap\" task requires the successful completion of both the \"Individuals_Merge\" task and the \"Populations\" task.",
+  "agent": "opencode",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "{\"type\":\"step_start\",\"timestamp\":1773238599725,\"sessionID\":\"ses_322be4e66ffejehppGohyyCQiR\",\"part\":{\"id\":\"prt_cdd41c021001HBv49tIcU2sYRY\",\"sessionID\":\"ses_322be4e66ffejehppGohyyCQiR\",\"messageID\":\"msg_cdd41b250001kWh3LJL8h8capY\",\"type\":\"step-start\",\"snapshot\":\"22cc2989108ba232f6b7694b92f54b4d66d8f27a\"}}\n{\"type\":\"text\",\"timestamp\":1773238613753,\"sessionID\":\"ses_322be4e66ffejehppGohyyCQiR\",\"part\":{\"id\":\"prt_cdd41c028001ZNMtSqpNxg7bTc\",\"sessionID\":\"ses_322be4e66ffejehppGohyyCQiR\",\"messageID\":\"msg_cdd41b250001kWh3LJL8h8capY\",\"type\":\"text\",\"text\":\"<think>The user is asking about the 1000 Genomes workflow and wants to know which two prior tasks must complete before the \\\"Mutation_Overlap\\\" task can calculate shared mutation frequencies.\\n\\nLet me look at the wdd_yaml context to find this information.\\n\\nLooking at the workflow graph and pc_edges:\\n\\nFrom the workflow_graph section:\\n- from: task:individuals_merge -> task:mutation_overlap (via pc:individuals_merge->mutation_overlap:1_to_n)\\n- from: task:sifting -> task:mutation_overlap (via pc:sifting->mutation_overlap:1_to_n)\\n\\nSo the mutation_overlap task depends on:\\n1. task:individuals_merge\\n2. task:sifting\\n\\nThis makes sense - the mutation_overlap task needs the merged individuals data and the sifted output to calculate shared mutation frequencies.\\n\\nThe answer should be: task:individuals_merge and task:sifting\\n</think>\\n\\nThe **task:individuals_merge** and **task:sifting** tasks must complete before task:mutation_overlap can calculate shared mutation frequencies.\\n\\nThis is shown in the workflow_graph DAG edges where both `individuals_merge` and `sifting` have edges to `mutation_overlap`. The mutation_overlap task requires the merged individuals data and the SIFT-filtered variants as inputs (as described in its inputs section).\",\"time\":{\"start\":1773238613748,\"end\":1773238613748}}}\n{\"type\":\"step_finish\",\"timestamp\":1773238613960,\"sessionID\":\"ses_322be4e66ffejehppGohyyCQiR\",\"part\":{\"id\":\"prt_cdd41f7110012JoKmLTl6LrDdC\",\"sessionID\":\"ses_322be4e66ffejehppGohyyCQiR\",\"messageID\":\"msg_cdd41b250001kWh3LJL8h8capY\",\"type\":\"step-finish\",\"reason\":\"stop\",\"snapshot\":\"22cc2989108ba232f6b7694b92f54b4d66d8f27a\",\"cost\":0,\"tokens\":{\"total\":18270,\"input\":15950,\"output\":272,\"reasoning\":0,\"cache\":{\"read\":2048,\"write\":0}}}}",
+  "duration_s": 20.39,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 5.0,
+  "correctness": 5.0
+}

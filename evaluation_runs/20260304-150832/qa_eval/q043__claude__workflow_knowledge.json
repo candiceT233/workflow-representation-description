@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-04T15:43:39.852676",
+  "qid": "q043",
+  "source_file": "1000genome-workflow-knowledge-eval-2.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "What specific data fields does the \"Sifting\" task record for the variants it filters?",
+  "reference_answer": "The \"Sifting\" task specifically records the variants' rs numbers and gene IDs.",
+  "agent": "claude",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "The context does not contain enough information to answer this question. The workflow knowledge report notes that it was produced **without access to file contents** (only file names and directory structure were analyzed), and all findings are explicitly marked as assumptions. No details about the specific data fields recorded by the `sifting` task are provided.",
+  "duration_s": 7.2,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 1.0,
+  "correctness": 1.0
+}

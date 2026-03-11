@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-04T15:28:23.926442",
+  "qid": "q025",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 4: INPUT FILES, OUTPUT FILES, AND DATA FORMATS",
+  "question": "What setup must be done before the workflow can process any input data, and which script handles it?",
+  "reference_answer": "The prepare_input.sh script must be run first. It unzips the included data and sets up the local environment so that the workflow has the necessary files in place to begin execution.",
+  "agent": "claude",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "Based on the provided workflow knowledge, the setup step is handled by **`prepare_input.sh`**, which corresponds to **`task:prepare_input`** in the Pre-processing stage.\n\nThis task prepares the input data before any analysis can begin, producing `data:input_data` that is then distributed to the subsequent `individuals` tasks.\n\nHowever, the context notes this is an **assumption** based on file names and directory structure, as the actual file contents were not analyzed. No further details about what the preparation entails are available in the provided knowledge.",
+  "duration_s": 7.75,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 3.0,
+  "correctness": 3.0
+}

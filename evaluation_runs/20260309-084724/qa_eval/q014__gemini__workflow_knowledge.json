@@ -1,0 +1,23 @@
+{
+  "timestamp": "2026-03-09T09:21:35.263069",
+  "qid": "q014",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "How does the pipeline generate the baseline data needed to distinguish common variations from disease-associated mutations?",
+  "reference_answer": "The \"Frequency\" task establishes a null distribution. It does this by selecting random individuals and analyzing variants without regard for their SIFT scores.",
+  "agent": "gemini",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "The pipeline generates baseline data to distinguish common variations from disease-associated mutations through two primary tasks:\n\n1.  **`individuals` task:** Filters variants based on allele frequency, producing per-individual mutation files (`data:chr<C>n.tar.gz`) that highlight variations based on their commonality.\n2.  **`sifting` task:** Processes functional annotations (SIFT scores) and filters for \"deleterious\" or \"tolerated\" variants, generating a text file (`data:sifted.SIFT.chr<C>.txt`) containing scores and variant identifiers relevant for assessing pathogenicity.",
+  "duration_s": 32.08,
+  "total_tokens": 12414,
+  "input_tokens": 1024,
+  "output_tokens": 0,
+  "tokens": {
+    "total": 12414,
+    "input": 1024,
+    "output": 0
+  },
+  "judge_score": 2.0,
+  "correctness": 2.0
+}

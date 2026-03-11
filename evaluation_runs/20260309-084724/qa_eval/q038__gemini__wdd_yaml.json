@@ -1,0 +1,23 @@
+{
+  "timestamp": "2026-03-09T10:26:55.988519",
+  "qid": "q038",
+  "source_file": "1000genome-workflow-knowledge-eval-2.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "How does the workflow manage the exceptionally large size of the Phase 3 chromosome VCF files?",
+  "reference_answer": "The workflow handles this scale by dividing the input file into manageable chunks. Multiple \"Individuals\" jobs are then executed in parallel to identify SNPs and determine which individuals possess mutations on both alleles.",
+  "agent": "gemini",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "The workflow manages the large size of Phase 3 chromosome VCF files by processing them in smaller \"segments.\" The `task:individuals` processes these segments, which are described as \"chunks of the larger chromosome VCF.\" The cardinality of these segments is \"config-determined\" by the `ind_jobs` parameter in `daxgen.py`.",
+  "duration_s": 31.74,
+  "total_tokens": 25117,
+  "input_tokens": 844,
+  "output_tokens": 0,
+  "tokens": {
+    "total": 25117,
+    "input": 844,
+    "output": 0
+  },
+  "judge_score": 3.0,
+  "correctness": 3.0
+}

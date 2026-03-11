@@ -1,0 +1,23 @@
+{
+  "timestamp": "2026-03-09T09:56:14.737342",
+  "qid": "q026",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 4: INPUT FILES, OUTPUT FILES, AND DATA FORMATS",
+  "question": "What intermediate data format is passed between the \"Individuals\" tasks and the \"Individuals_Merge\" task?",
+  "reference_answer": "The \"Individuals\" tasks produce chunked SNP lists — partial mutation files, one per VCF chunk, each identifying which individuals possess mutations on both alleles for a set of rs numbers. These chunks are the direct input to \"Individuals_Merge\".",
+  "agent": "gemini",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "The `individual_mutation_data_tar_gz_segment` is passed between the \"Individuals\" tasks and the \"Individuals_Merge\" task. This is a compressed tar.gz archive containing individual-specific mutation data for a processed segment of a chromosome.",
+  "duration_s": 64.08,
+  "total_tokens": 24809,
+  "input_tokens": 846,
+  "output_tokens": 0,
+  "tokens": {
+    "total": 24809,
+    "input": 846,
+    "output": 0
+  },
+  "judge_score": 3.0,
+  "correctness": 3.0
+}

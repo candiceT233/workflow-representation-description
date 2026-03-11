@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T09:10:28.900548",
+  "qid": "q034",
+  "source_file": "1000genome-workflow-knowledge-eval-2.txt",
+  "section": "SECTION 1: SCIENTIFIC PURPOSE AND BIOLOGICAL SEMANTICS",
+  "question": "What types of complex genetic variants were introduced for calling in Phase 3?",
+  "reference_answer": "Phase 3 introduced multi-allelic variant calling.  This encompasses single nucleotide polymorphisms (SNPs), insertions/deletions (INDELs), and complex structural variants (SVs).",
+  "agent": "opencode",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "{\"type\":\"step_start\",\"timestamp\":1773238233064,\"sessionID\":\"ses_322c3e00bffezJJMvyFOO0DBpq\",\"part\":{\"id\":\"prt_cdd3c27db001hz32uXOM2867nL\",\"sessionID\":\"ses_322c3e00bffezJJMvyFOO0DBpq\",\"messageID\":\"msg_cdd3c20aa001cf4qoGocMjN2gD\",\"type\":\"step-start\",\"snapshot\":\"db1fcdf79176b2968abcc4c6424899ffe794cc26\"}}\n{\"type\":\"text\",\"timestamp\":1773238240436,\"sessionID\":\"ses_322c3e00bffezJJMvyFOO0DBpq\",\"part\":{\"id\":\"prt_cdd3c3f4d0012PjnUeA71Cy1nc\",\"sessionID\":\"ses_322c3e00bffezJJMvyFOO0DBpq\",\"messageID\":\"msg_cdd3c20aa001cf4qoGocMjN2gD\",\"type\":\"text\",\"text\":\"\\nBased on the provided context, I cannot answer this question. The wdd_yaml does not contain information about \\\"complex genetic variants\\\" introduced for calling in Phase 3. The workflow description and data objects only mention SNPs (Single Nucleotide Polymorphisms) - specifically filtering for SNPs with allele frequency >= 0.5 and processing SNP variants for SIFT scores. There is no mention of complex genetic variants (such as structural variants, copy number variations, insertions, deletions, etc.) in the provided context.\",\"time\":{\"start\":1773238240431,\"end\":1773238240431}}}\n{\"type\":\"step_finish\",\"timestamp\":1773238240700,\"sessionID\":\"ses_322c3e00bffezJJMvyFOO0DBpq\",\"part\":{\"id\":\"prt_cdd3c44d1001qLJTowRPcFE0bz\",\"sessionID\":\"ses_322c3e00bffezJJMvyFOO0DBpq\",\"messageID\":\"msg_cdd3c20aa001cf4qoGocMjN2gD\",\"type\":\"step-finish\",\"reason\":\"stop\",\"snapshot\":\"db1fcdf79176b2968abcc4c6424899ffe794cc26\",\"cost\":0,\"tokens\":{\"total\":18418,\"input\":78,\"output\":427,\"reasoning\":0,\"cache\":{\"read\":11282,\"write\":6631}}}}",
+  "duration_s": 12.03,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 2.0,
+  "correctness": 2.0
+}

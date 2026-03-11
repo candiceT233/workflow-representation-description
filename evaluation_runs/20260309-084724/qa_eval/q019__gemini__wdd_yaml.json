@@ -1,0 +1,23 @@
+{
+  "timestamp": "2026-03-09T09:33:47.022055",
+  "qid": "q019",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 3: REPOSITORY USAGE AND SYSTEM MECHANICS",
+  "question": "How does the system locate the specific software executables needed to run the repository's tasks on a remote execution site?",
+  "reference_answer": "The Transformation Catalog (TC) identifies the physical locations of the software executables required for each task, specifying if they are already installed remotely or need to be staged in.",
+  "agent": "gemini",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "The provided `wdd_yaml` does not contain enough information to determine how the system locates the specific software executables needed to run the repository's tasks on a remote execution site. The document only specifies the executable name (e.g., `individuals.py`) for each task.",
+  "duration_s": 28.12,
+  "total_tokens": 25041,
+  "input_tokens": 849,
+  "output_tokens": 0,
+  "tokens": {
+    "total": 25041,
+    "input": 849,
+    "output": 0
+  },
+  "judge_score": 4.0,
+  "correctness": 4.0
+}

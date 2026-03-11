@@ -1,0 +1,23 @@
+{
+  "timestamp": "2026-03-09T09:22:38.219119",
+  "qid": "q014",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "How does the pipeline generate the baseline data needed to distinguish common variations from disease-associated mutations?",
+  "reference_answer": "The \"Frequency\" task establishes a null distribution. It does this by selecting random individuals and analyzing variants without regard for their SIFT scores.",
+  "agent": "gemini",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "The pipeline generates baseline data by identifying mutational overlaps using data from the 1000 Genomes project to provide a null distribution. It cross-matches individual mutation data with SIFT scores (how deleterious a mutation is) and computes mutation overlap frequencies and visualizations.",
+  "duration_s": 35.24,
+  "total_tokens": 25272,
+  "input_tokens": 844,
+  "output_tokens": 0,
+  "tokens": {
+    "total": 25272,
+    "input": 844,
+    "output": 0
+  },
+  "judge_score": 2.0,
+  "correctness": 2.0
+}

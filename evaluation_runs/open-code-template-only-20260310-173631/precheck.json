@@ -1,0 +1,17 @@
+{
+  "api": {
+    "opencode": {
+      "configured": true,
+      "env_var": "OPENCODE_API_KEY"
+    }
+  },
+  "cli": {
+    "opencode": {
+      "ok": true,
+      "info": "/home/mtang11/.opencode/bin/opencode"
+    }
+  },
+  "active_agents": [
+    "opencode"
+  ]
+}

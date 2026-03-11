@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-04T15:18:17.853320",
+  "qid": "q013",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "What are the direct dependencies required before the \"Mutations_Overlap\" task can begin execution?",
+  "reference_answer": "The \"Mutations_Overlap\" task depends on the successful completion of both the \"Individuals_Merge\" task and the \"Populations\" task.",
+  "agent": "claude",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "Based on the workflow knowledge provided, the **`mutation_overlap`** task requires:\n\n- **`data:merged_results`** — produced by the **`individuals_merge`** task\n\nSo the full dependency chain is:\n\n```\nprepare_input → individuals (scatter) → individuals_merge → mutation_overlap\n```\n\nThe `mutation_overlap` task cannot begin until `individuals_merge` completes and produces `data:merged_results`.",
+  "duration_s": 6.72,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 3.0,
+  "correctness": 3.0
+}

@@ -1,0 +1,23 @@
+{
+  "timestamp": "2026-03-09T11:02:34.894634",
+  "qid": "q052",
+  "source_file": "1000genome-workflow-knowledge-eval-3.txt",
+  "section": "SECTION 1: SCIENTIFIC PURPOSE AND BIOLOGICAL SEMANTICS",
+  "question": "What were the sequencing coverages and sample targets used during the project's pilot phase?",
+  "reference_answer": "The pilot phase utilized low-coverage whole-genome sequencing (2–4X) of 180 samples and high-coverage sequencing (20–60X) of two mother-father-child trios.",
+  "agent": "gemini",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "The provided WDD YAML does not contain information about the sequencing coverages or sample targets used during the project's pilot phase. It mentions that the project reconstructed the genomes of 2,504 individuals across 26 different populations, but does not specify this for a pilot phase or detail sequencing coverage.",
+  "duration_s": 34.33,
+  "total_tokens": 25218,
+  "input_tokens": 843,
+  "output_tokens": 0,
+  "tokens": {
+    "total": 25218,
+    "input": 843,
+    "output": 0
+  },
+  "judge_score": 2.0,
+  "correctness": 2.0
+}

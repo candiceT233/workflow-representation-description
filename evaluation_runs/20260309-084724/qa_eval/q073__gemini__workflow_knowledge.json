@@ -1,0 +1,23 @@
+{
+  "timestamp": "2026-03-09T11:54:59.742458",
+  "qid": "q073",
+  "source_file": "1000genome-workflow-knowledge-eval-3.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "How does the \"Mutations_Overlap\" task categorize the shared mutation frequencies it calculates?",
+  "reference_answer": "The task calculates the frequency of shared mutations among pairs of individuals, categorizing them by their population and chromosome.",
+  "agent": "gemini",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "The provided context does not contain enough information to describe how the \"mutation_overlap\" task categorizes the shared mutation frequencies it calculates. It only states that it \"generates plots and data files summarizing the overlap.\"",
+  "duration_s": 28.2,
+  "total_tokens": 12032,
+  "input_tokens": 202,
+  "output_tokens": 0,
+  "tokens": {
+    "total": 12032,
+    "input": 202,
+    "output": 0
+  },
+  "judge_score": 3.0,
+  "correctness": 3.0
+}

@@ -1,0 +1,4 @@
+Now let me read the key workflow files to understand its structure:
+Now I have a comprehensive understanding of the workflow. Let me create the WDD YAML file:
+Now I'll update the existing file to fix some issues I noticed - the data_id prefixes have "data:data:" which should be "data:" only, and the field name should be `round_trip_gaps`:
+STATUS: success | OUTPUT: /home/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial2.yaml

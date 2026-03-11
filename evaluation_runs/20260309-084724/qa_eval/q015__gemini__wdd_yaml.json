@@ -1,0 +1,23 @@
+{
+  "timestamp": "2026-03-09T09:24:40.455878",
+  "qid": "q015",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "What specific data fields does the \"Sifting\" task record when filtering variants?",
+  "reference_answer": "The \"Sifting\" task specifically filters for variants with SIFT scores and records their rs numbers, ENSEMBL GEN IDs, and HGNC IDs.",
+  "agent": "gemini",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "The \"Sifting\" task records the following specific data fields: line number, rs ID, ENSG ID, SIFT score, and phenotype.",
+  "duration_s": 25.96,
+  "total_tokens": 24750,
+  "input_tokens": 842,
+  "output_tokens": 0,
+  "tokens": {
+    "total": 24750,
+    "input": 842,
+    "output": 0
+  },
+  "judge_score": 3.0,
+  "correctness": 3.0
+}

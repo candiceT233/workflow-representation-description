@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T09:39:21.482056",
+  "qid": "q066",
+  "source_file": "1000genome-workflow-knowledge-eval-3.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "What is the primary function of the \"Individuals\" task at the very start of the pipeline?",
+  "reference_answer": "The \"Individuals\" task is responsible for fetching and parsing Phase 3 VCF data by chromosome to identify SNPs and determine which individuals possess mutations on both alleles.",
+  "agent": "opencode",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "{\"type\":\"step_start\",\"timestamp\":1773239967539,\"sessionID\":\"ses_322a96fc4ffeYl2kKHY4CeHVs9\",\"part\":{\"id\":\"prt_cdd569f26001UWS0wXYF8rLBgB\",\"sessionID\":\"ses_322a96fc4ffeYl2kKHY4CeHVs9\",\"messageID\":\"msg_cdd5690eb0014jhiWiVRYmH2rJ\",\"type\":\"step-start\",\"snapshot\":\"3c0f90b8a25256404858903444e7c866bcf4a081\"}}\n{\"type\":\"text\",\"timestamp\":1773239971739,\"sessionID\":\"ses_322a96fc4ffeYl2kKHY4CeHVs9\",\"part\":{\"id\":\"prt_cdd56aab7001naIQkDfuvb3eT1\",\"sessionID\":\"ses_322a96fc4ffeYl2kKHY4CeHVs9\",\"messageID\":\"msg_cdd5690eb0014jhiWiVRYmH2rJ\",\"type\":\"text\",\"text\":\"The **individuals** task is the first stage of the pipeline. Its primary function is to parse VCF files per chromosome and extract SNP data for each individual—specifically homozygous variants with allele frequency >= 0.5 or < 0.5 depending on genotype. It takes a VCF file and columns.txt as inputs, and outputs per-individual tar.gz files.\",\"time\":{\"start\":1773239971734,\"end\":1773239971734}}}\n{\"type\":\"step_finish\",\"timestamp\":1773239971958,\"sessionID\":\"ses_322a96fc4ffeYl2kKHY4CeHVs9\",\"part\":{\"id\":\"prt_cdd56afbc001xOJ21G4OkETSho\",\"sessionID\":\"ses_322a96fc4ffeYl2kKHY4CeHVs9\",\"messageID\":\"msg_cdd5690eb0014jhiWiVRYmH2rJ\",\"type\":\"step-finish\",\"reason\":\"stop\",\"snapshot\":\"3c0f90b8a25256404858903444e7c866bcf4a081\",\"cost\":0,\"tokens\":{\"total\":13857,\"input\":78,\"output\":314,\"reasoning\":0,\"cache\":{\"read\":11282,\"write\":2183}}}}",
+  "duration_s": 10.71,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": null,
+  "correctness": null
+}

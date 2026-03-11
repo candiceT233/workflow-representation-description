@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T09:10:10.506756",
+  "qid": "q034",
+  "source_file": "1000genome-workflow-knowledge-eval-2.txt",
+  "section": "SECTION 1: SCIENTIFIC PURPOSE AND BIOLOGICAL SEMANTICS",
+  "question": "What types of complex genetic variants were introduced for calling in Phase 3?",
+  "reference_answer": "Phase 3 introduced multi-allelic variant calling.  This encompasses single nucleotide polymorphisms (SNPs), insertions/deletions (INDELs), and complex structural variants (SVs).",
+  "agent": "opencode",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "{\"type\":\"step_start\",\"timestamp\":1773238215108,\"sessionID\":\"ses_322c427b9ffeYiUZGcqGq7fbWm\",\"part\":{\"id\":\"prt_cdd3be1b5001fi8DWV0tAveZxm\",\"sessionID\":\"ses_322c427b9ffeYiUZGcqGq7fbWm\",\"messageID\":\"msg_cdd3bd8f8001P4m8LKahj3eiOh\",\"type\":\"step-start\",\"snapshot\":\"6ea96b8a4bf6d8b30fc01e98dcb4348729d57e3c\"}}\n{\"type\":\"text\",\"timestamp\":1773238221642,\"sessionID\":\"ses_322c427b9ffeYiUZGcqGq7fbWm\",\"part\":{\"id\":\"prt_cdd3bf621001xfmIvi3A36oW00\",\"sessionID\":\"ses_322c427b9ffeYiUZGcqGq7fbWm\",\"messageID\":\"msg_cdd3bd8f8001P4m8LKahj3eiOh\",\"type\":\"text\",\"text\":\"Based on the provided workflow knowledge context, I cannot find specific information about the types of complex genetic variants introduced for calling in Phase 3. The context focuses on the workflow structure, tasks, data objects, and I/O patterns of this particular Pegasus WMS implementation, but does not detail the variant calling methodology or complex variant types specific to the 1000 Genomes Phase 3 release.\",\"time\":{\"start\":1773238221637,\"end\":1773238221637}}}\n{\"type\":\"step_finish\",\"timestamp\":1773238221843,\"sessionID\":\"ses_322c427b9ffeYiUZGcqGq7fbWm\",\"part\":{\"id\":\"prt_cdd3bfb6a001DD8ULz9AHlUVZp\",\"sessionID\":\"ses_322c427b9ffeYiUZGcqGq7fbWm\",\"messageID\":\"msg_cdd3bd8f8001P4m8LKahj3eiOh\",\"type\":\"step-finish\",\"reason\":\"stop\",\"snapshot\":\"6ea96b8a4bf6d8b30fc01e98dcb4348729d57e3c\",\"cost\":0,\"tokens\":{\"total\":13900,\"input\":78,\"output\":361,\"reasoning\":0,\"cache\":{\"read\":11282,\"write\":2179}}}}",
+  "duration_s": 11.58,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 1.0,
+  "correctness": 1.0
+}

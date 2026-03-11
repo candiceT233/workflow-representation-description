@@ -1,0 +1,169 @@
+[0m
+> build · minimax-m2.5-free
+[0m
+[0m→ [0mRead template_separate_docs/template_WDD.yml
+[0m→ [0mRead template_separate_docs/WIDGET_conventions.md
+[0m✱ [0mGlob "**/*"[90m in ../../../../../home/mtang11/scripts/workflow-representation-description/workflows_repo/1000genome-workflow · 100 matches[0m
+[0m→ [0mRead ../../../../../home/mtang11/scripts/workflow-representation-description/workflows_repo/1000genome-workflow/README.md
+[0m→ [0mRead ../../../../../home/mtang11/scripts/workflow-representation-description/workflows_repo/1000genome-workflow/daxgen.py
+[0m→ [0mRead ../../../../../home/mtang11/scripts/workflow-representation-description/workflows_repo/1000genome-workflow/data.csv
+[0m→ [0mRead ../../../../../home/mtang11/scripts/workflow-representation-description/workflows_repo/1000genome-workflow/bin/individuals.py
+[0m→ [0mRead ../../../../../home/mtang11/scripts/workflow-representation-description/workflows_repo/1000genome-workflow/bin/individuals_merge.py
+[0m→ [0mRead ../../../../../home/mtang11/scripts/workflow-representation-description/workflows_repo/1000genome-workflow/bin/sifting.py
+[0m→ [0mRead ../../../../../home/mtang11/scripts/workflow-representation-description/workflows_repo/1000genome-workflow/bin/mutation_overlap.py
+[0m→ [0mRead ../../../../../home/mtang11/scripts/workflow-representation-description/workflows_repo/1000genome-workflow/bin/frequency.py
+[0m
+[0m$ [0mcd /home/mtang11/scripts/workflow-representation-description/workflows_repo/1000genome-workflow && git rev-parse HEAD
+fatal: not a git repository: /mnt/common/mtang11/scripts/workflow-representation-description/workflows_repo/1000genome-workflow/../.git/modules/1000genome-workflow
+[0m
+[0m$ [0mls -la /home/mtang11/scripts/workflow-representation-description/workflows_repo/
+total 52
+drwxrwxr-x  4 mtang11 mtang11   151 Mar  4 09:38 .
+drwxrwxr-x 12 mtang11 mtang11  4096 Mar 10 17:32 ..
+-rw-rw-r--  1 mtang11 mtang11 28868 Feb 25 13:29 1000genome-project-description-by-geminiDR.md
+-rw-rw-r--  1 mtang11 mtang11  6992 Feb 25 13:29 1000-genome-Q&A.md
+drwxrwxr-x  7 mtang11 mtang11  4096 Mar  9 15:59 1000genome-workflow
+drwxrwxr-x 12 mtang11 mtang11  4096 Feb 23 01:59 deepdrivemd
+[0m
+[0m$ [0mcd /home/mtang11/scripts/workflow-representation-description && git log --oneline -1
+314cd28 update
+[0m
+[0m← [0mWrite ../../../../../home/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial3.yaml
+Wrote file successfully.
+
+LSP errors detected in this file, please fix:
+<diagnostics file="/home/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial3.yaml">
+ERROR [23:9] Implicit keys need to be on a single line
+ERROR [262:18] Nested mappings are not allowed in compact mappings
+</diagnostics>
+
+LSP errors detected in other files:
+<diagnostics file="/home/mtang11/scripts/workflow-representation-description/workflows_repo/1000genome-workflow/daxgen.py">
+ERROR [11:6] Import "Pegasus.api" could not be resolved
+ERROR [55:24] "File" is not defined
+ERROR [85:19] "File" is not defined
+ERROR [125:19] "SiteCatalog" is not defined
+ERROR [106:22] "Properties" is not defined
+ERROR [94:20] "write" is not a known attribute of "None"
+ERROR [177:19] "TransformationCatalog" is not defined
+ERROR [95:17] "write" is not a known attribute of "None"
+ERROR [347:19] "ReplicaCatalog" is not defined
+ERROR [96:17] "write" is not a known attribute of "None"
+ERROR [359:19] "Workflow" is not defined
+ERROR [97:17] "write" is not a known attribute of "None"
+ERROR [101:21] "graph" is not a known attribute of "None"
+ERROR [101:92] Operator "+" not supported for "None"
+ERROR [127:17] "Site" is not defined
+ERROR [128:13] "Directory" is not defined
+ERROR [128:23] "Directory" is not defined
+ERROR [129:17] "FileServer" is not defined
+ERROR [129:65] "Operation" is not defined
+ERROR [131:13] "Directory" is not defined
+... and 63 more
+</diagnostics>
+
+LSP errors detected in other files:
+<diagnostics file="/home/mtang11/scripts/workflow-representation-description/workflows_repo/1000genome-workflow/bin/frequency.py">
+ERROR [6:8] Import "numpy" could not be resolved
+ERROR [7:8] Import "numpy.ma" could not be resolved
+ERROR [10:8] Import "matplotlib" could not be resolved
+ERROR [13:8] Import "matplotlib.pyplot" could not be resolved
+ERROR [14:8] Import "matplotlib.colors" could not be resolved
+ERROR [15:8] Import "matplotlib.cm" could not be resolved
+ERROR [20:6] Import "mpl_toolkits.axes_grid1" could not be resolved
+ERROR [23:6] Import "pylab" could not be resolved
+ERROR [24:6] Import "matplotlib" could not be resolved
+ERROR [25:8] Import "matplotlib" could not be resolved
+</diagnostics>
+
+LSP errors detected in other files:
+<diagnostics file="/home/mtang11/scripts/workflow-representation-description/workflows_repo/1000genome-workflow/bin/mutation_overlap.py">
+ERROR [6:8] Import "numpy" could not be resolved
+ERROR [7:8] Import "numpy.ma" could not be resolved
+ERROR [11:8] Import "matplotlib" could not be resolved
+ERROR [13:8] Import "matplotlib.pyplot" could not be resolved
+ERROR [14:8] Import "matplotlib.colors" could not be resolved
+ERROR [15:8] Import "matplotlib.cm" could not be resolved
+ERROR [16:6] Import "mpl_toolkits.axes_grid1" could not be resolved
+ERROR [20:6] Import "pylab" could not be resolved
+ERROR [21:6] Import "matplotlib" could not be resolved
+ERROR [22:8] Import "matplotlib" could not be resolved
+</diagnostics>
+[0m
+[0m→ [0mRead ../../../../../home/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial3.yaml[90m [limit=30, offset=20][0m
+[0m→ [0mRead ../../../../../home/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial3.yaml[90m [limit=30, offset=255][0m
+[0m
+[0m← [0mEdit ../../../../../home/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial3.yaml
+Index: /home/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial3.yaml
+===================================================================
+--- /home/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial3.yaml
++++ /home/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial3.yaml
+@@ -19,13 +19,10 @@
+   name: Data Loading
+   order: 1
+   description: External input data (VCF files, population files, columns mapping) is prepared and registered in the replica catalog for workflow execution.
+   tasks:
+-    - task:data_loading
+-      _status: pending
+-      _note: Data loading is implicit in Pegasus workflow through replica catalog - no explicit task exists
+-
+-- stage_id: stage:individuals_extraction
++    - task:individuals
++    - task:individuals_merge
+   name: Individuals Extraction
+   order: 2
+   description: Parses VCF files to extract individual mutation data per chromosome, creating per-individual mutation files filtered by allele frequency criteria.
+   tasks:
+
+[0m
+[0m→ [0mRead ../../../../../home/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial3.yaml[90m [limit=50, offset=15][0m
+[0m
+[0m← [0mEdit ../../../../../home/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial3.yaml
+Index: /home/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial3.yaml
+===================================================================
+--- /home/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial3.yaml
++++ /home/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial3.yaml
+@@ -18,11 +18,11 @@
+ - stage_id: stage:data_loading
+   name: Data Loading
+   order: 1
+   description: External input data (VCF files, population files, columns mapping) is prepared and registered in the replica catalog for workflow execution.
+-  tasks:
+-    - task:individuals
+-    - task:individuals_merge
++  tasks: []
++
++- stage_id: stage:individuals_extraction
+   name: Individuals Extraction
+   order: 2
+   description: Parses VCF files to extract individual mutation data per chromosome, creating per-individual mutation files filtered by allele frequency criteria.
+   tasks:
+
+[0m
+[0m→ [0mRead ../../../../../home/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial3.yaml[90m [limit=20, offset=252][0m
+[0m
+[0m← [0mEdit ../../../../../home/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial3.yaml
+Index: /home/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial3.yaml
+===================================================================
+--- /home/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial3.yaml
++++ /home/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial3.yaml
+@@ -255,9 +255,9 @@
+     consumer_count: 3
+ 
+ - data_id: data:population_file
+   name: Population File
+-  description: Text files listing individual sample IDs belonging to each population group. Six super populations used: AFR (African), AMR (Mixed American), EAS (East Asian), EUR (European), GBR (British), SAS (South Asian), plus ALL.
++  description: "Text files listing individual sample IDs belonging to each population group. Six super populations used: AFR (African), AMR (Mixed American), EAS (East Asian), EUR (European), GBR (British), SAS (South Asian), plus ALL."
+   category: input
+   persistence: persistent
+   format_hint:
+     container: text
+
+[0m
+[0m$ [0mcd /home/mtang11/scripts/workflow-representation-description && python3 -c "import yaml; yaml.safe_load(open('workflow_wdd/1000genome-wdd-opencode-trial3.yaml'))" && echo "YAML is valid"
+YAML is valid
+[0m
+[0m$ [0mls -la /home/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial3.yaml
+-rw-rw-r-- 1 mtang11 mtang11 28678 Mar 10 17:40 /home/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial3.yaml
+[0m
+[0m→ [0mRead ../../../../../home/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial3.yaml

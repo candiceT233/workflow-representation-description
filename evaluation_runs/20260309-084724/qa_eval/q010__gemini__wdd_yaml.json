@@ -1,0 +1,23 @@
+{
+  "timestamp": "2026-03-09T09:11:14.479350",
+  "qid": "q010",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "How does the workflow architecture handle the massive scale of individual chromosome VCF files?",
+  "reference_answer": "The workflow employs a Scatter/Gather pattern. The large input file is divided into manageable chunks, and multiple \"Individuals\" jobs are executed in parallel to process these chunks.",
+  "agent": "gemini",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "The workflow handles the massive scale of individual chromosome VCF files by processing them in segments. The `task:individuals` processes a segment of a chromosome's VCF data, extracting information for each individual and compressing it into a tar.gz archive. This task is embarrassingly parallel, with each instance processing a distinct segment independently. The `data:raw_chromosome_vcf_segment` is described as a segment of a VCF file, with a cardinality determined by a `config-determined` parameter related to `ind_jobs`, implying that the large VCF is split into multiple segments for parallel processing.",
+  "duration_s": 28.35,
+  "total_tokens": 24865,
+  "input_tokens": 842,
+  "output_tokens": 0,
+  "tokens": {
+    "total": 24865,
+    "input": 842,
+    "output": 0
+  },
+  "judge_score": 4.0,
+  "correctness": 4.0
+}

@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T08:52:34.467663",
+  "qid": "q016",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 3: REPOSITORY USAGE AND SYSTEM MECHANICS",
+  "question": "Where is the official repository hosted for the bioinformatics workflow that identifies these mutational overlaps?",
+  "reference_answer": "The repository is hosted on GitHub under \"pegasus-isi/1000genome-workflow\".",
+  "agent": "opencode",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "{\"type\":\"step_start\",\"timestamp\":1773237158532,\"sessionID\":\"ses_322d444c7ffeWJZ65aMPcCMmm4\",\"part\":{\"id\":\"prt_cdd2bc276001cSMbgt12rnjGBq\",\"sessionID\":\"ses_322d444c7ffeWJZ65aMPcCMmm4\",\"messageID\":\"msg_cdd2bbbf4001k7tt4wwrUn0gQA\",\"type\":\"step-start\",\"snapshot\":\"4059a67e3e3299b2e003af0a930eaf3208c62a53\"}}\n{\"type\":\"text\",\"timestamp\":1773237165559,\"sessionID\":\"ses_322d444c7ffeWJZ65aMPcCMmm4\",\"part\":{\"id\":\"prt_cdd2bd81c0019MnS1KcMWHfdnp\",\"sessionID\":\"ses_322d444c7ffeWJZ65aMPcCMmm4\",\"messageID\":\"msg_cdd2bbbf4001k7tt4wwrUn0gQA\",\"type\":\"text\",\"text\":\"Based on the context, the source repository is located at `/home/mtang11/scripts/workflow-representation-description/workflows_repo/1000genome-workflow`. However, this is a local file system path rather than a hosted remote repository (e.g., GitHub, GitLab), so the context does not indicate where the workflow is \\\"officially hosted\\\" on any web-based git hosting service.\",\"time\":{\"start\":1773237165554,\"end\":1773237165554}}}\n{\"type\":\"step_finish\",\"timestamp\":1773237165883,\"sessionID\":\"ses_322d444c7ffeWJZ65aMPcCMmm4\",\"part\":{\"id\":\"prt_cdd2bde36001EDR8AgY4lXWMX6\",\"sessionID\":\"ses_322d444c7ffeWJZ65aMPcCMmm4\",\"messageID\":\"msg_cdd2bbbf4001k7tt4wwrUn0gQA\",\"type\":\"step-finish\",\"reason\":\"stop\",\"snapshot\":\"4059a67e3e3299b2e003af0a930eaf3208c62a53\",\"cost\":0,\"tokens\":{\"total\":18328,\"input\":78,\"output\":335,\"reasoning\":0,\"cache\":{\"read\":11282,\"write\":6633}}}}",
+  "duration_s": 11.68,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": null,
+  "correctness": null
+}

@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T09:07:07.366351",
+  "qid": "q030",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 4: INPUT FILES, OUTPUT FILES, AND DATA FORMATS",
+  "question": "Where are the core executable scripts that perform the actual genomic analysis located in the repository?",
+  "reference_answer": "The core executables and Python scripts that perform the calculations for sifting, overlapping, and merging are located in the bin/ directory of the repository. These are the scripts the workflow engine calls for each task.",
+  "agent": "opencode",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "{\"type\":\"step_start\",\"timestamp\":1773238031566,\"sessionID\":\"ses_322c6f33fffeNqI19tNZH3XIZo\",\"part\":{\"id\":\"prt_cdd3914c000192x2ab6M562DDC\",\"sessionID\":\"ses_322c6f33fffeNqI19tNZH3XIZo\",\"messageID\":\"msg_cdd390d850016pIt6Wqpx8saF4\",\"type\":\"step-start\",\"snapshot\":\"72b64d8fd7938519de2a2eebf52ad2e7bd5209c6\"}}\n{\"type\":\"text\",\"timestamp\":1773238034797,\"sessionID\":\"ses_322c6f33fffeNqI19tNZH3XIZo\",\"part\":{\"id\":\"prt_cdd391c98001NtSCa7Y8fiGPuz\",\"sessionID\":\"ses_322c6f33fffeNqI19tNZH3XIZo\",\"messageID\":\"msg_cdd390d850016pIt6Wqpx8saF4\",\"type\":\"text\",\"text\":\"The core executable scripts are located in the `bin/` directory of the repository:\\n\\n- `bin/individuals.py` - extracts individual mutation data from VCF files\\n- `bin/individuals_merge.py` - merges chunked individual outputs\\n- `bin/sifting.py` - extracts SIFT scores from VEP annotations\\n- `bin/mutation_overlap.py` - computes mutation overlap between individuals\\n- `bin/frequency.py` - performs frequency analysis with random sampling\",\"time\":{\"start\":1773238034792,\"end\":1773238034792}}}\n{\"type\":\"step_finish\",\"timestamp\":1773238034996,\"sessionID\":\"ses_322c6f33fffeNqI19tNZH3XIZo\",\"part\":{\"id\":\"prt_cdd392184001UESeRIWEKxxUy9\",\"sessionID\":\"ses_322c6f33fffeNqI19tNZH3XIZo\",\"messageID\":\"msg_cdd390d850016pIt6Wqpx8saF4\",\"type\":\"step-finish\",\"reason\":\"stop\",\"snapshot\":\"72b64d8fd7938519de2a2eebf52ad2e7bd5209c6\",\"cost\":0,\"tokens\":{\"total\":18225,\"input\":78,\"output\":232,\"reasoning\":0,\"cache\":{\"read\":11282,\"write\":6633}}}}",
+  "duration_s": 7.86,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 5.0,
+  "correctness": 5.0
+}

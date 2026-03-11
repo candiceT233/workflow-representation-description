@@ -1,0 +1,23 @@
+{
+  "timestamp": "2026-03-09T10:24:38.940572",
+  "qid": "q037",
+  "source_file": "1000genome-workflow-knowledge-eval-2.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "What are the five core task classes that perform the workflow's sequential analysis?",
+  "reference_answer": "The workflow consists of five core task classes: Individuals, Individuals_Merge, Populations, Sifting, and Mutations_Overlap/Frequency.",
+  "agent": "gemini",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "The five core task classes that perform the workflow's sequential analysis are:\n1. `task:individuals`\n2. `task:individuals_merge`\n3. `task:sifting`\n4. `task:mutation_overlap`\n5. `task:frequency`",
+  "duration_s": 30.02,
+  "total_tokens": 25055,
+  "input_tokens": 842,
+  "output_tokens": 0,
+  "tokens": {
+    "total": 25055,
+    "input": 842,
+    "output": 0
+  },
+  "judge_score": 3.0,
+  "correctness": 3.0
+}

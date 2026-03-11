@@ -1,0 +1,23 @@
+{
+  "timestamp": "2026-03-09T09:06:05.758667",
+  "qid": "q008",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "What are the five core task classes that make up the sequence of this workflow?",
+  "reference_answer": "The workflow consists of five core task classes: Individuals, Individuals_Merge, Populations, Sifting, Mutations_Overlap, and Frequency.",
+  "agent": "gemini",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "The five core task classes that make up the sequence of this workflow are: \"Individuals\", \"Individuals Merge\", \"Sifting\", \"Mutation Overlap\", and \"Frequency\".",
+  "duration_s": 28.11,
+  "total_tokens": 24776,
+  "input_tokens": 842,
+  "output_tokens": 0,
+  "tokens": {
+    "total": 24776,
+    "input": 842,
+    "output": 0
+  },
+  "judge_score": 4.0,
+  "correctness": 4.0
+}

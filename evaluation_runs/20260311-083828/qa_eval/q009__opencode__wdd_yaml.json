@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T08:45:41.460856",
+  "qid": "q009",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "What is the specific role of the \"Individuals\" task at the start of the pipeline?",
+  "reference_answer": "The \"Individuals\" task is the first and most intensive step, responsible for fetching and parsing Phase 3 VCF data by chromosome to identify SNPs and determine which individuals possess mutations on both alleles.",
+  "agent": "opencode",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "{\"type\":\"step_start\",\"timestamp\":1773236748193,\"sessionID\":\"ses_322da925affeXS0YWSpmCiPvWU\",\"part\":{\"id\":\"prt_cdd257f95001QoaiXO2trrxBGi\",\"sessionID\":\"ses_322da925affeXS0YWSpmCiPvWU\",\"messageID\":\"msg_cdd256e40001Z7Fe1dutG1JLsZ\",\"type\":\"step-start\",\"snapshot\":\"cf18bfb4cb50fd28d7171b6dcbce80706679a6ca\"}}\n{\"type\":\"text\",\"timestamp\":1773236761411,\"sessionID\":\"ses_322da925affeXS0YWSpmCiPvWU\",\"part\":{\"id\":\"prt_cdd25a79d0015tZU9As2ox7qjI\",\"sessionID\":\"ses_322da925affeXS0YWSpmCiPvWU\",\"messageID\":\"msg_cdd256e40001Z7Fe1dutG1JLsZ\",\"type\":\"text\",\"text\":\"The **Individuals** task (`task:individuals`) is the first data preparation task that processes VCF files from the 1000 Genomes Phase3 release to extract mutation data for each of the 2,504 individuals.\\n\\nIts specific role is to:\\n- Read chromosome VCF files\\n- Filter for SNPs with allele frequency ≥ 0.5\\n- Write per-individual mutation files\\n- Produce a tar.gz archive containing mutation data for all 2,504 individuals per chromosome chunk\\n\\nThis is an embarrassingly parallel task where each instance processes one chromosome chunk independently, producing intermediate output (`data:individuals_chunk_output`) that feeds into the `individuals_merge` task.\",\"time\":{\"start\":1773236761406,\"end\":1773236761406}}}\n{\"type\":\"step_finish\",\"timestamp\":1773236761637,\"sessionID\":\"ses_322da925affeXS0YWSpmCiPvWU\",\"part\":{\"id\":\"prt_cdd25b366001ZZBn61Jir1T5IP\",\"sessionID\":\"ses_322da925affeXS0YWSpmCiPvWU\",\"messageID\":\"msg_cdd256e40001Z7Fe1dutG1JLsZ\",\"type\":\"step-finish\",\"reason\":\"stop\",\"snapshot\":\"cf18bfb4cb50fd28d7171b6dcbce80706679a6ca\",\"cost\":0,\"tokens\":{\"total\":18574,\"input\":78,\"output\":580,\"reasoning\":0,\"cache\":{\"read\":510,\"write\":17406}}}}",
+  "duration_s": 20.42,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 3.0,
+  "correctness": 3.0
+}

@@ -1,0 +1,23 @@
+{
+  "timestamp": "2026-03-09T10:53:25.559881",
+  "qid": "q048",
+  "source_file": "1000genome-workflow-knowledge-eval-2.txt",
+  "section": "SECTION 3: REPOSITORY USAGE AND SYSTEM MECHANICS",
+  "question": "What were the key outputs from the high coverage NYGC project phase?",
+  "reference_answer": "The high coverage phase by NYGC utilized Illumina 30X technology to process 3,202 samples. The key outputs included GRCh38 realignment and the calling of structural variants (SVs).",
+  "agent": "gemini",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "The provided context does not contain enough information to answer this question. The WDD YAML describes the 1000 Genomes workflow generally but does not mention specific project phases like the \"high coverage NYGC project phase.\"",
+  "duration_s": 31.53,
+  "total_tokens": 24881,
+  "input_tokens": 840,
+  "output_tokens": 0,
+  "tokens": {
+    "total": 24881,
+    "input": 840,
+    "output": 0
+  },
+  "judge_score": 1.0,
+  "correctness": 1.0
+}

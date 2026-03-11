@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-04T15:08:48.597760",
+  "qid": "q001",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 1: SCIENTIFIC PURPOSE AND BIOLOGICAL SEMANTICS",
+  "question": "What is the primary scientific objective of the 1000 Genomes workflow?",
+  "reference_answer": "The primary objective is to process petascale genomic datasets to identify mutational overlaps and establish statistical null distributions for disease-related research. It successfully mapped the genetic diversity of 2,504 individuals across 26 distinct global populations.",
+  "agent": "claude",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "Based on the WDD, the primary scientific objective is to **identify mutational overlaps using data from the 1000 Genomes Project in order to provide a null distribution for rigorous statistical evaluation of potential disease-related mutations**.\n\nSpecifically, the workflow fetches, parses, and analyzes genomic data, cross-matches which individuals carry which mutations against SIFT scores (measuring mutation severity), and performs analyses including plotting.",
+  "duration_s": 8.13,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 4.0,
+  "correctness": 4.0
+}

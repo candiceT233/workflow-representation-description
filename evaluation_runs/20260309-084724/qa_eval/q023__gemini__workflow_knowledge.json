@@ -1,0 +1,23 @@
+{
+  "timestamp": "2026-03-09T09:43:02.821167",
+  "qid": "q023",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 4: INPUT FILES, OUTPUT FILES, AND DATA FORMATS",
+  "question": "What secondary input file does the workflow use to provide population-level demographic context?",
+  "reference_answer": "The \"Populations\" task downloads demographic metadata for the 26 global populations from the IGSR. This metadata maps individual sample IDs to their population and super-population categories (AFR, AMR, EAS, EUR, SAS, GBR).",
+  "agent": "gemini",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "The workflow uses `data:<POP>`, \"a file containing a list of individuals in a specific population,\" to provide population-level demographic context.",
+  "duration_s": 42.2,
+  "total_tokens": 11842,
+  "input_tokens": 201,
+  "output_tokens": 0,
+  "tokens": {
+    "total": 11842,
+    "input": 201,
+    "output": 0
+  },
+  "judge_score": 2.0,
+  "correctness": 2.0
+}

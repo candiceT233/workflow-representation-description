@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T08:57:06.289511",
+  "qid": "q021",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 4: INPUT FILES, OUTPUT FILES, AND DATA FORMATS",
+  "question": "What is the primary input file format consumed by the workflow?",
+  "reference_answer": "The primary input format is VCF (Variant Call Format). Phase 3 VCF files are fetched per chromosome from the IGSR (International Genome Sample Resource) FTP server. Each chromosomal VCF file can exceed 250,000 lines and contains variant records for all 2,504 individuals.",
+  "agent": "opencode",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "{\"type\":\"step_start\",\"timestamp\":1773237431256,\"sessionID\":\"ses_322d01f08ffehkMsL5nLMrPiEZ\",\"part\":{\"id\":\"prt_cdd2febca001H85fTus2hKy4yP\",\"sessionID\":\"ses_322d01f08ffehkMsL5nLMrPiEZ\",\"messageID\":\"msg_cdd2fe1b1001DXMEgTm5w2ZB3Y\",\"type\":\"step-start\",\"snapshot\":\"21b1d5c237d5746292c6365311f33193bc33fa6d\"}}\n{\"type\":\"text\",\"timestamp\":1773237434570,\"sessionID\":\"ses_322d01f08ffehkMsL5nLMrPiEZ\",\"part\":{\"id\":\"prt_cdd2ff795001I9nA288ukw9PSJ\",\"sessionID\":\"ses_322d01f08ffehkMsL5nLMrPiEZ\",\"messageID\":\"msg_cdd2fe1b1001DXMEgTm5w2ZB3Y\",\"type\":\"text\",\"text\":\"VCF (Variant Call Format)\",\"time\":{\"start\":1773237434563,\"end\":1773237434563}}}\n{\"type\":\"step_finish\",\"timestamp\":1773237434761,\"sessionID\":\"ses_322d01f08ffehkMsL5nLMrPiEZ\",\"part\":{\"id\":\"prt_cdd2ff8e30019ucOqyrySeFNa8\",\"sessionID\":\"ses_322d01f08ffehkMsL5nLMrPiEZ\",\"messageID\":\"msg_cdd2fe1b1001DXMEgTm5w2ZB3Y\",\"type\":\"step-finish\",\"reason\":\"stop\",\"snapshot\":\"21b1d5c237d5746292c6365311f33193bc33fa6d\",\"cost\":0,\"tokens\":{\"total\":13710,\"input\":78,\"output\":174,\"reasoning\":0,\"cache\":{\"read\":510,\"write\":12948}}}}",
+  "duration_s": 8.72,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 3.0,
+  "correctness": 3.0
+}

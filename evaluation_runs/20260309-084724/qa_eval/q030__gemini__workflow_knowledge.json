@@ -1,0 +1,23 @@
+{
+  "timestamp": "2026-03-09T10:05:05.678371",
+  "qid": "q030",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 4: INPUT FILES, OUTPUT FILES, AND DATA FORMATS",
+  "question": "Where are the core executable scripts that perform the actual genomic analysis located in the repository?",
+  "reference_answer": "The core executables and Python scripts that perform the calculations for sifting, overlapping, and merging are located in the bin/ directory of the repository. These are the scripts the workflow engine calls for each task.",
+  "agent": "gemini",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "The core executable scripts that perform the actual genomic analysis are referred to as \"individual task scripts\" within the workflow repository. The context does not specify their exact file system location.",
+  "duration_s": 29.79,
+  "total_tokens": 11901,
+  "input_tokens": 202,
+  "output_tokens": 0,
+  "tokens": {
+    "total": 11901,
+    "input": 202,
+    "output": 0
+  },
+  "judge_score": 2.0,
+  "correctness": 2.0
+}

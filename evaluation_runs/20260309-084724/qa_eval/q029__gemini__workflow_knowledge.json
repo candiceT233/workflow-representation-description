@@ -1,0 +1,23 @@
+{
+  "timestamp": "2026-03-09T10:03:01.338459",
+  "qid": "q029",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 4: INPUT FILES, OUTPUT FILES, AND DATA FORMATS",
+  "question": "What are the final output files produced by the workflow?",
+  "reference_answer": "The workflow produces two final outputs: (1) overlap metrics from the \"Mutations_Overlap\" task, recording shared mutation frequencies between pairs of individuals categorized by population and chromosome; and (2) a null distribution from the \"Frequency\" task, representing the baseline rate of random variant sharing used for statistical comparison.",
+  "agent": "gemini",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "The final output files produced by the workflow are:\n\n*   `data:chr<C>-<POP>.tar.gz` (from `mutation_overlap` task)\n\nThe context does not explicitly list the output files for the `frequency` task.",
+  "duration_s": 31.3,
+  "total_tokens": 12039,
+  "input_tokens": 1017,
+  "output_tokens": 0,
+  "tokens": {
+    "total": 12039,
+    "input": 1017,
+    "output": 0
+  },
+  "judge_score": 3.0,
+  "correctness": 3.0
+}

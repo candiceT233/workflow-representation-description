@@ -1,0 +1,23 @@
+{
+  "timestamp": "2026-03-09T10:55:34.922350",
+  "qid": "q049",
+  "source_file": "1000genome-workflow-knowledge-eval-2.txt",
+  "section": "SECTION 3: REPOSITORY USAGE AND SYSTEM MECHANICS",
+  "question": "What was the sample count and primary technology utilized during Phase 1?",
+  "reference_answer": "Phase 1 integrated calls for 1,092 samples. It used a mixed technology approach that included Illumina, SOLiD, and 454 platforms to produce integrated bi-allelic SNPs and INDELs.",
+  "agent": "gemini",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "The provided context does not contain enough information to answer the question regarding the sample count and primary technology utilized during Phase 1.",
+  "duration_s": 32.03,
+  "total_tokens": 25092,
+  "input_tokens": 840,
+  "output_tokens": 0,
+  "tokens": {
+    "total": 25092,
+    "input": 840,
+    "output": 0
+  },
+  "judge_score": 1.0,
+  "correctness": 1.0
+}

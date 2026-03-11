@@ -1,0 +1,23 @@
+{
+  "timestamp": "2026-03-09T10:42:46.062926",
+  "qid": "q044",
+  "source_file": "1000genome-workflow-knowledge-eval-2.txt",
+  "section": "SECTION 3: REPOSITORY USAGE AND SYSTEM MECHANICS",
+  "question": "Where is the source code and implementation for this bioinformatics workflow hosted?",
+  "reference_answer": "The workflow implementation is hosted on GitHub under the repository `pegasus-isi/1000genome-workflow`.",
+  "agent": "gemini",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "The source code and configuration files for the 1000 Genomes workflow are found in the workflow repository, primarily the Pegasus DAG generator (`daxgen.py`) and the individual task scripts.",
+  "duration_s": 28.76,
+  "total_tokens": 11859,
+  "input_tokens": 198,
+  "output_tokens": 0,
+  "tokens": {
+    "total": 11859,
+    "input": 198,
+    "output": 0
+  },
+  "judge_score": 3.0,
+  "correctness": 3.0
+}

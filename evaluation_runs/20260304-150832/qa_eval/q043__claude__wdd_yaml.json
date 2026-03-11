@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-04T15:43:51.983783",
+  "qid": "q043",
+  "source_file": "1000genome-workflow-knowledge-eval-2.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "What specific data fields does the \"Sifting\" task record for the variants it filters?",
+  "reference_answer": "The \"Sifting\" task specifically records the variants' rs numbers and gene IDs.",
+  "agent": "claude",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "Based on the WDD, the **Sifting** task (`task:sifting`) records **SIFT scores and SNP variant IDs** for the filtered variants.\n\nFrom the task description:\n> \"Records the scores and SNP variant IDs in a file per chromosome.\"\n\nThe output is written to `data:sifted_scores_txt` — a text file containing only SNPs that have SIFT scores (variants without SIFT scores are excluded).",
+  "duration_s": 9.28,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 2.0,
+  "correctness": 2.0
+}

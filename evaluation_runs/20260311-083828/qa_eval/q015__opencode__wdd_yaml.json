@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T08:51:49.026974",
+  "qid": "q015",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "What specific data fields does the \"Sifting\" task record when filtering variants?",
+  "reference_answer": "The \"Sifting\" task specifically filters for variants with SIFT scores and records their rs numbers, ENSEMBL GEN IDs, and HGNC IDs.",
+  "agent": "opencode",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "{\"type\":\"step_start\",\"timestamp\":1773237115512,\"sessionID\":\"ses_322d4f662ffeV7r3bijKd8T6AW\",\"part\":{\"id\":\"prt_cdd2b1a6b0018eapdP49CgRKDs\",\"sessionID\":\"ses_322d4f662ffeV7r3bijKd8T6AW\",\"messageID\":\"msg_cdd2b0a52001GO76PzWpcCD4Hf\",\"type\":\"step-start\",\"snapshot\":\"f92032171b2d3c055aff0564f693f3a094e408b7\"}}\n{\"type\":\"text\",\"timestamp\":1773237123443,\"sessionID\":\"ses_322d4f662ffeV7r3bijKd8T6AW\",\"part\":{\"id\":\"prt_cdd2b3065001r56354i63BYxGD\",\"sessionID\":\"ses_322d4f662ffeV7r3bijKd8T6AW\",\"messageID\":\"msg_cdd2b0a52001GO76PzWpcCD4Hf\",\"type\":\"text\",\"text\":\"The Sifting task records the following data fields for each filtered variant:\\n\\n1. **Line number**\\n2. **rs number** (variant identifier)\\n3. **ENSG gene ID** (Ensembl gene identifier)\\n4. **SIFT score**\\n5. **Phenotype** (deleterious or tolerated)\\n\\nThis is documented in both the task description (task:sifting) and the data object description (data:sifted_output), which states: \\\"Each line has: line number, rs number, ENSG gene ID, SIFT score, and phenotype (deleterious/tolerated).\\\"\",\"time\":{\"start\":1773237123438,\"end\":1773237123438}}}\n{\"type\":\"step_finish\",\"timestamp\":1773237123661,\"sessionID\":\"ses_322d4f662ffeV7r3bijKd8T6AW\",\"part\":{\"id\":\"prt_cdd2b3996001n3J4a2hI6YV5uA\",\"sessionID\":\"ses_322d4f662ffeV7r3bijKd8T6AW\",\"messageID\":\"msg_cdd2b0a52001GO76PzWpcCD4Hf\",\"type\":\"step-finish\",\"reason\":\"stop\",\"snapshot\":\"f92032171b2d3c055aff0564f693f3a094e408b7\",\"cost\":0,\"tokens\":{\"total\":18415,\"input\":78,\"output\":423,\"reasoning\":0,\"cache\":{\"read\":510,\"write\":17404}}}}",
+  "duration_s": 14.87,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 3.0,
+  "correctness": 3.0
+}

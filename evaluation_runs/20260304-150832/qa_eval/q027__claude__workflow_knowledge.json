@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-04T15:29:59.318044",
+  "qid": "q027",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 4: INPUT FILES, OUTPUT FILES, AND DATA FORMATS",
+  "question": "What does the \"Individuals_Merge\" task produce, and what tasks consume it?",
+  "reference_answer": "\"Individuals_Merge\" produces a single merged mutations file per chromosome, consolidating all parallel chunk outputs. This merged file is consumed by both the \"Mutations_Overlap\" task and the \"Frequency\" task.",
+  "agent": "claude",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "Based on the workflow knowledge provided:\n\nThe **`individuals_merge`** task produces **`data:merged_results`** — a single, aggregated dataset containing the results from all individuals.\n\nThis output is consumed by two tasks:\n- **`frequency`** — calculates allele frequencies from the merged results\n- **`mutation_overlap`** — identifies overlapping mutations from the merged results\n\nBoth consume `data:merged_results` via a `1-to-1` pattern, representing a fan-out from the merge step.",
+  "duration_s": 6.51,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 5.0,
+  "correctness": 5.0
+}

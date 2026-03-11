@@ -1,0 +1,23 @@
+{
+  "timestamp": "2026-03-09T09:47:52.331722",
+  "qid": "q025",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 4: INPUT FILES, OUTPUT FILES, AND DATA FORMATS",
+  "question": "What setup must be done before the workflow can process any input data, and which script handles it?",
+  "reference_answer": "The prepare_input.sh script must be run first. It unzips the included data and sets up the local environment so that the workflow has the necessary files in place to begin execution.",
+  "agent": "gemini",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "The provided context states that the primary stages and tasks of the workflow are defined in the `daxgen.py` script. However, it does not explicitly detail what setup must be done before the workflow can process any input data.",
+  "duration_s": 30.1,
+  "total_tokens": 12094,
+  "input_tokens": 1025,
+  "output_tokens": 0,
+  "tokens": {
+    "total": 12094,
+    "input": 1025,
+    "output": 0
+  },
+  "judge_score": 1.0,
+  "correctness": 1.0
+}

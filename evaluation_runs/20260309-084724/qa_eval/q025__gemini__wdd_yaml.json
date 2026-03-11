@@ -1,0 +1,23 @@
+{
+  "timestamp": "2026-03-09T09:48:52.488213",
+  "qid": "q025",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 4: INPUT FILES, OUTPUT FILES, AND DATA FORMATS",
+  "question": "What setup must be done before the workflow can process any input data, and which script handles it?",
+  "reference_answer": "The prepare_input.sh script must be run first. It unzips the included data and sets up the local environment so that the workflow has the necessary files in place to begin execution.",
+  "agent": "gemini",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "Before the workflow can process any input data, the following input files must be available: `raw_chromosome_vcf_segment` (raw VCF data), `annotated_chromosome_vcf` (annotated VCF data), `columns_file`, and `population_file`. The configuration related to segmenting VCF files and selecting population files is handled by `daxgen.py` and `ares_1kgenome_parallel.sbatch`.",
+  "duration_s": 36.58,
+  "total_tokens": 26629,
+  "input_tokens": 845,
+  "output_tokens": 0,
+  "tokens": {
+    "total": 26629,
+    "input": 845,
+    "output": 0
+  },
+  "judge_score": null,
+  "correctness": null
+}

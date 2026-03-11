@@ -1,0 +1,23 @@
+{
+  "timestamp": "2026-03-09T10:20:57.143957",
+  "qid": "q036",
+  "source_file": "1000genome-workflow-knowledge-eval-2.txt",
+  "section": "SECTION 1: SCIENTIFIC PURPOSE AND BIOLOGICAL SEMANTICS",
+  "question": "What biological function does the \"Sifting\" task evaluate, and what tool does it use?",
+  "reference_answer": "The Sifting task adds a functional annotation layer to the genomic data by utilizing the Variant Effect Predictor (VEP) to compute SIFT scores. SIFT (Sorts Intolerant From Tolerant) is a sequence homology-based tool that predicts whether an amino acid substitution will impact protein function.",
+  "agent": "gemini",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "The \"Sifting\" task evaluates **SIFT scores**, which indicate whether mutations are 'deleterious' or 'tolerated', and extracts associated phenotypes. It uses **grep** for efficient filtering.",
+  "duration_s": 32.74,
+  "total_tokens": 25127,
+  "input_tokens": 844,
+  "output_tokens": 0,
+  "tokens": {
+    "total": 25127,
+    "input": 844,
+    "output": 0
+  },
+  "judge_score": 3.0,
+  "correctness": 3.0
+}

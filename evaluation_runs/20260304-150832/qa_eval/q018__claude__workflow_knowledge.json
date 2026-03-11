@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-04T15:22:45.883521",
+  "qid": "q018",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 3: REPOSITORY USAGE AND SYSTEM MECHANICS",
+  "question": "When evaluating the workflow components, how are the logical file names defined in the workflow mapped to actual data locations?",
+  "reference_answer": "The workflow uses a Replica Catalog (RC) to map the logical file names (LFNs) used in the abstract workflow to their physical file locations (PFNs) on the storage systems.",
+  "agent": "claude",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "The provided workflow knowledge context does not contain enough information to answer this question.\n\nThe context explicitly notes that \"The analysis was performed **without access to file contents**\" and that all findings are assumptions based on file names and directory structure. No information about how logical file names map to actual data locations (e.g., path conventions, environment variables, configuration files, or runtime parameters) is available in this context.",
+  "duration_s": 8.08,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 1.0,
+  "correctness": 1.0
+}

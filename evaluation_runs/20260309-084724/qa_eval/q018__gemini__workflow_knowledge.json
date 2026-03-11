@@ -1,0 +1,23 @@
+{
+  "timestamp": "2026-03-09T09:29:29.340999",
+  "qid": "q018",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 3: REPOSITORY USAGE AND SYSTEM MECHANICS",
+  "question": "When evaluating the workflow components, how are the logical file names defined in the workflow mapped to actual data locations?",
+  "reference_answer": "The workflow uses a Replica Catalog (RC) to map the logical file names (LFNs) used in the abstract workflow to their physical file locations (PFNs) on the storage systems.",
+  "agent": "gemini",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "The provided context describes the logical file names (e.g., `data:ALL.chr<C>.vcf`, `data:columns.txt`) used as inputs and outputs for each task but does not contain information on how these logical file names are mapped to actual data locations.",
+  "duration_s": 28.45,
+  "total_tokens": 11930,
+  "input_tokens": 1026,
+  "output_tokens": 0,
+  "tokens": {
+    "total": 11930,
+    "input": 1026,
+    "output": 0
+  },
+  "judge_score": 2.0,
+  "correctness": 2.0
+}

@@ -1,0 +1,23 @@
+{
+  "timestamp": "2026-03-09T10:10:38.663130",
+  "qid": "q032",
+  "source_file": "1000genome-workflow-knowledge-eval-2.txt",
+  "section": "SECTION 1: SCIENTIFIC PURPOSE AND BIOLOGICAL SEMANTICS",
+  "question": "What were the sequencing characteristics and goals of the project's pilot phase?",
+  "reference_answer": "The pilot phase focused on assessing data-sharing strategies to establish the feasibility of identifying variants with frequencies as low as 1%. It achieved this through low-coverage whole-genome sequencing (2–4X) of 180 samples and high-coverage sequencing (20–60X) of two mother-father-child trios.",
+  "agent": "gemini",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "The provided context does not contain enough information to answer the question about the sequencing characteristics and goals of the project's pilot phase.",
+  "duration_s": 29.61,
+  "total_tokens": 11936,
+  "input_tokens": 1021,
+  "output_tokens": 0,
+  "tokens": {
+    "total": 11936,
+    "input": 1021,
+    "output": 0
+  },
+  "judge_score": 1.0,
+  "correctness": 1.0
+}

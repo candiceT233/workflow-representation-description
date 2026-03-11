@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T08:44:54.197978",
+  "qid": "q008",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "What are the five core task classes that make up the sequence of this workflow?",
+  "reference_answer": "The workflow consists of five core task classes: Individuals, Individuals_Merge, Populations, Sifting, Mutations_Overlap, and Frequency.",
+  "agent": "opencode",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "{\"type\":\"step_start\",\"timestamp\":1773236699455,\"sessionID\":\"ses_322db4ac0ffeEGxgo9QEvGRaNo\",\"part\":{\"id\":\"prt_cdd24c13200160M0GUumnjtbbj\",\"sessionID\":\"ses_322db4ac0ffeEGxgo9QEvGRaNo\",\"messageID\":\"msg_cdd24b5fe0016Ln9tQHP0qoRb9\",\"type\":\"step-start\",\"snapshot\":\"eb86bc282f33eac08c5a4d5b7e0fd431e7f7fb4a\"}}\n{\"type\":\"text\",\"timestamp\":1773236704471,\"sessionID\":\"ses_322db4ac0ffeEGxgo9QEvGRaNo\",\"part\":{\"id\":\"prt_cdd24d271001TAC09UKW02fyT4\",\"sessionID\":\"ses_322db4ac0ffeEGxgo9QEvGRaNo\",\"messageID\":\"msg_cdd24b5fe0016Ln9tQHP0qoRb9\",\"type\":\"text\",\"text\":\"The five core task classes in the 1000 Genomes workflow are:\\n\\n1. **individuals** - Individuals Extraction\\n2. **individuals_merge** - Individuals Merge\\n3. **sifting** - Sifting\\n4. **mutation_overlap** - Mutation Overlap Analysis\\n5. **frequency** - Frequency Analysis\",\"time\":{\"start\":1773236704465,\"end\":1773236704465}}}\n{\"type\":\"step_finish\",\"timestamp\":1773236704756,\"sessionID\":\"ses_322db4ac0ffeEGxgo9QEvGRaNo\",\"part\":{\"id\":\"prt_cdd24d4ff0016oBiI7GsU1DySl\",\"sessionID\":\"ses_322db4ac0ffeEGxgo9QEvGRaNo\",\"messageID\":\"msg_cdd24b5fe0016Ln9tQHP0qoRb9\",\"type\":\"step-finish\",\"reason\":\"stop\",\"snapshot\":\"eb86bc282f33eac08c5a4d5b7e0fd431e7f7fb4a\",\"cost\":0,\"tokens\":{\"total\":18292,\"input\":78,\"output\":300,\"reasoning\":0,\"cache\":{\"read\":11282,\"write\":6632}}}}",
+  "duration_s": 10.81,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 3.0,
+  "correctness": 3.0
+}

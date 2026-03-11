@@ -1,0 +1,254 @@
+{
+  "run_started_at": "2026-03-10T22:36:31.086073+00:00",
+  "run_finished_at": "2026-03-10T22:57:51.086836+00:00",
+  "trials": 3,
+  "random_seed": 20260223,
+  "records": [
+    {
+      "task_id": "trial3__opencode__wdd__1000genome",
+      "trial": 3,
+      "agent": "opencode",
+      "mode": "wdd",
+      "workflow": "1000genome",
+      "status": "ok",
+      "started_at": "2026-03-10T22:36:31.102074+00:00",
+      "finished_at": "2026-03-10T22:42:24.250085+00:00",
+      "duration_s": 353.148,
+      "exit_code": 0,
+      "error": null,
+      "prompt_path": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260310-173631/trial3__opencode__wdd__1000genome.prompt.txt",
+      "stdout_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260310-173631/trial3__opencode__wdd__1000genome.stdout.log",
+      "stderr_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260310-173631/trial3__opencode__wdd__1000genome.stderr.log",
+      "output_path": "/home/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial3.yaml",
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "total_tokens": null
+      },
+      "validation": {
+        "valid": true,
+        "score": 1.0,
+        "issues": []
+      },
+      "output_metrics": {
+        "lines": 651,
+        "words": 2590,
+        "chars": 28678,
+        "exists": true,
+        "bytes": 28678
+      },
+      "model_control": {
+        "model": "opencode/minimax-m2.5-free",
+        "temperature": "<SET_TEMP>",
+        "seed": "<SET_SEED>",
+        "max_tokens": "<SET_MAX_TOKENS>",
+        "cmd_template": "/home/mtang11/.opencode/bin/opencode run -m opencode/minimax-m2.5-free {prompt}"
+      }
+    },
+    {
+      "task_id": "trial2__opencode__knowledge__1000genome",
+      "trial": 2,
+      "agent": "opencode",
+      "mode": "knowledge",
+      "workflow": "1000genome",
+      "status": "ok",
+      "started_at": "2026-03-10T22:42:24.463191+00:00",
+      "finished_at": "2026-03-10T22:45:05.457850+00:00",
+      "duration_s": 160.995,
+      "exit_code": 0,
+      "error": null,
+      "prompt_path": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260310-173631/trial2__opencode__knowledge__1000genome.prompt.txt",
+      "stdout_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260310-173631/trial2__opencode__knowledge__1000genome.stdout.log",
+      "stderr_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260310-173631/trial2__opencode__knowledge__1000genome.stderr.log",
+      "output_path": "/home/mtang11/scripts/workflow-representation-description/workflow_knowledge/1000genome-knowledge-opencode-trial2.md",
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "total_tokens": null
+      },
+      "validation": {
+        "valid": true,
+        "score": 1.0,
+        "issues": []
+      },
+      "output_metrics": {
+        "lines": 267,
+        "words": 1434,
+        "chars": 11382,
+        "exists": true,
+        "bytes": 11391
+      },
+      "model_control": {
+        "model": "opencode/minimax-m2.5-free",
+        "temperature": "<SET_TEMP>",
+        "seed": "<SET_SEED>",
+        "max_tokens": "<SET_MAX_TOKENS>",
+        "cmd_template": "/home/mtang11/.opencode/bin/opencode run -m opencode/minimax-m2.5-free {prompt}"
+      }
+    },
+    {
+      "task_id": "trial3__opencode__knowledge__1000genome",
+      "trial": 3,
+      "agent": "opencode",
+      "mode": "knowledge",
+      "workflow": "1000genome",
+      "status": "ok",
+      "started_at": "2026-03-10T22:45:05.465327+00:00",
+      "finished_at": "2026-03-10T22:47:03.432073+00:00",
+      "duration_s": 117.967,
+      "exit_code": 0,
+      "error": null,
+      "prompt_path": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260310-173631/trial3__opencode__knowledge__1000genome.prompt.txt",
+      "stdout_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260310-173631/trial3__opencode__knowledge__1000genome.stdout.log",
+      "stderr_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260310-173631/trial3__opencode__knowledge__1000genome.stderr.log",
+      "output_path": "/home/mtang11/scripts/workflow-representation-description/workflow_knowledge/1000genome-knowledge-opencode-trial3.md",
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "total_tokens": null
+      },
+      "validation": {
+        "valid": true,
+        "score": 1.0,
+        "issues": []
+      },
+      "output_metrics": {
+        "lines": 164,
+        "words": 1009,
+        "chars": 8064,
+        "exists": true,
+        "bytes": 8068
+      },
+      "model_control": {
+        "model": "opencode/minimax-m2.5-free",
+        "temperature": "<SET_TEMP>",
+        "seed": "<SET_SEED>",
+        "max_tokens": "<SET_MAX_TOKENS>",
+        "cmd_template": "/home/mtang11/.opencode/bin/opencode run -m opencode/minimax-m2.5-free {prompt}"
+      }
+    },
+    {
+      "task_id": "trial2__opencode__wdd__1000genome",
+      "trial": 2,
+      "agent": "opencode",
+      "mode": "wdd",
+      "workflow": "1000genome",
+      "status": "ok",
+      "started_at": "2026-03-10T22:47:03.439111+00:00",
+      "finished_at": "2026-03-10T22:50:33.730744+00:00",
+      "duration_s": 210.292,
+      "exit_code": 0,
+      "error": null,
+      "prompt_path": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260310-173631/trial2__opencode__wdd__1000genome.prompt.txt",
+      "stdout_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260310-173631/trial2__opencode__wdd__1000genome.stdout.log",
+      "stderr_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260310-173631/trial2__opencode__wdd__1000genome.stderr.log",
+      "output_path": "/home/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial2.yaml",
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "total_tokens": null
+      },
+      "validation": {
+        "valid": true,
+        "score": 1.0,
+        "issues": []
+      },
+      "output_metrics": {
+        "lines": 769,
+        "words": 2831,
+        "chars": 29948,
+        "exists": true,
+        "bytes": 29948
+      },
+      "model_control": {
+        "model": "opencode/minimax-m2.5-free",
+        "temperature": "<SET_TEMP>",
+        "seed": "<SET_SEED>",
+        "max_tokens": "<SET_MAX_TOKENS>",
+        "cmd_template": "/home/mtang11/.opencode/bin/opencode run -m opencode/minimax-m2.5-free {prompt}"
+      }
+    },
+    {
+      "task_id": "trial1__opencode__knowledge__1000genome",
+      "trial": 1,
+      "agent": "opencode",
+      "mode": "knowledge",
+      "workflow": "1000genome",
+      "status": "ok",
+      "started_at": "2026-03-10T22:50:33.925589+00:00",
+      "finished_at": "2026-03-10T22:52:12.191895+00:00",
+      "duration_s": 98.266,
+      "exit_code": 0,
+      "error": null,
+      "prompt_path": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260310-173631/trial1__opencode__knowledge__1000genome.prompt.txt",
+      "stdout_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260310-173631/trial1__opencode__knowledge__1000genome.stdout.log",
+      "stderr_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260310-173631/trial1__opencode__knowledge__1000genome.stderr.log",
+      "output_path": "/home/mtang11/scripts/workflow-representation-description/workflow_knowledge/1000genome-knowledge-opencode-trial1.md",
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "total_tokens": null
+      },
+      "validation": {
+        "valid": true,
+        "score": 1.0,
+        "issues": []
+      },
+      "output_metrics": {
+        "lines": 176,
+        "words": 1219,
+        "chars": 9545,
+        "exists": true,
+        "bytes": 9921
+      },
+      "model_control": {
+        "model": "opencode/minimax-m2.5-free",
+        "temperature": "<SET_TEMP>",
+        "seed": "<SET_SEED>",
+        "max_tokens": "<SET_MAX_TOKENS>",
+        "cmd_template": "/home/mtang11/.opencode/bin/opencode run -m opencode/minimax-m2.5-free {prompt}"
+      }
+    },
+    {
+      "task_id": "trial1__opencode__wdd__1000genome",
+      "trial": 1,
+      "agent": "opencode",
+      "mode": "wdd",
+      "workflow": "1000genome",
+      "status": "ok",
+      "started_at": "2026-03-10T22:52:12.200264+00:00",
+      "finished_at": "2026-03-10T22:57:50.885216+00:00",
+      "duration_s": 338.685,
+      "exit_code": 0,
+      "error": null,
+      "prompt_path": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260310-173631/trial1__opencode__wdd__1000genome.prompt.txt",
+      "stdout_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260310-173631/trial1__opencode__wdd__1000genome.stdout.log",
+      "stderr_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260310-173631/trial1__opencode__wdd__1000genome.stderr.log",
+      "output_path": "/home/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial1.yaml",
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "total_tokens": null
+      },
+      "validation": {
+        "valid": true,
+        "score": 1.0,
+        "issues": []
+      },
+      "output_metrics": {
+        "lines": 723,
+        "words": 2782,
+        "chars": 29339,
+        "exists": true,
+        "bytes": 29339
+      },
+      "model_control": {
+        "model": "opencode/minimax-m2.5-free",
+        "temperature": "<SET_TEMP>",
+        "seed": "<SET_SEED>",
+        "max_tokens": "<SET_MAX_TOKENS>",
+        "cmd_template": "/home/mtang11/.opencode/bin/opencode run -m opencode/minimax-m2.5-free {prompt}"
+      }
+    }
+  ]
+}

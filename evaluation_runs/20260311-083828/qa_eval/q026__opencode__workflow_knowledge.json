@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T09:02:36.594919",
+  "qid": "q026",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 4: INPUT FILES, OUTPUT FILES, AND DATA FORMATS",
+  "question": "What intermediate data format is passed between the \"Individuals\" tasks and the \"Individuals_Merge\" task?",
+  "reference_answer": "The \"Individuals\" tasks produce chunked SNP lists — partial mutation files, one per VCF chunk, each identifying which individuals possess mutations on both alleles for a set of rs numbers. These chunks are the direct input to \"Individuals_Merge\".",
+  "agent": "opencode",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "{\"type\":\"step_start\",\"timestamp\":1773237762471,\"sessionID\":\"ses_322cb14dbffeub5o9K4LeAqHrn\",\"part\":{\"id\":\"prt_cdd34f999001ecMQgwwS6iUCy2\",\"sessionID\":\"ses_322cb14dbffeub5o9K4LeAqHrn\",\"messageID\":\"msg_cdd34ebec001khTbR3t8PivpIG\",\"type\":\"step-start\",\"snapshot\":\"15fe1443318304ef73f20c14dce1b679223859fe\"}}\n{\"type\":\"text\",\"timestamp\":1773237766532,\"sessionID\":\"ses_322cb14dbffeub5o9K4LeAqHrn\",\"part\":{\"id\":\"prt_cdd35061f001yjkSzS27JRGH4t\",\"sessionID\":\"ses_322cb14dbffeub5o9K4LeAqHrn\",\"messageID\":\"msg_cdd34ebec001khTbR3t8PivpIG\",\"type\":\"text\",\"text\":\"The intermediate data format is **tar.gz files** (specifically `chr{X}n-{counter}-{stop}.tar.gz` - per-chunk individual mutation data files that are then merged by the individuals_merge task).\",\"time\":{\"start\":1773237766527,\"end\":1773237766527}}}\n{\"type\":\"step_finish\",\"timestamp\":1773237766724,\"sessionID\":\"ses_322cb14dbffeub5o9K4LeAqHrn\",\"part\":{\"id\":\"prt_cdd3509a5001vf3llZ5tuCv74Y\",\"sessionID\":\"ses_322cb14dbffeub5o9K4LeAqHrn\",\"messageID\":\"msg_cdd34ebec001khTbR3t8PivpIG\",\"type\":\"step-finish\",\"reason\":\"stop\",\"snapshot\":\"15fe1443318304ef73f20c14dce1b679223859fe\",\"cost\":0,\"tokens\":{\"total\":13780,\"input\":78,\"output\":235,\"reasoning\":0,\"cache\":{\"read\":11282,\"write\":2185}}}}",
+  "duration_s": 10.38,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 3.0,
+  "correctness": 3.0
+}

@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-04T15:49:46.158051",
+  "qid": "q050",
+  "source_file": "1000genome-workflow-knowledge-eval-3.txt",
+  "section": "SECTION 1: SCIENTIFIC PURPOSE AND BIOLOGICAL SEMANTICS",
+  "question": "What is a primary objective of the contemporary genomic era as demonstrated by this project?",
+  "reference_answer": "The characterization of human genetic variation stands as a primary objective in the contemporary genomic era.",
+  "agent": "claude",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "Based on the `workflow_description` in the metadata:\n\nThe primary objective demonstrated by this project is **identifying mutational overlaps using data from the 1000 Genomes Project in order to provide a null distribution for rigorous statistical evaluation of potential disease-related mutations**.\n\nThe project does this by fetching, parsing, and analyzing genomic data — cross-matching which individuals carry which mutations with each mutation's SIFT score (a measure of how damaging the mutation is), then performing analyses including plotting.",
+  "duration_s": 7.8,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 2.0,
+  "correctness": 2.0
+}

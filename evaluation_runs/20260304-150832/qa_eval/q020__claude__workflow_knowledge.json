@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-04T15:24:27.568347",
+  "qid": "q020",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 3: REPOSITORY USAGE AND SYSTEM MECHANICS",
+  "question": "What mechanism is used by the workflow engine to maintain strict scientific provenance for every executed task script?",
+  "reference_answer": "Every job is wrapped in a \"kickstart\" executable. This wrapper captures comprehensive runtime information, including the exact software versions used, hardware metrics, and the specific command-line arguments passed to the scripts.",
+  "agent": "claude",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "The provided workflow knowledge does not contain information about provenance tracking mechanisms used by the workflow engine. The context is limited to static analysis of file names and directory structure, and explicitly notes it is based on assumptions without access to file contents. No provenance-related details are mentioned.",
+  "duration_s": 6.31,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 1.0,
+  "correctness": 1.0
+}

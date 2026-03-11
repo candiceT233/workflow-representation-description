@@ -1,0 +1,23 @@
+{
+  "timestamp": "2026-03-09T11:40:00.818820",
+  "qid": "q066",
+  "source_file": "1000genome-workflow-knowledge-eval-3.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "What is the primary function of the \"Individuals\" task at the very start of the pipeline?",
+  "reference_answer": "The \"Individuals\" task is responsible for fetching and parsing Phase 3 VCF data by chromosome to identify SNPs and determine which individuals possess mutations on both alleles.",
+  "agent": "gemini",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "The primary function of the \"individuals\" task is to read a large VCF file for a single chromosome, split the processing into parallel jobs, filter variants based on allele frequency, and create a set of per-individual mutation files within a compressed archive.",
+  "duration_s": 32.05,
+  "total_tokens": 11926,
+  "input_tokens": 203,
+  "output_tokens": 0,
+  "tokens": {
+    "total": 11926,
+    "input": 203,
+    "output": 0
+  },
+  "judge_score": 3.0,
+  "correctness": 3.0
+}

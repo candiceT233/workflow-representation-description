@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T08:58:58.304205",
+  "qid": "q023",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 4: INPUT FILES, OUTPUT FILES, AND DATA FORMATS",
+  "question": "What secondary input file does the workflow use to provide population-level demographic context?",
+  "reference_answer": "The \"Populations\" task downloads demographic metadata for the 26 global populations from the IGSR. This metadata maps individual sample IDs to their population and super-population categories (AFR, AMR, EAS, EUR, SAS, GBR).",
+  "agent": "opencode",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "{\"type\":\"step_start\",\"timestamp\":1773237543327,\"sessionID\":\"ses_322ce698effe1WKkkHvkuzWkDg\",\"part\":{\"id\":\"prt_cdd31a192001bEeeiT9i8SfaEz\",\"sessionID\":\"ses_322ce698effe1WKkkHvkuzWkDg\",\"messageID\":\"msg_cdd319718001Fjgly4LBh3MB7o\",\"type\":\"step-start\",\"snapshot\":\"e6ecbed316c6490575df472c78c9dd26de67d492\"}}\n{\"type\":\"text\",\"timestamp\":1773237547091,\"sessionID\":\"ses_322ce698effe1WKkkHvkuzWkDg\",\"part\":{\"id\":\"prt_cdd31abb40012yob2XuB2ljHXJ\",\"sessionID\":\"ses_322ce698effe1WKkkHvkuzWkDg\",\"messageID\":\"msg_cdd319718001Fjgly4LBh3MB7o\",\"type\":\"text\",\"text\":\"The workflow uses **population membership files** (AFR, AMR, EAS, EUR, GBR, SAS, ALL) located in `data/populations/` to provide population-level demographic context. These files are static inputs required for both the `mutation_overlap` and `frequency` analysis tasks.\",\"time\":{\"start\":1773237547086,\"end\":1773237547086}}}\n{\"type\":\"step_finish\",\"timestamp\":1773237547292,\"sessionID\":\"ses_322ce698effe1WKkkHvkuzWkDg\",\"part\":{\"id\":\"prt_cdd31b0750012ZS65gg3xDXQgu\",\"sessionID\":\"ses_322ce698effe1WKkkHvkuzWkDg\",\"messageID\":\"msg_cdd319718001Fjgly4LBh3MB7o\",\"type\":\"step-finish\",\"reason\":\"stop\",\"snapshot\":\"e6ecbed316c6490575df472c78c9dd26de67d492\",\"cost\":0,\"tokens\":{\"total\":13728,\"input\":78,\"output\":189,\"reasoning\":0,\"cache\":{\"read\":11282,\"write\":2179}}}}",
+  "duration_s": 9.25,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 2.0,
+  "correctness": 2.0
+}

@@ -1,0 +1,23 @@
+{
+  "timestamp": "2026-03-09T11:57:59.476125",
+  "qid": "q074",
+  "source_file": "1000genome-workflow-knowledge-eval-3.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "How is the statistical baseline established in the \"Frequency\" task to help distinguish common variations from disease-associated mutations?",
+  "reference_answer": "The \"Frequency\" task establishes a null distribution by selecting random individuals and analyzing variants without regard for their functional SIFT scores.",
+  "agent": "gemini",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "The \"Frequency\" task establishes a statistical baseline by performing multiple simulation runs (1000 by default). In each run, it randomly selects individuals and counts all SNP variants, specifically **without considering SIFT scores**. This process calculates mutation overlaps for these random groups and generates histograms of these overlaps, effectively creating a null distribution of common variations.",
+  "duration_s": 29.26,
+  "total_tokens": 25221,
+  "input_tokens": 848,
+  "output_tokens": 0,
+  "tokens": {
+    "total": 25221,
+    "input": 848,
+    "output": 0
+  },
+  "judge_score": 5.0,
+  "correctness": 5.0
+}

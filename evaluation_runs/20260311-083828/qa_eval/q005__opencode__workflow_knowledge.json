@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T08:42:01.556290",
+  "qid": "q005",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 1: SCIENTIFIC PURPOSE AND BIOLOGICAL SEMANTICS",
+  "question": "How is the genotype dosage mathematically calculated to represent confidence in a genotype call?",
+  "reference_answer": "The dosage, which represents the predicted number of non-reference alleles, is calculated using the relationship $Dosage = Pr(Het|Data) + 2 \\times Pr(Alt|Data)$. This value is derived from imputation engines and complements standard genotype likelihoods.",
+  "agent": "opencode",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "{\"type\":\"step_start\",\"timestamp\":1773236525604,\"sessionID\":\"ses_322dded23ffedgIJGS5scMIDGh\",\"part\":{\"id\":\"prt_cdd221a17001e7gOLkLTLo2F6d\",\"sessionID\":\"ses_322dded23ffedgIJGS5scMIDGh\",\"messageID\":\"msg_cdd221390001oODDpV2OZRXMyM\",\"type\":\"step-start\",\"snapshot\":\"8fd898f27ee4a7f53493bd2cec5954a21e061bd6\"}}\n{\"type\":\"text\",\"timestamp\":1773236530487,\"sessionID\":\"ses_322dded23ffedgIJGS5scMIDGh\",\"part\":{\"id\":\"prt_cdd222aa90013LsYWdCEXA6qdG\",\"sessionID\":\"ses_322dded23ffedgIJGS5scMIDGh\",\"messageID\":\"msg_cdd221390001oODDpV2OZRXMyM\",\"type\":\"text\",\"text\":\"The context above does not contain enough information to answer this question. While the workflow mentions extracting SNP data for individuals and processing VCF files, there is no description of genotype dosage calculation or confidence metrics in the provided workflow_knowledge.\",\"time\":{\"start\":1773236530480,\"end\":1773236530480}}}\n{\"type\":\"step_finish\",\"timestamp\":1773236530688,\"sessionID\":\"ses_322dded23ffedgIJGS5scMIDGh\",\"part\":{\"id\":\"prt_cdd222d53001cpWxVpMuID7yLj\",\"sessionID\":\"ses_322dded23ffedgIJGS5scMIDGh\",\"messageID\":\"msg_cdd221390001oODDpV2OZRXMyM\",\"type\":\"step-finish\",\"reason\":\"stop\",\"snapshot\":\"8fd898f27ee4a7f53493bd2cec5954a21e061bd6\",\"cost\":0,\"tokens\":{\"total\":13833,\"input\":78,\"output\":294,\"reasoning\":0,\"cache\":{\"read\":11282,\"write\":2179}}}}",
+  "duration_s": 9.38,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 1.0,
+  "correctness": 1.0
+}

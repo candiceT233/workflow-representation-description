@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T09:13:02.992082",
+  "qid": "q037",
+  "source_file": "1000genome-workflow-knowledge-eval-2.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "What are the five core task classes that perform the workflow's sequential analysis?",
+  "reference_answer": "The workflow consists of five core task classes: Individuals, Individuals_Merge, Populations, Sifting, and Mutations_Overlap/Frequency.",
+  "agent": "opencode",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "{\"type\":\"step_start\",\"timestamp\":1773238387063,\"sessionID\":\"ses_322c185e4ffeMo3vplz93d5093\",\"part\":{\"id\":\"prt_cdd3e816a0015VPP4R4VVCJesg\",\"sessionID\":\"ses_322c185e4ffeMo3vplz93d5093\",\"messageID\":\"msg_cdd3e7ade001wqTsTlcfA431dU\",\"type\":\"step-start\",\"snapshot\":\"8c259a52779ef027f889c3997f46bc1a5fa18592\"}}\n{\"type\":\"text\",\"timestamp\":1773238392951,\"sessionID\":\"ses_322c185e4ffeMo3vplz93d5093\",\"part\":{\"id\":\"prt_cdd3e937b001vH8JdxXLAA4Qw6\",\"sessionID\":\"ses_322c185e4ffeMo3vplz93d5093\",\"messageID\":\"msg_cdd3e7ade001wqTsTlcfA431dU\",\"type\":\"text\",\"text\":\"Based on the wdd_yaml, the five core tasks that perform sequential analysis are:\\n\\n1. **task:individuals** - Individuals Extraction\\n2. **task:individuals_merge** - Individuals Merge\\n3. **task:sifting** - Sifting\\n4. **task:mutation_overlap** - Mutation Overlap Analysis\\n5. **task:frequency** - Frequency Analysis\\n\\nThese tasks execute sequentially across three stages: data_preparation (individuals, individuals_merge), sifting (sifting), and analysis (mutation_overlap, frequency).\",\"time\":{\"start\":1773238392946,\"end\":1773238392946}}}\n{\"type\":\"step_finish\",\"timestamp\":1773238393144,\"sessionID\":\"ses_322c185e4ffeMo3vplz93d5093\",\"part\":{\"id\":\"prt_cdd3e9891001dUZjApz0ysYbHL\",\"sessionID\":\"ses_322c185e4ffeMo3vplz93d5093\",\"messageID\":\"msg_cdd3e7ade001wqTsTlcfA431dU\",\"type\":\"step-finish\",\"reason\":\"stop\",\"snapshot\":\"8c259a52779ef027f889c3997f46bc1a5fa18592\",\"cost\":0,\"tokens\":{\"total\":18350,\"input\":78,\"output\":359,\"reasoning\":0,\"cache\":{\"read\":11282,\"write\":6631}}}}",
+  "duration_s": 10.4,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 3.0,
+  "correctness": 3.0
+}

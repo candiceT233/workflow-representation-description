@@ -1,0 +1,23 @@
+{
+  "timestamp": "2026-03-09T09:04:07.981404",
+  "qid": "q007",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 1: SCIENTIFIC PURPOSE AND BIOLOGICAL SEMANTICS",
+  "question": "What is the biological function of the \"SIFT\" scores computed during the workflow?",
+  "reference_answer": "SIFT stands for \"Sorts Intolerant From Tolerant,\" and it is a sequence homology-based tool that predicts whether an amino acid substitution will impact protein function.",
+  "agent": "gemini",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "The SIFT score indicates \"how bad\" a mutation is. It is used to evaluate potential disease-related mutations.",
+  "duration_s": 29.16,
+  "total_tokens": 24775,
+  "input_tokens": 843,
+  "output_tokens": 0,
+  "tokens": {
+    "total": 24775,
+    "input": 843,
+    "output": 0
+  },
+  "judge_score": 3.0,
+  "correctness": 3.0
+}

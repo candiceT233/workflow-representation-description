@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-04T15:51:00.446617",
+  "qid": "q051",
+  "source_file": "1000genome-workflow-knowledge-eval-3.txt",
+  "section": "SECTION 1: SCIENTIFIC PURPOSE AND BIOLOGICAL SEMANTICS",
+  "question": "How many individuals and distinct populations were successfully mapped by the 1000 Genomes Project?",
+  "reference_answer": "The project successfully mapped the genetic diversity of 2,504 individuals across 26 distinct global populations.",
+  "agent": "claude",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "Based on the `metadata.workflow_description` field:\n\n**2,504 individuals** across **26 distinct populations** were successfully mapped by the 1000 Genomes Project.",
+  "duration_s": 9.42,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 5.0,
+  "correctness": 5.0
+}

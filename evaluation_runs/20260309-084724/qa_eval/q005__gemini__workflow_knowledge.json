@@ -1,0 +1,23 @@
+{
+  "timestamp": "2026-03-09T08:58:26.715880",
+  "qid": "q005",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 1: SCIENTIFIC PURPOSE AND BIOLOGICAL SEMANTICS",
+  "question": "How is the genotype dosage mathematically calculated to represent confidence in a genotype call?",
+  "reference_answer": "The dosage, which represents the predicted number of non-reference alleles, is calculated using the relationship $Dosage = Pr(Het|Data) + 2 \\times Pr(Alt|Data)$. This value is derived from imputation engines and complements standard genotype likelihoods.",
+  "agent": "gemini",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "The provided context does not contain enough information to answer how genotype dosage is mathematically calculated to represent confidence in a genotype call.",
+  "duration_s": 28.45,
+  "total_tokens": 12081,
+  "input_tokens": 1021,
+  "output_tokens": 0,
+  "tokens": {
+    "total": 12081,
+    "input": 1021,
+    "output": 0
+  },
+  "judge_score": 1.0,
+  "correctness": 1.0
+}

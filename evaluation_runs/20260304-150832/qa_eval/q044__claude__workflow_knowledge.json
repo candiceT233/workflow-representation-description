@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-04T15:44:55.327095",
+  "qid": "q044",
+  "source_file": "1000genome-workflow-knowledge-eval-2.txt",
+  "section": "SECTION 3: REPOSITORY USAGE AND SYSTEM MECHANICS",
+  "question": "Where is the source code and implementation for this bioinformatics workflow hosted?",
+  "reference_answer": "The workflow implementation is hosted on GitHub under the repository `pegasus-isi/1000genome-workflow`.",
+  "agent": "claude",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "The provided context does not contain information about where the 1000 Genomes workflow source code is hosted. The report only describes file names and directory structure inferred from static analysis, without mentioning any repository URL, hosting platform, or institution.",
+  "duration_s": 11.57,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 1.0,
+  "correctness": 1.0
+}

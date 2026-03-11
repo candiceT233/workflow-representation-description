@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-04T15:15:04.413295",
+  "qid": "q009",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "What is the specific role of the \"Individuals\" task at the start of the pipeline?",
+  "reference_answer": "The \"Individuals\" task is the first and most intensive step, responsible for fetching and parsing Phase 3 VCF data by chromosome to identify SNPs and determine which individuals possess mutations on both alleles.",
+  "agent": "claude",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "Based on the provided workflow knowledge, the **Individuals** task (`task:individuals`) processes data for each individual in the cohort in a **parallelized scatter operation** — meaning the input data is distributed and processed separately per individual. It takes `data:input_data` (prepared by the prior `prepare_input` task) and produces `data:individual_results` (intermediate files, one per individual).\n\nThe context notes this corresponds to `bin/individuals.py` and is explicitly characterized as a scatter step at the start of a scatter-gather pattern.",
+  "duration_s": 8.55,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 2.0,
+  "correctness": 2.0
+}

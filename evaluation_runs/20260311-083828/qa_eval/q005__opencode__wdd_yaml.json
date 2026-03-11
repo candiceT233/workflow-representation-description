@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T08:42:19.261823",
+  "qid": "q005",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 1: SCIENTIFIC PURPOSE AND BIOLOGICAL SEMANTICS",
+  "question": "How is the genotype dosage mathematically calculated to represent confidence in a genotype call?",
+  "reference_answer": "The dosage, which represents the predicted number of non-reference alleles, is calculated using the relationship $Dosage = Pr(Het|Data) + 2 \\times Pr(Alt|Data)$. This value is derived from imputation engines and complements standard genotype likelihoods.",
+  "agent": "opencode",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "{\"type\":\"step_start\",\"timestamp\":1773236545876,\"sessionID\":\"ses_322dda83effeMG3O1iE5VVgOFF\",\"part\":{\"id\":\"prt_cdd226947001ACHX2IufAB4we0\",\"sessionID\":\"ses_322dda83effeMG3O1iE5VVgOFF\",\"messageID\":\"msg_cdd225877001KuaTv2XWFOwrIW\",\"type\":\"step-start\",\"snapshot\":\"439d76bcc67160751a473f805c318f8bd9063795\"}}\n{\"type\":\"text\",\"timestamp\":1773236552604,\"sessionID\":\"ses_322dda83effeMG3O1iE5VVgOFF\",\"part\":{\"id\":\"prt_cdd22807a001KDCtZgPAd3Ra4Y\",\"sessionID\":\"ses_322dda83effeMG3O1iE5VVgOFF\",\"messageID\":\"msg_cdd225877001KuaTv2XWFOwrIW\",\"type\":\"text\",\"text\":\"The context does not contain information about genotype dosage calculation. The wdd_yaml describes a workflow that processes VCF files to extract mutation data, compute SIFT scores, and measure mutation overlap between individuals, but it does not detail any mathematical formula for genotype dosage or confidence metrics.\",\"time\":{\"start\":1773236552598,\"end\":1773236552598}}}\n{\"type\":\"step_finish\",\"timestamp\":1773236552789,\"sessionID\":\"ses_322dda83effeMG3O1iE5VVgOFF\",\"part\":{\"id\":\"prt_cdd2283b1001fCOYDd27UDQSI3\",\"sessionID\":\"ses_322dda83effeMG3O1iE5VVgOFF\",\"messageID\":\"msg_cdd225877001KuaTv2XWFOwrIW\",\"type\":\"step-finish\",\"reason\":\"stop\",\"snapshot\":\"439d76bcc67160751a473f805c318f8bd9063795\",\"cost\":0,\"tokens\":{\"total\":18352,\"input\":78,\"output\":361,\"reasoning\":0,\"cache\":{\"read\":11282,\"write\":6631}}}}",
+  "duration_s": 13.8,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 1.0,
+  "correctness": 1.0
+}

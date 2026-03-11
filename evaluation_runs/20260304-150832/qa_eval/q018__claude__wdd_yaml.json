@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-04T15:22:58.535553",
+  "qid": "q018",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 3: REPOSITORY USAGE AND SYSTEM MECHANICS",
+  "question": "When evaluating the workflow components, how are the logical file names defined in the workflow mapped to actual data locations?",
+  "reference_answer": "The workflow uses a Replica Catalog (RC) to map the logical file names (LFNs) used in the abstract workflow to their physical file locations (PFNs) on the storage systems.",
+  "agent": "claude",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "The provided WDD YAML does **not contain information** about how logical file names map to actual data locations.\n\nThe YAML defines data objects using logical IDs (e.g., `data:vcf_chromosome_chunk`, `data:columns_config`) with descriptions, format hints, and cardinality, but no concrete file system paths or location mappings are specified. The `source_file: \"daxgen.py\"` and `source_format: \"compiled_from_pegasus_dax\"` fields indicate this workflow is managed by Pegasus, which typically handles the mapping of logical file names to physical storage locations at runtime via its replica catalog — but that mapping mechanism is outside the scope of this WDD document and not captured in the YAML provided.",
+  "duration_s": 16.79,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 3.0,
+  "correctness": 3.0
+}

@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T08:58:30.952340",
+  "qid": "q022",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 4: INPUT FILES, OUTPUT FILES, AND DATA FORMATS",
+  "question": "Where does the workflow retrieve its primary genomic input data from?",
+  "reference_answer": "The workflow fetches Phase 3 VCF data from the IGSR FTP mirrors. The \"Individuals\" task is responsible for downloading and parsing these files by chromosome.",
+  "agent": "opencode",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "{\"type\":\"step_start\",\"timestamp\":1773237517835,\"sessionID\":\"ses_322ced43effe6b3aQvToaNOjR4\",\"part\":{\"id\":\"prt_cdd313dfe001Br7X2lka0iUWac\",\"sessionID\":\"ses_322ced43effe6b3aQvToaNOjR4\",\"messageID\":\"msg_cdd312c74001bWInwTPVZRBmF1\",\"type\":\"step-start\",\"snapshot\":\"98a0fbe354e81d9f7a38d242d04928f1d7425148\"}}\n{\"type\":\"text\",\"timestamp\":1773237525487,\"sessionID\":\"ses_322ced43effe6b3aQvToaNOjR4\",\"part\":{\"id\":\"prt_cdd31574b001RPq0S6BocnDHz2\",\"sessionID\":\"ses_322ced43effe6b3aQvToaNOjR4\",\"messageID\":\"msg_cdd312c74001bWInwTPVZRBmF1\",\"type\":\"text\",\"text\":\"The workflow retrieves its primary genomic input data from **Phase 3 variant call format (VCF) files from the 1000 Genomes Project** (`data:chr_vcf`). These files contain SNP variant positions, allele information, and genotypes for all 2,504 individuals, with one file per chromosome (typically chromosomes 1-10 by default). The workflow also uses **VEP (Variant Effect Predictor) annotation files** (`data:sift_annotation_vcf`) containing SIFT scores for SNP variants.\",\"time\":{\"start\":1773237525483,\"end\":1773237525483}}}\n{\"type\":\"step_finish\",\"timestamp\":1773237525671,\"sessionID\":\"ses_322ced43effe6b3aQvToaNOjR4\",\"part\":{\"id\":\"prt_cdd315c0e001ZLVY449wMwhDoX\",\"sessionID\":\"ses_322ced43effe6b3aQvToaNOjR4\",\"messageID\":\"msg_cdd312c74001bWInwTPVZRBmF1\",\"type\":\"step-finish\",\"reason\":\"stop\",\"snapshot\":\"98a0fbe354e81d9f7a38d242d04928f1d7425148\",\"cost\":0,\"tokens\":{\"total\":18407,\"input\":78,\"output\":419,\"reasoning\":0,\"cache\":{\"read\":11282,\"write\":6628}}}}",
+  "duration_s": 14.97,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 3.0,
+  "correctness": 3.0
+}

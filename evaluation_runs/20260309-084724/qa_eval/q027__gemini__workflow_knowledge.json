@@ -1,0 +1,23 @@
+{
+  "timestamp": "2026-03-09T09:58:20.251699",
+  "qid": "q027",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 4: INPUT FILES, OUTPUT FILES, AND DATA FORMATS",
+  "question": "What does the \"Individuals_Merge\" task produce, and what tasks consume it?",
+  "reference_answer": "\"Individuals_Merge\" produces a single merged mutations file per chromosome, consolidating all parallel chunk outputs. This merged file is consumed by both the \"Mutations_Overlap\" task and the \"Frequency\" task.",
+  "agent": "gemini",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "The \"Individuals_Merge\" task produces `data:chr<C>n.tar.gz`, a single compressed archive containing all per-individual mutation data for one chromosome. This output is consumed by the `mutation_overlap` and `frequency` tasks.",
+  "duration_s": 31.46,
+  "total_tokens": 12061,
+  "input_tokens": 1022,
+  "output_tokens": 0,
+  "tokens": {
+    "total": 12061,
+    "input": 1022,
+    "output": 0
+  },
+  "judge_score": 5.0,
+  "correctness": 5.0
+}

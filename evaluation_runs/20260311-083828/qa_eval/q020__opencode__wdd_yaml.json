@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T08:56:34.797729",
+  "qid": "q020",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 3: REPOSITORY USAGE AND SYSTEM MECHANICS",
+  "question": "What mechanism is used by the workflow engine to maintain strict scientific provenance for every executed task script?",
+  "reference_answer": "Every job is wrapped in a \"kickstart\" executable. This wrapper captures comprehensive runtime information, including the exact software versions used, hardware metrics, and the specific command-line arguments passed to the scripts.",
+  "agent": "opencode",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "{\"type\":\"step_start\",\"timestamp\":1773237401548,\"sessionID\":\"ses_322d099f8ffeA4dunDyytW81ZN\",\"part\":{\"id\":\"prt_cdd2f77bd001l6M6K6d3lQY1uA\",\"sessionID\":\"ses_322d099f8ffeA4dunDyytW81ZN\",\"messageID\":\"msg_cdd2f66cd001Hlhi14ZMZq8xYD\",\"type\":\"step-start\",\"snapshot\":\"377e610d8488cf9733f39228cd8aaa8843237973\"}}\n{\"type\":\"text\",\"timestamp\":1773237410747,\"sessionID\":\"ses_322d099f8ffeA4dunDyytW81ZN\",\"part\":{\"id\":\"prt_cdd2f93a1001pTQdcp1mAmabCO\",\"sessionID\":\"ses_322d099f8ffeA4dunDyytW81ZN\",\"messageID\":\"msg_cdd2f66cd001Hlhi14ZMZq8xYD\",\"type\":\"text\",\"text\":\"The provided context does not contain information about a mechanism for maintaining strict scientific provenance for executed task scripts. While the YAML describes the workflow structure, tasks, data flow, and execution patterns (including `restart_model: idempotent` for all tasks), there is no explicit provenance tracking mechanism described (e.g., no mention of audit trails, lineage recording, or provenance capture tools). The only related field is `workflow_lineage_id: wrd:1000genome`, which is merely an identifier for the workflow itself, not a provenance system.\",\"time\":{\"start\":1773237410742,\"end\":1773237410742}}}\n{\"type\":\"step_finish\",\"timestamp\":1773237410960,\"sessionID\":\"ses_322d099f8ffeA4dunDyytW81ZN\",\"part\":{\"id\":\"prt_cdd2f9be2001aOpDJMxtpv55Et\",\"sessionID\":\"ses_322d099f8ffeA4dunDyytW81ZN\",\"messageID\":\"msg_cdd2f66cd001Hlhi14ZMZq8xYD\",\"type\":\"step-finish\",\"reason\":\"stop\",\"snapshot\":\"377e610d8488cf9733f39228cd8aaa8843237973\",\"cost\":0,\"tokens\":{\"total\":18454,\"input\":78,\"output\":459,\"reasoning\":0,\"cache\":{\"read\":11282,\"write\":6635}}}}",
+  "duration_s": 16.41,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 1.0,
+  "correctness": 1.0
+}

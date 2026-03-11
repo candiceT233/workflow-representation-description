@@ -1,0 +1,23 @@
+{
+  "timestamp": "2026-03-09T09:15:23.336088",
+  "qid": "q012",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "How does the workflow establish the categorical framework necessary for analyzing different demographic groups?",
+  "reference_answer": "The \"Populations\" task runs simultaneously to the parsing steps and downloads demographic metadata for the 26 global populations.",
+  "agent": "gemini",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "The workflow establishes a categorical framework for analyzing different demographic groups through the `data:population_file` data object. This data object is described as \"A text file listing individual identifiers belonging to a specific population group.\" It's consumed by the `task:mutation_overlap` and `task:frequency` tasks, which process data \"for a specific chromosome and population.\" The cardinality of this file is \"one per population (6 standard populations + ALL)\", with possible values including 'ALL', 'EUR', 'EAS', 'AFR', 'AMR', 'SAS', 'GBR'.",
+  "duration_s": 65.45,
+  "total_tokens": 24898,
+  "input_tokens": 841,
+  "output_tokens": 0,
+  "tokens": {
+    "total": 24898,
+    "input": 841,
+    "output": 0
+  },
+  "judge_score": 3.0,
+  "correctness": 3.0
+}

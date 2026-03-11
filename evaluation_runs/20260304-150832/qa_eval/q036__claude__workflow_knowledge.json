@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-04T15:38:04.502971",
+  "qid": "q036",
+  "source_file": "1000genome-workflow-knowledge-eval-2.txt",
+  "section": "SECTION 1: SCIENTIFIC PURPOSE AND BIOLOGICAL SEMANTICS",
+  "question": "What biological function does the \"Sifting\" task evaluate, and what tool does it use?",
+  "reference_answer": "The Sifting task adds a functional annotation layer to the genomic data by utilizing the Variant Effect Predictor (VEP) to compute SIFT scores. SIFT (Sorts Intolerant From Tolerant) is a sequence homology-based tool that predicts whether an amino acid substitution will impact protein function.",
+  "agent": "claude",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "The context does not contain enough information to answer this question fully.\n\nWhat the context does say about the **sifting** task:\n- It **filters results** based on frequency and overlap data (inputs: `data:frequencies`, `data:overlaps`)\n- It corresponds to the script `bin/sifting.py`\n\nThe context does **not** specify the biological function being evaluated (e.g., functional impact, deleteriousness, etc.) nor does it name any specific tool used by the sifting task. The analysis explicitly notes it was performed without access to file contents, so no details about the script's internals are available.",
+  "duration_s": 14.89,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 2.0,
+  "correctness": 2.0
+}

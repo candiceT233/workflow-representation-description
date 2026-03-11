@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T08:49:39.831813",
+  "qid": "q013",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "What are the direct dependencies required before the \"Mutations_Overlap\" task can begin execution?",
+  "reference_answer": "The \"Mutations_Overlap\" task depends on the successful completion of both the \"Individuals_Merge\" task and the \"Populations\" task.",
+  "agent": "opencode",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "{\"type\":\"step_start\",\"timestamp\":1773236985089,\"sessionID\":\"ses_322d6ef23ffe7BtDRR8qnSI5kP\",\"part\":{\"id\":\"prt_cdd291cf3001PiQnzwN1vgbMQt\",\"sessionID\":\"ses_322d6ef23ffe7BtDRR8qnSI5kP\",\"messageID\":\"msg_cdd2911a9001QDqsv9tMzXzcWw\",\"type\":\"step-start\",\"snapshot\":\"7c7614ca2f129ee68a47ef2d85a47576a30e4487\"}}\n{\"type\":\"text\",\"timestamp\":1773237005162,\"sessionID\":\"ses_322d6ef23ffe7BtDRR8qnSI5kP\",\"part\":{\"id\":\"prt_cdd295d69001EsdthTPgq5wab3\",\"sessionID\":\"ses_322d6ef23ffe7BtDRR8qnSI5kP\",\"messageID\":\"msg_cdd2911a9001QDqsv9tMzXzcWw\",\"type\":\"text\",\"text\":\"Based on the wdd_yaml, the **task:mutation_overlap** (Mutation Overlap Analysis) task requires two direct dependencies to complete before it can begin execution:\\n\\n1. **task:individuals_merge** - produces `data:individuals_merged_output` (the merged per-individual mutation data for a chromosome)\\n\\n2. **task:sifting** - produces `data:sifted_output` (the SIFT-scored SNP variants for a chromosome)\\n\\nThis is defined in the producer-consumer edges:\\n- `pc:individuals_merge->mutation_overlap:1_to_n` \\n- `pc:sifting->mutation_overlap:1_to_n`\\n\\nAdditionally, `data:population_file` and `data:columns_file` are required inputs, but these are static config files (category: config) with no producer task, so they don't represent task dependencies.\\n\\nThe workflow allows sifting to run in parallel with individuals processing since they operate on independent data.\",\"time\":{\"start\":1773237005157,\"end\":1773237005157}}}\n{\"type\":\"step_finish\",\"timestamp\":1773237005378,\"sessionID\":\"ses_322d6ef23ffe7BtDRR8qnSI5kP\",\"part\":{\"id\":\"prt_cdd296b8d001aWBAGuOwc2zZNj\",\"sessionID\":\"ses_322d6ef23ffe7BtDRR8qnSI5kP\",\"messageID\":\"msg_cdd2911a9001QDqsv9tMzXzcWw\",\"type\":\"step-finish\",\"reason\":\"stop\",\"snapshot\":\"7c7614ca2f129ee68a47ef2d85a47576a30e4487\",\"cost\":0,\"tokens\":{\"total\":18549,\"input\":78,\"output\":554,\"reasoning\":0,\"cache\":{\"read\":510,\"write\":17407}}}}",
+  "duration_s": 25.8,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 3.0,
+  "correctness": 3.0
+}

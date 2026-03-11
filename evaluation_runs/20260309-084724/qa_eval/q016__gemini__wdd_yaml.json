@@ -1,0 +1,23 @@
+{
+  "timestamp": "2026-03-09T09:26:30.317830",
+  "qid": "q016",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 3: REPOSITORY USAGE AND SYSTEM MECHANICS",
+  "question": "Where is the official repository hosted for the bioinformatics workflow that identifies these mutational overlaps?",
+  "reference_answer": "The repository is hosted on GitHub under \"pegasus-isi/1000genome-workflow\".",
+  "agent": "gemini",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "The official repository is hosted at `/home/mtang11/scripts/workflow-representation-description/workflows_repo/1000genome-workflow`.",
+  "duration_s": 28.56,
+  "total_tokens": 24757,
+  "input_tokens": 843,
+  "output_tokens": 0,
+  "tokens": {
+    "total": 24757,
+    "input": 843,
+    "output": 0
+  },
+  "judge_score": 1.0,
+  "correctness": 1.0
+}

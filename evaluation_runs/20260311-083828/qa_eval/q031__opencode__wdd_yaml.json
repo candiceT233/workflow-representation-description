@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T09:07:40.410807",
+  "qid": "q031",
+  "source_file": "1000genome-workflow-knowledge-eval-2.txt",
+  "section": "SECTION 1: SCIENTIFIC PURPOSE AND BIOLOGICAL SEMANTICS",
+  "question": "What is the primary scientific objective of the 1000 Genomes workflow?",
+  "reference_answer": "The primary objective is to identify mutational overlaps and establish statistical null distributions for disease-related research. It successfully mapped the genetic diversity of 2,504 individuals across 26 distinct global populations.",
+  "agent": "opencode",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "{\"type\":\"step_start\",\"timestamp\":1773238064287,\"sessionID\":\"ses_322c671d1ffeN9CCwpTQP3skgE\",\"part\":{\"id\":\"prt_cdd399492001jrNGcrbmLBOPaC\",\"sessionID\":\"ses_322c671d1ffeN9CCwpTQP3skgE\",\"messageID\":\"msg_cdd398f000017kQECsfMSNRYWL\",\"type\":\"step-start\",\"snapshot\":\"5b5a9c4de2f8da1752eba35b44b409201d3e0fd4\"}}\n{\"type\":\"text\",\"timestamp\":1773238075743,\"sessionID\":\"ses_322c671d1ffeN9CCwpTQP3skgE\",\"part\":{\"id\":\"prt_cdd39bf00001FJqWCurGEGYmRr\",\"sessionID\":\"ses_322c671d1ffeN9CCwpTQP3skgE\",\"messageID\":\"msg_cdd398f000017kQECsfMSNRYWL\",\"type\":\"text\",\"text\":\"Based on the context, the primary scientific objective of the 1000 Genomes workflow is to **identify mutational overlaps among individuals across different populations** to provide a null distribution for rigorous statistical evaluation of potential disease-related mutations.\",\"time\":{\"start\":1773238075737,\"end\":1773238075737}}}\n{\"type\":\"step_finish\",\"timestamp\":1773238076011,\"sessionID\":\"ses_322c671d1ffeN9CCwpTQP3skgE\",\"part\":{\"id\":\"prt_cdd39c1760016I9PXaAJBvL3hs\",\"sessionID\":\"ses_322c671d1ffeN9CCwpTQP3skgE\",\"messageID\":\"msg_cdd398f000017kQECsfMSNRYWL\",\"type\":\"step-finish\",\"reason\":\"stop\",\"snapshot\":\"5b5a9c4de2f8da1752eba35b44b409201d3e0fd4\",\"cost\":0,\"tokens\":{\"total\":18235,\"input\":78,\"output\":244,\"reasoning\":0,\"cache\":{\"read\":11282,\"write\":6631}}}}",
+  "duration_s": 15.85,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 4.0,
+  "correctness": 4.0
+}

@@ -1,0 +1,23 @@
+{
+  "timestamp": "2026-03-09T09:27:25.844029",
+  "qid": "q017",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 3: REPOSITORY USAGE AND SYSTEM MECHANICS",
+  "question": "Which script within the implementation is responsible for the dynamic generation of workflow dependencies?",
+  "reference_answer": "The `daxgen.py` script governs the dynamic generation of dependencies, particularly handling the transition between parallelized VCF chunks and the synchronized merge task.",
+  "agent": "gemini",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "The `daxgen.py` script (Pegasus DAG generator) is responsible for the dynamic generation of workflow dependencies.",
+  "duration_s": 26.31,
+  "total_tokens": 11785,
+  "input_tokens": 200,
+  "output_tokens": 0,
+  "tokens": {
+    "total": 11785,
+    "input": 200,
+    "output": 0
+  },
+  "judge_score": 4.0,
+  "correctness": 4.0
+}

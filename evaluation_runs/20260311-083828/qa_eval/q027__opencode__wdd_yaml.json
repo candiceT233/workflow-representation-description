@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T09:03:52.651097",
+  "qid": "q027",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 4: INPUT FILES, OUTPUT FILES, AND DATA FORMATS",
+  "question": "What does the \"Individuals_Merge\" task produce, and what tasks consume it?",
+  "reference_answer": "\"Individuals_Merge\" produces a single merged mutations file per chromosome, consolidating all parallel chunk outputs. This merged file is consumed by both the \"Mutations_Overlap\" task and the \"Frequency\" task.",
+  "agent": "opencode",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "{\"type\":\"step_start\",\"timestamp\":1773237838627,\"sessionID\":\"ses_322c9ebc8ffetIACXAbJMfXmUi\",\"part\":{\"id\":\"prt_cdd362316001J6KvWKUP7b121q\",\"sessionID\":\"ses_322c9ebc8ffetIACXAbJMfXmUi\",\"messageID\":\"msg_cdd3614f30011dbL3a58Y9xjkh\",\"type\":\"step-start\",\"snapshot\":\"99c14d6dbb0b77c9b42fb8e59555ca67ec98e241\"}}\n{\"type\":\"text\",\"timestamp\":1773237844534,\"sessionID\":\"ses_322c9ebc8ffetIACXAbJMfXmUi\",\"part\":{\"id\":\"prt_cdd36364d001Y9rL624ZV6n2Am\",\"sessionID\":\"ses_322c9ebc8ffetIACXAbJMfXmUi\",\"messageID\":\"msg_cdd3614f30011dbL3a58Y9xjkh\",\"type\":\"text\",\"text\":\"The **Individuals_Merge** task produces `data:individuals_merged_output` — a tar.gz archive containing merged per-individual mutation data for a complete chromosome.\\n\\nThis output is consumed by two tasks:\\n- **task:mutation_overlap**\\n- **task:frequency**\\n\\nBoth tasks read the merged individuals file as input for their respective analyses (mutation overlap and frequency calculations) per chromosome-population combination.\",\"time\":{\"start\":1773237844528,\"end\":1773237844528}}}\n{\"type\":\"step_finish\",\"timestamp\":1773237844753,\"sessionID\":\"ses_322c9ebc8ffetIACXAbJMfXmUi\",\"part\":{\"id\":\"prt_cdd363a57001D7OBCygei21pzC\",\"sessionID\":\"ses_322c9ebc8ffetIACXAbJMfXmUi\",\"messageID\":\"msg_cdd3614f30011dbL3a58Y9xjkh\",\"type\":\"step-finish\",\"reason\":\"stop\",\"snapshot\":\"99c14d6dbb0b77c9b42fb8e59555ca67ec98e241\",\"cost\":0,\"tokens\":{\"total\":18334,\"input\":78,\"output\":341,\"reasoning\":0,\"cache\":{\"read\":11282,\"write\":6633}}}}",
+  "duration_s": 12.34,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 5.0,
+  "correctness": 5.0
+}

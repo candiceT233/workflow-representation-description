@@ -1,0 +1,23 @@
+{
+  "timestamp": "2026-03-09T10:14:49.845616",
+  "qid": "q034",
+  "source_file": "1000genome-workflow-knowledge-eval-2.txt",
+  "section": "SECTION 1: SCIENTIFIC PURPOSE AND BIOLOGICAL SEMANTICS",
+  "question": "What types of complex genetic variants were introduced for calling in Phase 3?",
+  "reference_answer": "Phase 3 introduced multi-allelic variant calling.  This encompasses single nucleotide polymorphisms (SNPs), insertions/deletions (INDELs), and complex structural variants (SVs).",
+  "agent": "gemini",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "The provided context does not contain information about \"complex genetic variants\" or \"Phase 3\" of the 1000 Genomes workflow.",
+  "duration_s": 28.42,
+  "total_tokens": 11810,
+  "input_tokens": 1021,
+  "output_tokens": 0,
+  "tokens": {
+    "total": 11810,
+    "input": 1021,
+    "output": 0
+  },
+  "judge_score": 1.0,
+  "correctness": 1.0
+}

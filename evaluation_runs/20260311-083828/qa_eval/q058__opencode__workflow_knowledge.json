@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T09:31:49.082369",
+  "qid": "q058",
+  "source_file": "1000genome-workflow-knowledge-eval-3.txt",
+  "section": "SECTION 1: SCIENTIFIC PURPOSE AND BIOLOGICAL SEMANTICS",
+  "question": "Which organization facilitated the critical transition to the GRCh38 human genome assembly?",
+  "reference_answer": "The transition to the GRCh38 human genome assembly was facilitated by the International Genome Sample Resource (IGSR).",
+  "agent": "opencode",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "{\"type\":\"step_start\",\"timestamp\":1773239515231,\"sessionID\":\"ses_322b0572effe7ROd5A942h4a52\",\"part\":{\"id\":\"prt_cdd4fb852001ioF9LYpbtU1kwA\",\"sessionID\":\"ses_322b0572effe7ROd5A942h4a52\",\"messageID\":\"msg_cdd4fa988001ULBYFjMWM5ew4i\",\"type\":\"step-start\",\"snapshot\":\"18c85f3d3098c073e21bc9218f10cd52d95c4b9f\"}}\n{\"type\":\"text\",\"timestamp\":1773239520844,\"sessionID\":\"ses_322b0572effe7ROd5A942h4a52\",\"part\":{\"id\":\"prt_cdd4fcd21001dygJj5vcMM3lUK\",\"sessionID\":\"ses_322b0572effe7ROd5A942h4a52\",\"messageID\":\"msg_cdd4fa988001ULBYFjMWM5ew4i\",\"type\":\"text\",\"text\":\"The context does not contain information about the GRCh38 human genome assembly or which organization facilitated its transition. The workflow knowledge focuses on workflow structure, data objects, parallelism, and I/O patterns—not genome assembly versions or organizational history.\",\"time\":{\"start\":1773239520838,\"end\":1773239520838}}}\n{\"type\":\"step_finish\",\"timestamp\":1773239521050,\"sessionID\":\"ses_322b0572effe7ROd5A942h4a52\",\"part\":{\"id\":\"prt_cdd4fce6e001QmhpNLE6ejoDJu\",\"sessionID\":\"ses_322b0572effe7ROd5A942h4a52\",\"messageID\":\"msg_cdd4fa988001ULBYFjMWM5ew4i\",\"type\":\"step-finish\",\"reason\":\"stop\",\"snapshot\":\"18c85f3d3098c073e21bc9218f10cd52d95c4b9f\",\"cost\":0,\"tokens\":{\"total\":13858,\"input\":78,\"output\":319,\"reasoning\":0,\"cache\":{\"read\":11282,\"write\":2179}}}}",
+  "duration_s": 12.2,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 1.0,
+  "correctness": 1.0
+}

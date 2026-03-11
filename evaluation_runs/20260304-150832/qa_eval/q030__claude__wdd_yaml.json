@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-04T15:33:12.952621",
+  "qid": "q030",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 4: INPUT FILES, OUTPUT FILES, AND DATA FORMATS",
+  "question": "Where are the core executable scripts that perform the actual genomic analysis located in the repository?",
+  "reference_answer": "The core executables and Python scripts that perform the calculations for sifting, overlapping, and merging are located in the bin/ directory of the repository. These are the scripts the workflow engine calls for each task.",
+  "agent": "claude",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "Based on the WDD YAML provided, the source repository is listed as:\n\n```\n/home/mtang11/scripts/workflow-representation-description/workflows_repo/1000genome-workflow\n```\n\nThe core executable scripts identified are:\n- `individuals.py` (or `individuals_mpi.py` for MPI mode)\n- `individuals_merge.py` (or `individuals_merge_mpi.py` for MPI mode)\n- `sifting.py`\n- `mutation_overlap.py`\n- `frequency.py`\n\nHowever, **the WDD does not specify the exact subdirectory** within the repository where these scripts reside. The workflow structure was compiled from `daxgen.py` (the Pegasus DAX generator), but the context does not provide path information beyond the top-level repository location.",
+  "duration_s": 9.34,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 3.0,
+  "correctness": 3.0
+}

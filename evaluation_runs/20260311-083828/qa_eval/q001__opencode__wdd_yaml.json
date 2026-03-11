@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T08:38:48.975298",
+  "qid": "q001",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 1: SCIENTIFIC PURPOSE AND BIOLOGICAL SEMANTICS",
+  "question": "What is the primary scientific objective of the 1000 Genomes workflow?",
+  "reference_answer": "The primary objective is to process petascale genomic datasets to identify mutational overlaps and establish statistical null distributions for disease-related research. It successfully mapped the genetic diversity of 2,504 individuals across 26 distinct global populations.",
+  "agent": "opencode",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "{\"type\":\"step_start\",\"timestamp\":1773236335323,\"sessionID\":\"ses_322e0dda9ffe81jL3fB2DsUsR3\",\"part\":{\"id\":\"prt_cdd1f32cc001KjZzr11I9qzcKe\",\"sessionID\":\"ses_322e0dda9ffe81jL3fB2DsUsR3\",\"messageID\":\"msg_cdd1f231e001K2AI1ygx74n8Re\",\"type\":\"step-start\",\"snapshot\":\"a47d3a25da0d14449d93004a2970fbd16ce684c1\"}}\n{\"type\":\"text\",\"timestamp\":1773236338267,\"sessionID\":\"ses_322e0dda9ffe81jL3fB2DsUsR3\",\"part\":{\"id\":\"prt_cdd1f3c7d001OgP3jrhU3xjfqm\",\"sessionID\":\"ses_322e0dda9ffe81jL3fB2DsUsR3\",\"messageID\":\"msg_cdd1f231e001K2AI1ygx74n8Re\",\"type\":\"text\",\"text\":\"The primary scientific objective of the 1000 Genomes workflow is to analyze 1000 Genomes Project data to identify mutational overlaps among individuals across different populations, providing a null distribution for rigorous statistical evaluation of potential disease-related mutations.\",\"time\":{\"start\":1773236338261,\"end\":1773236338261}}}\n{\"type\":\"step_finish\",\"timestamp\":1773236338530,\"sessionID\":\"ses_322e0dda9ffe81jL3fB2DsUsR3\",\"part\":{\"id\":\"prt_cdd1f3e7c001H1dFJl74YAFTCu\",\"sessionID\":\"ses_322e0dda9ffe81jL3fB2DsUsR3\",\"messageID\":\"msg_cdd1f231e001K2AI1ygx74n8Re\",\"type\":\"step-finish\",\"reason\":\"stop\",\"snapshot\":\"a47d3a25da0d14449d93004a2970fbd16ce684c1\",\"cost\":0,\"tokens\":{\"total\":18239,\"input\":78,\"output\":248,\"reasoning\":0,\"cache\":{\"read\":11282,\"write\":6631}}}}",
+  "duration_s": 9.82,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 4.0,
+  "correctness": 4.0
+}

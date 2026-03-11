@@ -1,0 +1,47 @@
+{
+  "run_start": "2026-03-11T08:38:28.598084",
+  "trial_used": 1,
+  "knowledge_file": "1000genome-knowledge-opencode-trial1.md",
+  "wdd_file": "1000genome-wdd-opencode-trial1.yaml",
+  "context_by_agent": {
+    "opencode": {
+      "knowledge_file": "1000genome-knowledge-opencode-trial1.md",
+      "wdd_file": "1000genome-wdd-opencode-trial1.yaml",
+      "trial_used": 1
+    }
+  },
+  "agents": [
+    "opencode"
+  ],
+  "context_types": [
+    "workflow_knowledge",
+    "wdd_yaml"
+  ],
+  "n_questions": 74,
+  "summary": {
+    "opencode__workflow_knowledge": {
+      "n": 74,
+      "success": 74,
+      "correctness_mean": 2.69,
+      "correctness_std": 1.41,
+      "judge_mean": 2.69,
+      "judge_std": 1.41,
+      "duration_mean_s": 15.29,
+      "duration_total_s": 1131.35,
+      "total_tokens_sum": null,
+      "total_tokens_mean": null
+    },
+    "opencode__wdd_yaml": {
+      "n": 74,
+      "success": 74,
+      "correctness_mean": 2.78,
+      "correctness_std": 1.47,
+      "judge_mean": 2.78,
+      "judge_std": 1.47,
+      "duration_mean_s": 16.18,
+      "duration_total_s": 1197.36,
+      "total_tokens_sum": null,
+      "total_tokens_mean": null
+    }
+  }
+}

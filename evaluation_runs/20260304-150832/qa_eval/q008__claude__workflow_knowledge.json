@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-04T15:14:02.835455",
+  "qid": "q008",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "What are the five core task classes that make up the sequence of this workflow?",
+  "reference_answer": "The workflow consists of five core task classes: Individuals, Individuals_Merge, Populations, Sifting, Mutations_Overlap, and Frequency.",
+  "agent": "claude",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "Based on the workflow knowledge, the five core task classes are:\n\n1. **task:prepare_input** — prepares the input data\n2. **task:individuals** — processes each individual in parallel (scatter)\n3. **task:individuals_merge** — merges individual results (gather)\n4. **task:frequency** — calculates allele frequencies\n5. **task:mutation_overlap** — identifies overlapping mutations\n6. **task:sifting** — filters results using frequency and overlap data\n\n> Note: The context actually describes **six** tasks, not five. If forced to pick five \"core\" tasks excluding the pre-processing stage, they would be: `individuals`, `individuals_merge`, `frequency`, `mutation_overlap`, and `sifting`.",
+  "duration_s": 7.18,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 4.0,
+  "correctness": 4.0
+}

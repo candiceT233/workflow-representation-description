@@ -1,0 +1,23 @@
+{
+  "timestamp": "2026-03-09T11:11:03.380579",
+  "qid": "q056",
+  "source_file": "1000genome-workflow-knowledge-eval-3.txt",
+  "section": "SECTION 1: SCIENTIFIC PURPOSE AND BIOLOGICAL SEMANTICS",
+  "question": "Why did the project shift away from the multi-platform approach used in Phase 1?",
+  "reference_answer": "The strategic shift to an Illumina-only approach in Phase 3 was driven by the need for higher-quality variant calling and more consistent error profiles.",
+  "agent": "gemini",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "The provided context does not contain information about a multi-platform approach in Phase 1 or reasons for shifting away from it. The document describes the current static analysis of the 1000genome workflow.",
+  "duration_s": 51.27,
+  "total_tokens": 12083,
+  "input_tokens": 202,
+  "output_tokens": 0,
+  "tokens": {
+    "total": 12083,
+    "input": 202,
+    "output": 0
+  },
+  "judge_score": 1.0,
+  "correctness": 1.0
+}

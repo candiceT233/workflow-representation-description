@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T09:07:24.233291",
+  "qid": "q031",
+  "source_file": "1000genome-workflow-knowledge-eval-2.txt",
+  "section": "SECTION 1: SCIENTIFIC PURPOSE AND BIOLOGICAL SEMANTICS",
+  "question": "What is the primary scientific objective of the 1000 Genomes workflow?",
+  "reference_answer": "The primary objective is to identify mutational overlaps and establish statistical null distributions for disease-related research. It successfully mapped the genetic diversity of 2,504 individuals across 26 distinct global populations.",
+  "agent": "opencode",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "{\"type\":\"step_start\",\"timestamp\":1773238048081,\"sessionID\":\"ses_322c6b115ffew6XVzTTjCbzS75\",\"part\":{\"id\":\"prt_cdd395544001MixnA1BFeR1ENJ\",\"sessionID\":\"ses_322c6b115ffew6XVzTTjCbzS75\",\"messageID\":\"msg_cdd394fd5001TE6DYZSS2v0rh7\",\"type\":\"step-start\",\"snapshot\":\"b17fc4eddfb666c2baffa53cb028f38c961ab574\"}}\n{\"type\":\"text\",\"timestamp\":1773238050278,\"sessionID\":\"ses_322c6b115ffew6XVzTTjCbzS75\",\"part\":{\"id\":\"prt_cdd395d50001sLHFGLBdV2Q6Y7\",\"sessionID\":\"ses_322c6b115ffew6XVzTTjCbzS75\",\"messageID\":\"msg_cdd394fd5001TE6DYZSS2v0rh7\",\"type\":\"text\",\"text\":\"\\nThe primary scientific objective of the 1000 Genomes workflow is to identify mutational overlaps using data from the 1000 Genomes Project to provide a null distribution for rigorous statistical evaluation of potential disease-related mutations.\",\"time\":{\"start\":1773238050273,\"end\":1773238050273}}}\n{\"type\":\"step_finish\",\"timestamp\":1773238050486,\"sessionID\":\"ses_322c6b115ffew6XVzTTjCbzS75\",\"part\":{\"id\":\"prt_cdd395e060012CdHj8alXqbrsc\",\"sessionID\":\"ses_322c6b115ffew6XVzTTjCbzS75\",\"messageID\":\"msg_cdd394fd5001TE6DYZSS2v0rh7\",\"type\":\"step-finish\",\"reason\":\"stop\",\"snapshot\":\"b17fc4eddfb666c2baffa53cb028f38c961ab574\",\"cost\":0,\"tokens\":{\"total\":13730,\"input\":78,\"output\":191,\"reasoning\":0,\"cache\":{\"read\":11282,\"write\":2179}}}}",
+  "duration_s": 6.5,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 4.0,
+  "correctness": 4.0
+}
