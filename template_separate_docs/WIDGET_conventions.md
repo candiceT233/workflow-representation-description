@@ -84,10 +84,14 @@ Each template uses `# [STATUS]` inline comments. Downstream consumer agents read
 
 ## 4. Compact vs. Full Document Format
 
-Every template is the **authoring format**: it carries `# [STATUS]` comments, `# _reasoning:` hints, and `# _prompt:` elicitation scripts. These annotations exist only to guide the authoring agent and are stripped from inter-agent transfers.
+Every template is the **authoring format**: it carries `# [STATUS]` comments, `# _reasoning:` hints, and `# _prompt:` elicitation scripts in comments, plus YAML fields such as `_status`, `_prompt`, `_quality_check`, `_extract`. These annotations guide the authoring agent but are **not document content**.
 
-**When passing a completed document to a downstream agent, use the compact form:**
-- Omit all lines beginning with `#`
+**Authoring agents MUST emit the canonical form.** When producing a completed WDD (or EDD, DDD, etc.), do not include authoring-only fields in the output. Apply these rules:
+
+- **Flatten `_value` fields:** For any field that uses `{ _status: ..., _prompt: ..., _value: X }`, emit only the parent key with the value: `field_name: X` (e.g. `workflow_description: "..."` not the nested structure)
+- **Omit authoring-only keys:** Do not emit `_status`, `_prompt`, `_quality_check`, `_extract`, `_entry`, or any other `_*` keys — they are generation instructions, not document content
+- **Omit `filled_by`** in `translation_metadata.field_confidence_records` — provenance is in `metadata.generated_by` or `translation_metadata.translation_tool`
+- **Omit comment lines** (lines beginning with `#`) in the output
 - Retain only `key: value` pairs where `value` is non-null
 - Retain document header (schema_version, all IDs, version)
 

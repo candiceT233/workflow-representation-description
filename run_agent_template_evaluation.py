@@ -1,5 +1,16 @@
 #!/usr/bin/env python3
 # future import intentionally omitted
+"""
+Run agent benchmark for workflow WDD and knowledge generation.
+
+Outputs are written to three locations:
+  1. evaluation_runs/<timestamp>/  - Run metadata (precheck, metrics, aggregates, stdout/stderr logs)
+  2. workflow_wdd/                 - WDD YAML files: {workflow}-wdd-{agent}-trial{N}.yaml
+  3. workflow_knowledge/           - Knowledge Markdown files: {workflow}-knowledge-{agent}-trial{N}.md
+
+Files in workflow_wdd/ and workflow_knowledge/ are created by the agents (or recovered from stdout).
+A task may fail validation but still produce a file; check metrics.json for validation scores.
+"""
 
 import csv
 import argparse
@@ -68,9 +79,9 @@ AGENTS = [
         name="claude",
         api_env="ANTHROPIC_API_KEY",
         api_key=ANTHROPIC_API_KEY,
-        # Keep Claude on your session default model (you selected Sonnet 4.6 in CLI).
-        cmd_template="claude --output-format json -p {prompt}",
-        model="sonnet-4.6-default",
+        # Use Haiku (cheapest) to avoid credit issues; use --model sonnet for Sonnet 4.6.
+        cmd_template="claude --model haiku --dangerously-skip-permissions --output-format json -p {prompt}",
+        model="haiku",
         temperature="<SET_TEMP>",
         seed="<SET_SEED>",
         max_tokens="<SET_MAX_TOKENS>",
@@ -225,7 +236,8 @@ def build_prompt(mode: str, template_text: str, wf_name: str, wf_repo: str, out_
         - static analysis only
         - no deployment/runtime tuning details
         - follow template instructions exactly
-        - write final output to output_path
+        - write final output to output_path (if you have file access)
+        - INCLUDE THE COMPLETE FILE CONTENT IN YOUR RESPONSE so the script can save it to output_path
         - end response with: STATUS: success | OUTPUT: <output_path>
         TEMPLATE START
         {template_text}
@@ -261,6 +273,20 @@ def validate_output(mode: str, path: Path) -> Dict[str, object]:
     if present < 3:
         issues.append("missing_core_terms")
     return {"valid": score >= 0.75, "score": round(score, 3), "issues": issues}
+
+
+def _is_valid_workflow_payload(payload: str, mode: str) -> bool:
+    """Reject error messages or trivial content; require structural indicators."""
+    if not payload or len(payload.strip()) < 100:
+        return False
+    # Reject common error/API messages.
+    lower = payload.lower()
+    for reject in ("credit balance is too low", "permission denied", "api key", "error:", "is_error", "rate limit"):
+        if reject in lower and len(payload) < 500:
+            return False
+    if mode == "wdd":
+        return bool(re.search(r"(metadata|workflow_name|schema_version)\s*:", payload))
+    return bool(re.search(r"(workflow|task|stage|# )", payload, re.I))
 
 
 def _extract_payload_from_stdout(stdout: str, mode: str) -> Optional[str]:
@@ -321,7 +347,16 @@ def run_one(run_dir: Path, task: Dict[str, object]) -> Dict[str, object]:
                 )
             )
     env = os.environ.copy()
-    env[agent.api_env] = agent.api_key
+    if agent.api_key == "no_key_required":
+        # Free model (e.g. OpenCode minimax-m2.5-free): do not set API key;
+        # remove it from env so the CLI does not receive an invalid key.
+        env.pop(agent.api_env, None)
+    else:
+        env[agent.api_env] = agent.api_key
+    # OpenCode: allow reading workflow repo without permission prompts (YOLO mode)
+    if agent.name.lower() == "opencode":
+        env["OPENCODE_YOLO"] = "true"
+        env["OPENCODE_DANGEROUSLY_SKIP_PERMISSIONS"] = "true"
     t0 = time.perf_counter()
     rec: Dict[str, object] = {
         "task_id": tid,
@@ -369,10 +404,11 @@ def run_one(run_dir: Path, task: Dict[str, object]) -> Dict[str, object]:
         else:
             rec["tokens"] = parse_tokens(combined)
         # Fallback: if agent did not write output file, try capturing payload from stdout or JSON response.
-        if p.returncode == 0 and not out_path.exists():
+        # Run even when returncode != 0 so we can recover content from agents that exit non-zero.
+        if not out_path.exists():
             body = response_text if response_text else (p.stdout or "")
             payload = _extract_payload_from_stdout(body, mode)
-            if payload:
+            if payload and _is_valid_workflow_payload(payload, mode):
                 out_path.parent.mkdir(parents=True, exist_ok=True)
                 out_path.write_text(payload, encoding="utf-8")
                 log(f"RECOVERED {tid} | wrote output from stdout to {out_path}")
@@ -468,6 +504,7 @@ def main() -> None:
     run_dir.mkdir(parents=True, exist_ok=True)
     run_started = now_iso()
     log(f"Run directory: {run_dir}")
+    log(f"Output dirs: workflow_wdd={WDD_OUTPUT_DIR}, workflow_knowledge={KNOWLEDGE_OUTPUT_DIR}")
 
     active_agents = resolve_active_agents(AGENTS, args.agents)
     log(f"Active agents for this run: {', '.join(a.name for a in active_agents)}")
@@ -579,6 +616,24 @@ def main() -> None:
             writer.writerows(rows)
     write_json(run_dir / "aggregates.json", aggregate(records))
     log("Aggregates written.")
+
+    # Collect workflow outputs created this run (from records' output_path)
+    created_wdd: List[str] = []
+    created_knowledge: List[str] = []
+    for r in records:
+        out = r.get("output_path")
+        if not out:
+            continue
+        p = Path(out)
+        if p.exists():
+            try:
+                rel = str(p.relative_to(REPO_ROOT))
+            except ValueError:
+                rel = str(p)
+            if p.suffix in (".yaml", ".yml"):
+                created_wdd.append(rel)
+            elif p.suffix == ".md":
+                created_knowledge.append(rel)
     summary = {
         "run_dir": str(run_dir),
         "precheck": str(run_dir / "precheck.json"),
@@ -586,9 +641,13 @@ def main() -> None:
         "metrics_json": str(run_dir / "metrics.json"),
         "metrics_csv": str(csv_path),
         "aggregates": str(run_dir / "aggregates.json"),
+        "workflow_wdd_created": created_wdd,
+        "workflow_knowledge_created": created_knowledge,
     }
     write_json(run_dir / "run_summary.json", summary)
     log("Run complete. Summary written.")
+    if created_wdd or created_knowledge:
+        log(f"Workflow outputs: {len(created_wdd)} WDD, {len(created_knowledge)} knowledge")
     print(json.dumps(summary, indent=2))
 
 
@@ -664,7 +723,7 @@ AGENTS = [
         name="claude",
         api_env="ANTHROPIC_API_KEY",
         api_key=ANTHROPIC_API_KEY,
-        cmd_template="claude -p {prompt}",
+        cmd_template="claude --dangerously-skip-permissions -p {prompt}",
         model="<SET_CLAUDE_MODEL>",
         temperature="<SET_TEMP>",
         seed="<SET_SEED>",

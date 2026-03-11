@@ -15,6 +15,7 @@ A new shared reference document extracts and consolidates content that was repea
 - **ID namespace table** — all prefix conventions in one place. Templates now reference this table instead of repeating it.
 - **Field status code definitions** — one table covering all six documents' status codes.
 - **Compact vs. full document format** — explicit guidance that `_status`, `_prompt`, `_reasoning`, and `_extract` annotations are stripped from inter-agent transfers. Completed documents passed between agents carry only `key: value` pairs plus header IDs. Estimated token reduction: ~60% for consumed documents.
+- **Canonical output format (refinement)** — Authoring agents MUST emit the canonical form directly. Do not include in output: `_status`, `_prompt`, `_quality_check`, `_extract`, `_entry`, or any `_*` keys; flatten `_value` to the parent field name; omit `filled_by` from `field_confidence_records` (provenance is in `metadata.generated_by` / `translation_metadata.translation_tool`). See WIDGET_conventions §4 and template_WDD.yml OUTPUT FORMAT.
 - **Cross-run comparison model** — the IODD comparison table.
 - **Seven key design principles** — consolidated from scattered PURPOSE blocks.
 
@@ -269,3 +270,18 @@ Added to `optimization_opportunities.opportunity_type` allowed values.
 | `run_id` removal from IODD | Minor |
 | **Total estimated reduction (authoring templates)** | **~4,000–5,000 tokens** |
 | **Total estimated reduction (inter-agent transfers of completed docs)** | **~60%** |
+
+---
+
+## Canonical Output Format (Post-v7 Refinement)
+
+**Updated:** `WIDGET_conventions.md` §4, `template_WDD.yml` header
+
+Authoring agents must produce the canonical form directly — no post-processing required. The following are generation instructions, not document content, and must not appear in the output:
+
+- **Strip all `_*` keys:** `_status`, `_prompt`, `_quality_check`, `_extract`, `_entry`, and any other authoring-only keys
+- **Flatten `_value` fields:** For fields using `{ _status: ..., _prompt: ..., _value: X }`, emit only `field_name: X`
+- **Omit `filled_by`** in `translation_metadata.field_confidence_records` — provenance is already in `metadata.generated_by` or `translation_metadata.translation_tool`
+- **Omit comment lines** (lines beginning with `#`)
+
+The template header now includes an OUTPUT FORMAT section instructing agents to emit the canonical form. This reduces document size and token consumption for downstream consumers.

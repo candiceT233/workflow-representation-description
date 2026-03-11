@@ -1,8 +1,9 @@
 # =============================================================================
 # WIDGET — Workflow Definition Document (WDD) Agent Template
 # Schema: wrd-7.0  |  Architecture Design: v7
-# See WIDGET_conventions.md for ID namespace, field status codes, and
-# compact inter-agent transfer format.
+# See WIDGET_conventions.md for ID namespace, field status codes, compact
+# inter-agent transfer format, and stripping rules (_status, _prompt,
+# _quality_check, filled_by).
 #
 # PURPOSE
 # This file is the schema an AI agent reads before analyzing a workflow
@@ -69,6 +70,12 @@
 #   7. Analyze workflow-level patterns (DAG topology, control flow)
 #   8. Extract I/O behavioral hints (partial access, format mismatch, MPI-IO risks)
 #   9. Assemble and validate (mark assumptions, fill confidence records)
+#
+# OUTPUT FORMAT (WIDGET_conventions §4)
+#   Emit the canonical form only. Do NOT include in the output:
+#   - _status, _prompt, _quality_check, _extract, _entry, or any _* keys
+#   - filled_by in field_confidence_records
+#   For fields with _value, emit: field_name: <value> directly.
 #
 # For format-specific extraction rules (Nextflow, Pegasus, Parsl, Slurm,
 # Snakemake, Swift/T) see wdd_design-v7.md Section 5.
@@ -1205,10 +1212,11 @@ translation_metadata:
         - behavioral_notes per task
         - All io_behavioral_hints
         - All execution_profile proposals
+      Omit filled_by from each record; provenance is in metadata.generated_by
+      and translation_metadata.translation_tool. See WIDGET_conventions §4.
     _value: []
     _entry:
       field_path: null
-      filled_by: null
       confidence_level: null    # high | medium | low | inferred
       confidence_reason: null
       requires_human_review: null
