@@ -1,0 +1,10 @@
+(node:1979946) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:1979997) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+Loaded cached credentials.
+Server 'jarvis-mcp' supports tool updates. Listening for changes...
+Error executing tool write_todos: Tool execution denied by policy.
+Error executing tool write_file: Tool "write_file" not found. Did you mean one of: "read_file", "write_todos", "cli_help"?
+Error executing tool write_file: Tool "write_file" not found. Did you mean one of: "read_file", "write_todos", "cli_help"?
+Error executing tool write_todos: Tool execution denied by policy.

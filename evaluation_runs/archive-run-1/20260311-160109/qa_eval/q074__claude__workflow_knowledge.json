@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T16:38:42.261077",
+  "qid": "q074",
+  "source_file": "1000genome-workflow-knowledge-eval-3.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "How is the statistical baseline established in the \"Frequency\" task to help distinguish common variations from disease-associated mutations?",
+  "reference_answer": "The \"Frequency\" task establishes a null distribution by selecting random individuals and analyzing variants without regard for their functional SIFT scores.",
+  "agent": "claude",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "The Frequency task establishes a statistical baseline through **Monte Carlo random sampling**. Specifically:\n\n- It randomly selects **52 individuals** (`n_indiv=52`) from a population and computes their mutation overlap.\n- This random sampling is repeated **1,000 times** (`n_runs=1000`).\n- The results are aggregated across all runs to estimate a **null distribution** of mutation overlap.\n\nThis null distribution serves as the baseline — by comparing observed mutation overlap patterns against this randomly-generated expectation, one can identify overlap levels that are statistically unusual and potentially indicative of disease-associated (non-random) mutation patterns rather than common variation.\n\nThe context does not provide further detail on the specific statistical tests or thresholds applied to distinguish significant deviations from this baseline.",
+  "duration_s": 9.68,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 3.0,
+  "correctness": 3.0
+}

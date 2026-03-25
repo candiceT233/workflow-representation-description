@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T16:35:53.389455",
+  "qid": "q069",
+  "source_file": "1000genome-workflow-knowledge-eval-3.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "What is the specific function of the \"Individuals_Merge\" task within the pipeline's logic?",
+  "reference_answer": "The \"Individuals_Merge\" task acts as a synchronization point, gathering the outputs of the parallel chunks and merging them into a single mutations file per chromosome.",
+  "agent": "claude",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "The **Individuals_Merge** task consolidates per-individual results when a chromosome's VCF processing has been split into multiple chunks (i.e., when `ind_jobs > 1`).\n\nSpecifically, it:\n\n1. **Takes** multiple partial tar archives (`chrXn-{counter}-{stop}.tar.gz`) produced by chunked Individuals jobs for the same chromosome\n2. **Extracts** all input archives, then **aggregates files by name** — concatenating content for files with duplicate filenames (i.e., the same individual's data from different chunks)\n3. **Re-compresses** the merged result into a single tar archive (`chrXn.tar.gz`)\n4. **Cleans up** temporary directories\n\nThis task is only created when `ind_jobs > 1`. If the chromosome is processed as a single chunk, it is skipped entirely. Its output (`chrXn.tar.gz`) is the critical input required by both downstream analysis tasks (Mutation_Overlap and Frequency).",
+  "duration_s": 10.44,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 5.0,
+  "correctness": 5.0
+}

@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-09T15:15:01.557442",
+  "qid": "q052",
+  "source_file": "1000genome-workflow-knowledge-eval-3.txt",
+  "section": "SECTION 1: SCIENTIFIC PURPOSE AND BIOLOGICAL SEMANTICS",
+  "question": "What were the sequencing coverages and sample targets used during the project's pilot phase?",
+  "reference_answer": "The pilot phase utilized low-coverage whole-genome sequencing (2–4X) of 180 samples and high-coverage sequencing (20–60X) of two mother-father-child trios.",
+  "agent": "opencode",
+  "context_type": "wdd_yaml",
+  "success": false,
+  "model_answer": "stdin and input arguments may not both be used.",
+  "duration_s": 0.0,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": null,
+  "correctness": null
+}

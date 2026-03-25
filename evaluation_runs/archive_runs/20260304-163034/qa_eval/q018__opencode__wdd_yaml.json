@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-04T16:46:31.301225",
+  "qid": "q018",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 3: REPOSITORY USAGE AND SYSTEM MECHANICS",
+  "question": "When evaluating the workflow components, how are the logical file names defined in the workflow mapped to actual data locations?",
+  "reference_answer": "The workflow uses a Replica Catalog (RC) to map the logical file names (LFNs) used in the abstract workflow to their physical file locations (PFNs) on the storage systems.",
+  "agent": "opencode",
+  "context_type": "wdd_yaml",
+  "success": false,
+  "model_answer": "exit 1: \u001b[91m\u001b[1mError: \u001b[0mUnexpected error, check log file at /home/mtang11/.local/share/opencode/log/2026-03-04T224633.log for more details\n\nEBADF: bad file descriptor, read\n",
+  "duration_s": 1.95,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": null,
+  "correctness": null
+}

@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T16:38:56.807419",
+  "qid": "q074",
+  "source_file": "1000genome-workflow-knowledge-eval-3.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "How is the statistical baseline established in the \"Frequency\" task to help distinguish common variations from disease-associated mutations?",
+  "reference_answer": "The \"Frequency\" task establishes a null distribution by selecting random individuals and analyzing variants without regard for their functional SIFT scores.",
+  "agent": "claude",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "The WDD describes the Frequency task as using **random sampling of individuals** (via `random.sample()`) to measure how often overlapping mutations occur across populations and chromosomes. It reads individual variant data and SIFT scores **without filtering by SIFT**, computes frequency statistics of variant overlaps, and produces frequency distribution matrices and visualizations.\n\nHowever, the WDD does not contain enough detail to explain precisely how this statistical baseline distinguishes common variations from disease-associated mutations. It describes the *mechanism* (random sampling, frequency distributions, overlap statistics) but not the *interpretive framework* — e.g., what thresholds or comparisons are used to classify a mutation as common vs. disease-associated. That level of detail would require examining the actual `bin/frequency.py` source code, which is beyond what this WDD captures.",
+  "duration_s": 13.15,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 4.0,
+  "correctness": 4.0
+}

@@ -1,0 +1,26 @@
+I'll analyze the workflow codebase to produce the WDD YAML file. Let me start by reading the template files and exploring the workflow repository.
+Now I have sufficient information to compile the WDD. Based on my analysis:
+
+**Workflow Overview:**
+- This is a Pegasus workflow (compiled_from_pegasus_dax)
+- Named "1000-genome" in the daxgen.py
+- Analyzes 1000 genomes data to identify mutational overlaps
+
+**Tasks:**
+1. **individuals** - Processes chromosome VCF files to extract individual mutations
+2. **individuals_merge** - Merges chunks of individuals output per chromosome
+3. **sifting** - Filters SNPs with SIFT scores from VEP annotations
+4. **mutation_overlap** - Cross-matches mutations between individuals by population/chromosome
+5. **frequency** - Measures frequency of overlapping mutations with random sampling
+
+**Data Objects:**
+- Input VCF files (chromosome-specific)
+- SIFT annotation files
+- Population files
+- Columns file
+- Intermediate: individuals tar.gz files (per chromosome chunk)
+- Merged: chrN.tar.gz (per chromosome)
+- Sifted: sifted.SIFT.chrN.txt
+- Output: chrN-POP.tar.gz, chrN-POP-freq.tar.gz
+
+Let me now generate the WDD YAML:

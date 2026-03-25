@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-06T16:50:51.354965",
+  "qid": "q048",
+  "source_file": "1000genome-workflow-knowledge-eval-2.txt",
+  "section": "SECTION 3: REPOSITORY USAGE AND SYSTEM MECHANICS",
+  "question": "What were the key outputs from the high coverage NYGC project phase?",
+  "reference_answer": "The high coverage phase by NYGC utilized Illumina 30X technology to process 3,202 samples. The key outputs included GRCh38 realignment and the calling of structural variants (SVs).",
+  "agent": "gemini",
+  "context_type": "workflow_knowledge",
+  "success": false,
+  "model_answer": "exit 1: An unexpected critical error occurred:Error: EBADF: bad file descriptor, read",
+  "duration_s": 24.61,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": null,
+  "correctness": null
+}

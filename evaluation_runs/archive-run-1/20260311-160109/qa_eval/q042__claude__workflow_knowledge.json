@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T16:22:37.436719",
+  "qid": "q042",
+  "source_file": "1000genome-workflow-knowledge-eval-2.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "How does the workflow establish a baseline or \"null distribution\" to compare against disease-associated cohorts?",
+  "reference_answer": "The \"Frequency\" task establishes a null distribution by selecting random individuals and analyzing variants without regard for their SIFT scores. This task depends on the completion of the Merge and Sifting tasks.",
+  "agent": "claude",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "The **Frequency** task (Stage 4) establishes the null distribution using **Monte Carlo random sampling**:\n\n- It randomly selects subsets of **52 individuals** from a population and computes their pairwise mutation overlap.\n- This sampling is repeated **1,000 times** (`n_runs=1000`).\n- The aggregated results across all random runs produce a **frequency distribution** of expected mutation overlap under random selection.\n\nThis null distribution provides a statistical baseline — you can compare the observed mutation overlap in a specific cohort (e.g., disease-associated) against this randomly-sampled distribution to assess whether the overlap is significantly different from chance.\n\nThe analysis is done **without SIFT filtering** (labeled \"no_sift\" in the output directories), and runs independently per (chromosome, population) pair.",
+  "duration_s": 11.76,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 4.0,
+  "correctness": 4.0
+}

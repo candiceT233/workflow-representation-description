@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T16:05:04.795355",
+  "qid": "q009",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "What is the specific role of the \"Individuals\" task at the start of the pipeline?",
+  "reference_answer": "The \"Individuals\" task is the first and most intensive step, responsible for fetching and parsing Phase 3 VCF data by chromosome to identify SNPs and determine which individuals possess mutations on both alleles.",
+  "agent": "claude",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "The **Individuals** task extracts SNP variants from raw VCF files and creates per-individual mutation records. Specifically, it:\n\n1. Reads a VCF file (`ALL.chrX.250000.vcf`) in chunks, skipping header lines\n2. For each of the ~2,504 individuals (columns in the VCF), writes a separate output file (`chr{X}.{individual_id}`) containing that person's mutations\n3. Filters variants by allele frequency threshold — keeping mutations where AF ≥ 0.5 with the reference allele or AF < 0.5 with the alternate allele\n4. Records five fields per mutation: chromosome position, SNP rs number, alternative allele, reference allele, and allele frequency\n5. Compresses all per-individual files into a single tar.gz archive (`chrXn-{counter}-{stop}.tar.gz`)\n\nIt is the most compute-intensive task in the workflow, consuming **81.85%** of total execution time, and can be parallelized by chunking each chromosome's VCF into multiple jobs via the `-i` parameter.",
+  "duration_s": 10.59,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 5.0,
+  "correctness": 5.0
+}

@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-09T15:15:01.634788",
+  "qid": "q072",
+  "source_file": "1000genome-workflow-knowledge-eval-3.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "When adding the functional annotation layer, what specific data fields does the \"Sifting\" task record?",
+  "reference_answer": "The \"Sifting\" task specifically filters for variants with SIFT scores and records their rs numbers and gene IDs.",
+  "agent": "opencode",
+  "context_type": "workflow_knowledge",
+  "success": false,
+  "model_answer": "stdin and input arguments may not both be used.",
+  "duration_s": 0.0,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": null,
+  "correctness": null
+}

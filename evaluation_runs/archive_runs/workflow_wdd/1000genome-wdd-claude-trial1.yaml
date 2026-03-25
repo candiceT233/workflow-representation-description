@@ -1,0 +1,353 @@
+schema_version: wrd-7.0
+workflow_id: wrd:1000genome
+workflow_name: 1000genome
+version: "1.0.0"
+
+metadata:
+  workflow_description: "The 1000 Genomes Project variant analysis workflow processes whole-genome VCF files to identify per-individual variants, compute pairwise mutation overlaps across populations, and estimate allele frequencies. It uses a Pegasus WMS DAG with scatter-gather parallelism across chromosomes and 7 populations."
+  workflow_class: scientific_data_analysis
+  domain: genomics
+  primary_language: python
+  wms: pegasus
+  source_url: "https://github.com/pegasus-isi/1000genome-workflow"
+  source_commit: unknown
+  static_analysis_date: "2026-03-04"
+  generated_by: claude-sonnet-4-6
+
+stages:
+  - stage_id: stage:individuals_processing
+    stage_name: individuals_processing
+    description: "Extract per-individual variant data from VCF files in parallel chunks per chromosome"
+    tasks:
+      - task:individuals
+    parallelism: embarrassingly_parallel
+    stage_type: compute
+
+  - stage_id: stage:merge
+    stage_name: merge
+    description: "Merge chunked individual output files into per-chromosome archives"
+    tasks:
+      - task:individuals_merge
+    parallelism: embarrassingly_parallel
+    stage_type: compute
+
+  - stage_id: stage:population_analysis
+    stage_name: population_analysis
+    description: "Compute SIFT scores, mutation overlaps, and allele frequencies across 7 populations per chromosome"
+    tasks:
+      - task:sifting
+      - task:mutation_overlap
+      - task:frequency
+    parallelism: embarrassingly_parallel
+    stage_type: compute
+
+tasks:
+  - task_id: task:individuals
+    task_name: individuals
+    description: "Reads a range of lines from an input VCF file and emits one output text file per individual (2,504 files), then compresses all files into a tar.gz archive"
+    script: bin/individuals.py
+    parallelism_model:
+      type: embarrassingly_parallel
+      dimension: chromosome_chunk
+    io_dominance: io_bound
+    io_access_type: python_serial
+    restart_model: idempotent
+    output_class: intermediate
+    inputs:
+      - data:vcf_input
+    outputs:
+      - data:individuals_chunk_tar
+
+  - task_id: task:individuals_merge
+    task_name: individuals_merge
+    description: "Extracts all chunk tar.gz archives for a chromosome, concatenates per-individual files across chunks, and re-archives into a single merged tar.gz"
+    script: bin/individuals_merge.py
+    parallelism_model:
+      type: embarrassingly_parallel
+      dimension: chromosome
+    io_dominance: io_bound
+    io_access_type: python_serial
+    restart_model: idempotent
+    output_class: intermediate
+    inputs:
+      - data:individuals_chunk_tar
+    outputs:
+      - data:individuals_merged_tar
+
+  - task_id: task:sifting
+    task_name: sifting
+    description: "Extracts SIFT pathogenicity scores from VEP-annotated VCF files using subprocess grep and Python regex parsing"
+    script: bin/sifting.py
+    parallelism_model:
+      type: embarrassingly_parallel
+      dimension: chromosome
+    io_dominance: balanced
+    io_access_type: python_serial
+    restart_model: idempotent
+    output_class: intermediate
+    inputs:
+      - data:sift_annotation_vcf
+    outputs:
+      - data:sift_scores
+
+  - task_id: task:mutation_overlap
+    task_name: mutation_overlap
+    description: "Computes pairwise mutation overlap between individuals in a population using O(N^2) comparison; generates matplotlib heatmap plots and compresses results"
+    script: bin/mutation_overlap.py
+    parallelism_model:
+      type: embarrassingly_parallel
+      dimension: chromosome_population
+    io_dominance: balanced
+    io_access_type: python_serial
+    restart_model: idempotent
+    output_class: output
+    inputs:
+      - data:individuals_merged_tar
+      - data:sift_scores
+      - data:population_file
+    outputs:
+      - data:mutation_overlap_tar
+
+  - task_id: task:frequency
+    task_name: frequency
+    description: "Estimates allele frequency distributions via 1,000 Monte Carlo sampling iterations across 52 individuals per population; compresses results to tar.gz"
+    script: bin/frequency.py
+    parallelism_model:
+      type: embarrassingly_parallel
+      dimension: chromosome_population
+    io_dominance: compute_bound
+    io_access_type: python_serial
+    restart_model: idempotent
+    output_class: output
+    inputs:
+      - data:individuals_merged_tar
+      - data:population_file
+    outputs:
+      - data:frequency_tar
+
+data_objects:
+  - data_id: data:vcf_input
+    data_name: vcf_input
+    description: "Input VCF file for a chromosome containing variant calls for 2,504 individuals from the 1000 Genomes Project"
+    format: vcf
+    category: input
+    persistence: workflow_scoped
+    data_volume_class: large
+    typical_size_gb: 1.0
+
+  - data_id: data:sift_annotation_vcf
+    data_name: sift_annotation_vcf
+    description: "VEP-annotated VCF file containing SIFT pathogenicity scores for variant annotation per chromosome"
+    format: vcf
+    category: input
+    persistence: workflow_scoped
+    data_volume_class: large
+    typical_size_gb: 5.0
+
+  - data_id: data:population_file
+    data_name: population_file
+    description: "Text file listing sample IDs belonging to a specific population (one of 7: ALL, AFR, AMR, EAS, EUR, GBR, SAS)"
+    format: txt
+    category: config
+    persistence: workflow_scoped
+    data_volume_class: small
+    typical_size_gb: 0.001
+
+  - data_id: data:workflow_config
+    data_name: workflow_config
+    description: "CSV configuration file (data.csv) mapping chromosome identifiers to input VCF files and SIFT annotation files"
+    format: csv
+    category: config
+    persistence: workflow_scoped
+    data_volume_class: small
+    typical_size_gb: 0.001
+
+  - data_id: data:individuals_chunk_tar
+    data_name: individuals_chunk_tar
+    description: "Tar.gz archive containing per-individual text files for a VCF chunk; one archive per (chromosome, chunk) pair"
+    format: tar.gz
+    category: intermediate
+    persistence: stage_scoped
+    data_volume_class: large
+    typical_size_gb: 2.0
+
+  - data_id: data:individuals_merged_tar
+    data_name: individuals_merged_tar
+    description: "Merged tar.gz archive containing concatenated per-individual variant files for an entire chromosome"
+    format: tar.gz
+    category: intermediate
+    persistence: workflow_scoped
+    data_volume_class: large
+    typical_size_gb: 5.0
+
+  - data_id: data:sift_scores
+    data_name: sift_scores
+    description: "Extracted SIFT pathogenicity scores per chromosome produced by parsing VEP annotation VCF"
+    format: txt
+    category: intermediate
+    persistence: workflow_scoped
+    data_volume_class: medium
+    typical_size_gb: 0.1
+
+  - data_id: data:mutation_overlap_tar
+    data_name: mutation_overlap_tar
+    description: "Tar.gz archive containing pairwise mutation overlap results and heatmap plots per (chromosome, population)"
+    format: tar.gz
+    category: output
+    persistence: persistent
+    data_volume_class: medium
+    typical_size_gb: 0.5
+
+  - data_id: data:frequency_tar
+    data_name: frequency_tar
+    description: "Tar.gz archive containing allele frequency distribution results per (chromosome, population) from Monte Carlo sampling"
+    format: tar.gz
+    category: output
+    persistence: persistent
+    data_volume_class: small
+    typical_size_gb: 0.05
+
+pc_edges:
+  - edge_id: pc:individuals->individuals_merge:n_to_1
+    producer: task:individuals
+    consumer: task:individuals_merge
+    data_objects:
+      - data:individuals_chunk_tar
+    pc_pattern: n_to_1
+    coupling: loose
+    communication_pattern: file_per_producer
+    co_scheduling_hint: neutral
+
+  - edge_id: pc:individuals_merge->frequency:1_to_n
+    producer: task:individuals_merge
+    consumer: task:frequency
+    data_objects:
+      - data:individuals_merged_tar
+    pc_pattern: 1_to_n
+    coupling: loose
+    communication_pattern: shared_file
+    co_scheduling_hint: neutral
+
+  - edge_id: pc:individuals_merge->mutation_overlap:1_to_n
+    producer: task:individuals_merge
+    consumer: task:mutation_overlap
+    data_objects:
+      - data:individuals_merged_tar
+    pc_pattern: 1_to_n
+    coupling: loose
+    communication_pattern: shared_file
+    co_scheduling_hint: neutral
+
+  - edge_id: pc:sifting->mutation_overlap:1_to_n
+    producer: task:sifting
+    consumer: task:mutation_overlap
+    data_objects:
+      - data:sift_scores
+    pc_pattern: 1_to_n
+    coupling: loose
+    communication_pattern: shared_file
+    co_scheduling_hint: neutral
+
+workflow_graph:
+  dag_or_dcg: dag
+  entry_tasks:
+    - task:individuals
+    - task:sifting
+  exit_tasks:
+    - task:mutation_overlap
+    - task:frequency
+  critical_path:
+    - task:individuals
+    - task:individuals_merge
+    - task:mutation_overlap
+
+workflow_patterns:
+  primary_pattern: scatter_gather
+  secondary_patterns:
+    - broadcast
+  loop_present: false
+  conditional_branching: false
+  max_parallelism_degree: 70
+  pattern_notes: "Scatter-gather across chromosomes (10) and chunks (up to 250 per chromosome) for individuals processing; broadcast of merged chromosome data to 7 populations for analysis tasks"
+
+io_behavioral_hints:
+  - hint_id: hint:small_file_overhead_individuals
+    task_ref: task:individuals
+    data_ref: data:individuals_chunk_tar
+    potential_concern: small_file_overhead
+    description: "Each individuals job writes 2,504 separate text files before compressing into tar.gz; creates high metadata load on shared filesystems during the write phase"
+    severity: high
+
+  - hint_id: hint:small_file_overhead_merge
+    task_ref: task:individuals_merge
+    data_ref: data:individuals_chunk_tar
+    potential_concern: small_file_overhead
+    description: "Merge task extracts many small per-individual files from multiple chunk archives before re-archiving; high metadata overhead during sequential decompression"
+    severity: medium
+
+  - hint_id: hint:data_reuse_merged_tar
+    task_ref: task:mutation_overlap
+    data_ref: data:individuals_merged_tar
+    potential_concern: data_reuse
+    description: "The merged tar.gz per chromosome is read by both mutation_overlap and frequency tasks across 7 populations (14 reads total per chromosome); potential caching or staging benefit"
+    severity: medium
+
+  - hint_id: hint:partial_access_sifting
+    task_ref: task:sifting
+    data_ref: data:sift_annotation_vcf
+    potential_concern: partial_access
+    description: "Sifting task uses subprocess grep to scan large annotation VCFs extracting only SIFT-annotated lines; sequential full-file scan to extract small subset of data"
+    severity: medium
+
+  - hint_id: hint:compute_intensive_frequency
+    task_ref: task:frequency
+    data_ref: data:individuals_merged_tar
+    potential_concern: unknown
+    description: "Frequency task runs 1,000 Monte Carlo iterations loading individuals tar.gz into memory; compute-bound with significant memory footprint for ALL population (2,504 individuals)"
+    severity: low
+
+execution_profiles:
+  - profile_id: profile:individuals_small_chrom
+    task_ref: task:individuals
+    scenario: small_chromosome
+    estimated_runtime_s: 60
+    estimated_memory_gb: 1.0
+    notes: "Estimated for smaller chromosomes with fewer variants and shorter VCF line ranges"
+
+  - profile_id: profile:individuals_large_chrom
+    task_ref: task:individuals
+    scenario: large_chromosome
+    estimated_runtime_s: 300
+    estimated_memory_gb: 2.0
+    notes: "Estimated for larger chromosomes (chr1, chr2) with more variants and longer VCF files"
+
+  - profile_id: profile:frequency_all_population
+    task_ref: task:frequency
+    scenario: all_population
+    estimated_runtime_s: 120
+    estimated_memory_gb: 4.0
+    notes: "1,000 Monte Carlo iterations over ALL population (2,504 individuals); memory scales with population size"
+
+translation_metadata:
+  wdd_id: wrd:1000genome
+  source_workflow: 1000genome
+  translation_date: "2026-03-04"
+  translation_tool: claude-sonnet-4-6
+  static_analysis_confidence: medium
+  field_confidence_records:
+    - field: workflow_patterns.primary_pattern
+      confidence: high
+      note: "Clearly scatter-gather from DAX generator (daxgen.py) DAG structure"
+    - field: tasks.io_dominance
+      confidence: medium
+      note: "Inferred from script logic analysis; no empirical profiling data available"
+    - field: execution_profiles
+      confidence: low
+      note: "Order-of-magnitude estimates based on genomics domain knowledge; no profiling data"
+    - field: data_objects.typical_size_gb
+      confidence: low
+      note: "Order-of-magnitude estimates based on 1000 Genomes Project data characteristics"
+    - field: tasks.parallelism_model.dimension
+      confidence: high
+      note: "Confirmed from daxgen.py: individuals parallelized per (chromosome, chunk); merge per chromosome; analysis per (chromosome, population)"
+  integrity_hash: a3f8c2b1d4e9f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0

@@ -18,7 +18,7 @@ Question to anwer: how we structure the data so that the agent can answer our qu
 - [sets of IODD] = execution (WDD, EDD DDD, HRD, GD)
 
 
-# next step:
+# next step: (done)
 * improve design of WDD (based on above note)
     - need to iterate through with architecutre document with other files (done)
     - add conditional sementioncs to the WDD (done)
@@ -29,7 +29,36 @@ Question to anwer: how we structure the data so that the agent can answer our qu
 (make agent recheck: things missing in WDD v3, overexplaining, gaps, anything info in the workflow repo was not included in the WDD due to it's format)
 
 
+---
+# next step:
+widget.yml meainig the ddd, edd, gd, hrd, iodd, and wdd.
+- generate prompts for teach template document
+  - each prompt targets one file generation
+- generate wdd for other 5+ workflows(repos)
+- generate the rest of the template (formalize the prompts also)
+- evaluations possibilities: only code, only markdown, only widget.yml 
+ - trying local models to use the generated docs (compare it with claude models as well)
+ - model comparison
+- compares the different semantics:
+  -qa on only the wdd
+  -qa on only the edd
+  -qa on knowledge across the wdd and edd
+  - what are the differences? 
+  - what if the prompt becomes much more complicated:
+    - asks the agent to draw insights from I/O patterns
+    - based on this I/O profiling what do I need to change on deployment/code ect.
+    - give it a bunch of darshan traces, give analysis and improvement plan
+    - (/context find the context usage comparison from giving it everything vs. just the widget.yml)
+  - closing the loop: can the agent actually execute the improvement plan
+  ** context size problem for agent, with profiling/traces on workflow, and the system environment. how would an agent implement meaningful improvement for workflow. widget.yml would guide on the workflow improvement (whether it's sucessful in analysis? in executing improvement? and perhaps use much less context?)
+  ** agent interceptor -> track context of claude to show context explosion when doing I/O analysis/or execute improvement plan
 
+
+value: I/O patterns and semantics on *local models*
+- the templated definition values: less capable model works just as well?
+- also on how these template files are being used -> deployment with a less capable model?
+
+---
 # 1. qualitative
 Use natrual language to asks information about the workflow, how much the agent know about the workflow already with just:
 - understanding the workflow repo vs. 

@@ -1,0 +1,44 @@
+{
+  "opencode__knowledge": {
+    "n": 3,
+    "duration_mean_s": 10.351,
+    "duration_std_s": 2.267,
+    "validation_mean": 0.293,
+    "validation_pass_rate": 0.0
+  },
+  "claude__knowledge": {
+    "n": 3,
+    "duration_mean_s": 3.256,
+    "duration_std_s": 0.039,
+    "validation_mean": 0.0,
+    "validation_pass_rate": 0.0
+  },
+  "gemini__knowledge": {
+    "n": 3,
+    "duration_mean_s": 204.711,
+    "duration_std_s": 40.707,
+    "validation_mean": 0.907,
+    "validation_pass_rate": 1.0
+  },
+  "opencode__wdd": {
+    "n": 3,
+    "duration_mean_s": 229.574,
+    "duration_std_s": 53.593,
+    "validation_mean": 0.333,
+    "validation_pass_rate": 0.333
+  },
+  "claude__wdd": {
+    "n": 3,
+    "duration_mean_s": 3.381,
+    "duration_std_s": 0.233,
+    "validation_mean": 0.067,
+    "validation_pass_rate": 0.0
+  },
+  "gemini__wdd": {
+    "n": 3,
+    "duration_mean_s": 586.46,
+    "duration_std_s": 227.829,
+    "validation_mean": 1.0,
+    "validation_pass_rate": 1.0
+  }
+}

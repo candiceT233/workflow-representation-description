@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-04T11:04:08.256786",
+  "qid": "q003",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 1: SCIENTIFIC PURPOSE AND BIOLOGICAL SEMANTICS",
+  "question": "What types of genetic variants are included in the Phase 3 multi-allelic variant calling?",
+  "reference_answer": "Phase 3 introduced multi-allelic variant calling that encompasses single nucleotide polymorphisms (SNPs), insertions/deletions (INDELs), and complex structural variants (SVs).",
+  "agent": "opencode",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "Based on the provided wdd_yaml context, the specific details about \"Phase 3 multi-allelic variant calling\" and the complete list of variant types (SNPs, INDELs, structural variants) are not explicitly mentioned. The context primarily describes the workflow's processing of \"SNPs variants\" and mentions \"Phase3 data from the 1000 Genomes Project,\" but does not elaborate on the variant types included in the multi-allelic calling.\n\nTherefore, I must state: The provided wdd_yaml context does not contain enough information to fully answer this question. It identifies that the workflow processes \"SNPs variants\" from Phase3 data but does not specify the complete set of variant types (such as INDELs or structural variants) included in the Phase 3 multi-allelic variant calling.",
+  "duration_s": 41.98,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 2.0,
+  "correctness": 2.0
+}

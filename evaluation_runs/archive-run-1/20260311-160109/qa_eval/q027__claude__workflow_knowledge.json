@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T16:14:35.443276",
+  "qid": "q027",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 4: INPUT FILES, OUTPUT FILES, AND DATA FORMATS",
+  "question": "What does the \"Individuals_Merge\" task produce, and what tasks consume it?",
+  "reference_answer": "\"Individuals_Merge\" produces a single merged mutations file per chromosome, consolidating all parallel chunk outputs. This merged file is consumed by both the \"Mutations_Overlap\" task and the \"Frequency\" task.",
+  "agent": "claude",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "The **Individuals_Merge** task produces a single merged tar archive: **`chrXn.tar.gz`** — a consolidated archive of per-individual mutation files for a given chromosome.\n\nIt is consumed by two downstream tasks:\n\n1. **Mutation_Overlap** — uses it to compute pairwise mutation similarity across individuals within a population\n2. **Frequency** — uses it for Monte Carlo random sampling to estimate mutation frequency distributions\n\nBoth tasks extract the archive to access the individual mutation files contained within it.",
+  "duration_s": 8.21,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 5.0,
+  "correctness": 5.0
+}

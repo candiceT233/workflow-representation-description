@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-09T15:15:01.491684",
+  "qid": "q042",
+  "source_file": "1000genome-workflow-knowledge-eval-2.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "How does the workflow establish a baseline or \"null distribution\" to compare against disease-associated cohorts?",
+  "reference_answer": "The \"Frequency\" task establishes a null distribution by selecting random individuals and analyzing variants without regard for their SIFT scores. This task depends on the completion of the Merge and Sifting tasks.",
+  "agent": "opencode",
+  "context_type": "workflow_knowledge",
+  "success": false,
+  "model_answer": "stdin and input arguments may not both be used.",
+  "duration_s": 0.0,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": null,
+  "correctness": null
+}

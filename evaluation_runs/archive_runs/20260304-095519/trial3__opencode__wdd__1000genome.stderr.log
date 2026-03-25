@@ -1,0 +1,289 @@
+[0m
+> build · minimax-m2.5-free
+[0m
+[0m→ [0mRead template_separate_docs/template_WDD.yml
+[0m→ [0mRead template_separate_docs/WIDGET_conventions.md
+[0m
+[0m$ [0mls -la /mnt/common/mtang11/scripts/workflow-representation-description/workflows_repo/1000genome-workflow
+total 96
+drwxrwxr-x 7 mtang11 mtang11  4096 Feb 24 14:42 .
+drwxrwxr-x 4 mtang11 mtang11   151 Mar  4 09:38 ..
+drwxrwxr-x 2 mtang11 mtang11  4096 Feb 23 01:44 analysis
+-rw-rw-r-- 1 mtang11 mtang11  8476 Feb 24 14:52 ares_1kgenome_parallel.sbatch
+drwxrwxr-x 2 mtang11 mtang11  4096 Feb 23 01:44 bin
+drwxrwxr-x 4 mtang11 mtang11    53 Feb 23 01:49 data
+-rw-rw-r-- 1 mtang11 mtang11  1042 Feb 23 01:49 data.csv
+-rwxrwxr-x 1 mtang11 mtang11 24554 Feb 23 01:49 daxgen.py
+drwxrwxr-x 3 mtang11 mtang11    28 Feb 23 01:49 docs
+-rw-rw-r-- 1 mtang11 mtang11   481 Feb 23 01:49 env.sh
+-rw-rw-r-- 1 mtang11 mtang11    44 Feb 23 01:49 .git
+-rw-rw-r-- 1 mtang11 mtang11    75 Feb 23 01:49 .gitignore
+drwxrwxr-x 2 mtang11 mtang11  4096 Feb 23 01:49 lib
+-rw-rw-r-- 1 mtang11 mtang11 11368 Feb 23 01:49 LICENSE
+-rwxrwxr-x 1 mtang11 mtang11   483 Feb 23 01:49 prepare_input.sh
+-rw-rw-r-- 1 mtang11 mtang11 10090 Feb 23 01:49 README.md
+[0m
+[0m→ [0mRead workflows_repo/1000genome-workflow/README.md
+[0m→ [0mRead workflows_repo/1000genome-workflow/daxgen.py
+[0m
+[0m$ [0mls -la /mnt/common/mtang11/scripts/workflow-representation-description/workflows_repo/1000genome-workflow/bin
+total 84
+drwxrwxr-x 2 mtang11 mtang11  4096 Feb 23 01:44 .
+drwxrwxr-x 7 mtang11 mtang11  4096 Feb 24 14:42 ..
+-rwxrwxr-x 1 mtang11 mtang11 10747 Feb 23 01:44 frequency.py
+-rwxrwxr-x 1 mtang11 mtang11  2576 Feb 23 01:44 individuals
+-rwxrwxr-x 1 mtang11 mtang11   373 Feb 23 01:44 individuals_merge
+-rwxrwxr-x 1 mtang11 mtang11  3809 Feb 23 01:44 individuals_merge_mpi.py
+-rwxrwxr-x 1 mtang11 mtang11  2076 Feb 23 01:44 individuals_merge.py
+-rwxrwxr-x 1 mtang11 mtang11  6599 Feb 23 01:44 individuals_mpi.py
+-rwxrwxr-x 1 mtang11 mtang11  4976 Feb 23 01:44 individuals.py
+-rwxrwxr-x 1 mtang11 mtang11 17109 Feb 23 01:44 mutation_overlap.py
+-rwxrwxr-x 1 mtang11 mtang11   167 Feb 23 01:44 pmc-wrapper
+-rwxrwxr-x 1 mtang11 mtang11   952 Feb 23 01:44 sifting
+-rwxrwxr-x 1 mtang11 mtang11  2910 Feb 23 01:44 sifting.py
+[0m
+[0m→ [0mRead workflows_repo/1000genome-workflow/bin/individuals.py
+[0m→ [0mRead workflows_repo/1000genome-workflow/bin/individuals_merge.py
+[0m→ [0mRead workflows_repo/1000genome-workflow/bin/sifting.py
+[0m→ [0mRead workflows_repo/1000genome-workflow/bin/mutation_overlap.py
+[0m→ [0mRead workflows_repo/1000genome-workflow/bin/frequency.py
+[0m→ [0mRead workflows_repo/1000genome-workflow/data.csv
+[0m
+[0m$ [0mls -la /mnt/common/mtang11/scripts/workflow-representation-description/workflows_repo/1000genome-workflow/data/
+total 12
+drwxrwxr-x 4 mtang11 mtang11   53 Feb 23 01:49 .
+drwxrwxr-x 7 mtang11 mtang11 4096 Feb 24 14:42 ..
+drwxrwxr-x 6 mtang11 mtang11 4096 Feb 23 01:49 20130502
+drwxrwxr-x 2 mtang11 mtang11  115 Feb 23 01:49 populations
+[0m
+[0m$ [0mgit -C /mnt/common/mtang11/scripts/workflow-representation-description/workflows_repo/1000genome-workflow log -1 --format=%H
+fatal: not a git repository: /mnt/common/mtang11/scripts/workflow-representation-description/workflows_repo/1000genome-workflow/../.git/modules/1000genome-workflow
+[0m
+[0m$ [0mgit log -1 --format=%H
+314cd288ff1cdb8b931864e3f4f72c2c24071d2e
+[0m
+[0m$ [0mpython3 -c "import uuid; print(uuid.uuid4())"
+7387d81a-11d2-4ab0-b9e5-2a2b38180de8
+[0m
+[0m← [0mWrite workflow_wdd/1000genome-wdd-opencode-trial3.yaml
+Wrote file successfully.
+
+LSP errors detected in this file, please fix:
+<diagnostics file="/mnt/common/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial3.yaml">
+ERROR [424:51] Nested mappings are not allowed in compact mappings
+ERROR [424:51] Implicit keys need to be on a single line
+ERROR [425:15] Nested mappings are not allowed in compact mappings
+ERROR [425:15] Implicit keys need to be on a single line
+ERROR [426:15] Nested mappings are not allowed in compact mappings
+ERROR [426:15] Implicit keys need to be on a single line
+ERROR [429:1] All mapping items must start at the same column
+ERROR [430:1] All mapping items must start at the same column
+ERROR [431:1] All mapping items must start at the same column
+ERROR [432:1] All mapping items must start at the same column
+ERROR [433:1] All mapping items must start at the same column
+ERROR [434:1] All mapping items must start at the same column
+ERROR [435:1] All mapping items must start at the same column
+ERROR [436:1] A block sequence may not be used as an implicit map key
+ERROR [437:3] Implicit keys need to be on a single line
+ERROR [437:3] Implicit map keys need to be followed by map values
+ERROR [562:29] Nested mappings are not allowed in compact mappings
+</diagnostics>
+
+LSP errors detected in other files:
+<diagnostics file="/mnt/common/mtang11/scripts/workflow-representation-description/workflows_repo/1000genome-workflow/daxgen.py">
+ERROR [11:6] Import "Pegasus.api" could not be resolved
+ERROR [55:24] "File" is not defined
+ERROR [85:19] "File" is not defined
+ERROR [125:19] "SiteCatalog" is not defined
+ERROR [106:22] "Properties" is not defined
+ERROR [94:20] "write" is not a known attribute of "None"
+ERROR [177:19] "TransformationCatalog" is not defined
+ERROR [95:17] "write" is not a known attribute of "None"
+ERROR [347:19] "ReplicaCatalog" is not defined
+ERROR [96:17] "write" is not a known attribute of "None"
+ERROR [359:19] "Workflow" is not defined
+ERROR [97:17] "write" is not a known attribute of "None"
+ERROR [101:21] "graph" is not a known attribute of "None"
+ERROR [101:92] Operator "+" not supported for "None"
+ERROR [127:17] "Site" is not defined
+ERROR [128:13] "Directory" is not defined
+ERROR [128:23] "Directory" is not defined
+ERROR [129:17] "FileServer" is not defined
+ERROR [129:65] "Operation" is not defined
+ERROR [131:13] "Directory" is not defined
+... and 63 more
+</diagnostics>
+
+LSP errors detected in other files:
+<diagnostics file="/mnt/common/mtang11/scripts/workflow-representation-description/workflows_repo/1000genome-workflow/bin/frequency.py">
+ERROR [6:8] Import "numpy" could not be resolved
+ERROR [7:8] Import "numpy.ma" could not be resolved
+ERROR [10:8] Import "matplotlib" could not be resolved
+ERROR [13:8] Import "matplotlib.pyplot" could not be resolved
+ERROR [14:8] Import "matplotlib.colors" could not be resolved
+ERROR [15:8] Import "matplotlib.cm" could not be resolved
+ERROR [20:6] Import "mpl_toolkits.axes_grid1" could not be resolved
+ERROR [23:6] Import "pylab" could not be resolved
+ERROR [24:6] Import "matplotlib" could not be resolved
+ERROR [25:8] Import "matplotlib" could not be resolved
+</diagnostics>
+
+LSP errors detected in other files:
+<diagnostics file="/mnt/common/mtang11/scripts/workflow-representation-description/workflows_repo/1000genome-workflow/bin/mutation_overlap.py">
+ERROR [6:8] Import "numpy" could not be resolved
+ERROR [7:8] Import "numpy.ma" could not be resolved
+ERROR [11:8] Import "matplotlib" could not be resolved
+ERROR [13:8] Import "matplotlib.pyplot" could not be resolved
+ERROR [14:8] Import "matplotlib.colors" could not be resolved
+ERROR [15:8] Import "matplotlib.cm" could not be resolved
+ERROR [16:6] Import "mpl_toolkits.axes_grid1" could not be resolved
+ERROR [20:6] Import "pylab" could not be resolved
+ERROR [21:6] Import "matplotlib" could not be resolved
+ERROR [22:8] Import "matplotlib" could not be resolved
+</diagnostics>
+[0m
+[0m← [0mEdit workflow_wdd/1000genome-wdd-opencode-trial3.yaml
+Index: /mnt/common/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial3.yaml
+===================================================================
+--- /mnt/common/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial3.yaml
++++ /mnt/common/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial3.yaml
+@@ -420,9 +420,9 @@
+       access_frequency_class: once
+       consumer_count: 0
+ 
+ pc_edges:
+-  -:individuals->individuals_merge:1_to_ edge_id: pc1
++  - edge_id: pc:individuals->individuals_merge:n_to_1
+     producer: task:individuals
+     consumer: task:individuals_merge
+     data_objects:
+       - data:individual_chr_tar
+
+[0m
+[0m→ [0mRead workflow_wdd/1000genome-wdd-opencode-trial3.yaml[90m [limit=30, offset=555][0m
+[0m
+[0m← [0mEdit workflow_wdd/1000genome-wdd-opencode-trial3.yaml
+Index: /mnt/common/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial3.yaml
+===================================================================
+--- /mnt/common/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial3.yaml
++++ /mnt/common/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial3.yaml
+@@ -558,9 +558,15 @@
+ workflow_patterns:
+   primary_pattern: scatter_gather
+   secondary_patterns:
+     - cascading
+-  classification_rationale: The workflow exhibits scatter-gather pattern at multiple levels: (1) individuals jobs scatter across chromosome segments, gather into merge job; (2) merge output scatters to multiple population-specific analysis jobs. The overall flow follows cascading stages (data_ingestion -> sifting -> analysis). The n_to_1 edges from individuals to merge and 1_to_n edges from merge/sifting to analysis tasks demonstrate the scatter-gather structure.
++  classification_rationale: >
++    The workflow exhibits scatter-gather pattern at multiple levels:
++    (1) individuals jobs scatter across chromosome segments, gather into merge job;
++    (2) merge output scatters to multiple population-specific analysis jobs.
++    The overall flow follows cascading stages (data_ingestion -> sifting -> analysis).
++    The n_to_1 edges from individuals to merge and 1_to_n edges from merge/sifting
++    to analysis tasks demonstrate the scatter-gather structure.
+   pattern_table_row: "1000genome | 3 stages | 5 task types (multiple instances) | n_to_1, 1_to_n | parallel file processing, sequential merge, multi-population analysis"
+ 
+ io_behavioral_hints:
+   - hint_id: hint:small_file_overhead_individuals
+
+[0m
+[0m$ [0mpython3 -c "import yaml; yaml.safe_load(open('/mnt/common/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial3.yaml'))" 2>&1 | head -20
+[0m
+[0m$ [0mwc -l /mnt/common/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial3.yaml
+661 /mnt/common/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial3.yaml
+[0m
+[0m→ [0mRead workflow_wdd/1000genome-wdd-opencode-trial3.yaml[90m [limit=30, offset=630][0m
+[0m→ [0mRead workflow_wdd/1000genome-wdd-opencode-trial3.yaml[90m [limit=10, offset=655][0m
+[0m
+[0m$ [0mpython3 -c "
+import hashlib
+import json
+import yaml
+
+# Load the YAML file
+with open('/mnt/common/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial3.yaml', 'r') as f:
+    wdd = yaml.safe_load(f)
+
+# Extract pc_edges for hashing
+pc_edges = wdd.get('pc_edges', [])
+
+# Create a canonical representation
+edges_data = []
+for edge in pc_edges:
+    edge_info = {
+        'edge_id': edge.get('edge_id'),
+        'producer': edge.get('producer'),
+        'consumer': edge.get('consumer'),
+        'data_objects': sorted(edge.get('data_objects', [])),
+        'pc_pattern': edge.get('pc_pattern'),
+        'coupling': edge.get('coupling'),
+        'communication_pattern': edge.get('communication_pattern'),
+        'data_volume_class': edge.get('data_volume_class')
+    }
+    edges_data.append(edge_info)
+
+# Sort by edge_id for consistency
+edges_data = sorted(edges_data, key=lambda x: x['edge_id'])
+
+# Compute SHA-256 hash
+hash_input = json.dumps(edges_data, sort_keys=True)
+hash_value = hashlib.sha256(hash_input.encode()).hexdigest()
+print(hash_value)
+"
+75e91e92078276e31d515c5ae7f53097af7bae0c1ea175b7a6b0c0e1e91fd846
+[0m
+[0m← [0mEdit workflow_wdd/1000genome-wdd-opencode-trial3.yaml
+Index: /mnt/common/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial3.yaml
+===================================================================
+--- /mnt/common/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial3.yaml
++++ /mnt/common/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial3.yaml
+@@ -486,9 +486,9 @@
+     communication_pattern: file_per_producer
+     data_volume_class: small
+ 
+ workflow_graph:
+-  integrity_hash: null
++  integrity_hash: 75e91e92078276e31d515c5ae7f53097af7bae0c1ea175b7a7a6b0c0e1e91fd846
+   last_generated: 2026-03-04T00:00:00Z
+   dag_edges:
+     - from: task:individuals
+       to: task:individuals_merge
+
+[0m
+[0m$ [0mpython3 -c "import yaml; yaml.safe_load(open('/mnt/common/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial3.yaml')); print('YAML is valid')"
+YAML is valid
+[0m
+[0m$ [0mpython3 -c "
+import yaml
+with open('/mnt/common/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial3.yaml') as f:
+    data = yaml.safe_load(f)
+    
+print('Sections present:')
+for key in data:
+    print(f'  - {key}')
+    
+print(f'\\nTasks count: {len(data.get(\"tasks\", []))}')
+print(f'Stages count: {len(data.get(\"stages\", []))}')
+print(f'Data objects count: {len(data.get(\"data_objects\", []))}')
+print(f'PC edges count: {len(data.get(\"pc_edges\", []))}')
+print(f'IO behavioral hints count: {len(data.get(\"io_behavioral_hints\", []))}')
+print(f'Execution profiles count: {len(data.get(\"execution_profiles\", []))}')
+"
+Sections present:
+  - metadata
+  - stages
+  - tasks
+  - data_objects
+  - pc_edges
+  - workflow_graph
+  - workflow_patterns
+  - io_behavioral_hints
+  - execution_profiles
+  - translation_metadata
+
+Tasks count: 5
+Stages count: 3
+Data objects count: 9
+PC edges count: 5
+IO behavioral hints count: 3
+Execution profiles count: 1
+[0m

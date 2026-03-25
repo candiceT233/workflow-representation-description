@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-06T17:04:04.549093",
+  "qid": "q064",
+  "source_file": "1000genome-workflow-knowledge-eval-3.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "How does the workflow's dependency structure contribute to the biological analysis?",
+  "reference_answer": "The dependency structure ensures that biological insights are derived through a systematic pipeline of data refinement.",
+  "agent": "gemini",
+  "context_type": "workflow_knowledge",
+  "success": false,
+  "model_answer": "exit 1: An unexpected critical error occurred:Error: EBADF: bad file descriptor, read",
+  "duration_s": 24.76,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": null,
+  "correctness": null
+}

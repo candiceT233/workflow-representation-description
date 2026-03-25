@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-04T16:52:04.870230",
+  "qid": "q025",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 4: INPUT FILES, OUTPUT FILES, AND DATA FORMATS",
+  "question": "What setup must be done before the workflow can process any input data, and which script handles it?",
+  "reference_answer": "The prepare_input.sh script must be run first. It unzips the included data and sets up the local environment so that the workflow has the necessary files in place to begin execution.",
+  "agent": "gemini",
+  "context_type": "wdd_yaml",
+  "success": false,
+  "model_answer": "exit 1: (node:3185918) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n(node:3185977) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.\n(Use `node --trace-deprecation ...` to show where the warning was created)\nLoaded cached credentials.\nServer 'jarvis-mcp' supports tool updates. Listening for changes...\nAn un",
+  "duration_s": 23.89,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": null,
+  "correctness": null
+}

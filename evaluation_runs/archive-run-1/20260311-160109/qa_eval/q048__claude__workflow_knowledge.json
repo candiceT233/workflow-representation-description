@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T16:25:35.529490",
+  "qid": "q048",
+  "source_file": "1000genome-workflow-knowledge-eval-2.txt",
+  "section": "SECTION 3: REPOSITORY USAGE AND SYSTEM MECHANICS",
+  "question": "What were the key outputs from the high coverage NYGC project phase?",
+  "reference_answer": "The high coverage phase by NYGC utilized Illumina 30X technology to process 3,202 samples. The key outputs included GRCh38 realignment and the calling of structural variants (SVs).",
+  "agent": "claude",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "The provided workflow knowledge document does not contain any information about a \"high coverage NYGC project phase.\" The context covers only the 1000Genome workflow's static code analysis, including its stages, data objects, dependencies, and configuration. There is no mention of NYGC (New York Genome Center) or a high coverage sequencing phase.",
+  "duration_s": 6.97,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 1.0,
+  "correctness": 1.0
+}

@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T16:25:58.275576",
+  "qid": "q049",
+  "source_file": "1000genome-workflow-knowledge-eval-2.txt",
+  "section": "SECTION 3: REPOSITORY USAGE AND SYSTEM MECHANICS",
+  "question": "What was the sample count and primary technology utilized during Phase 1?",
+  "reference_answer": "Phase 1 integrated calls for 1,092 samples. It used a mixed technology approach that included Illumina, SOLiD, and 454 platforms to produce integrated bi-allelic SNPs and INDELs.",
+  "agent": "claude",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "Based on the workflow knowledge context:\n\n**Sample count:** 2,504 individuals (per chromosome, as stated in the VCF format assumption: \"Standard VCF with 2504 individual columns\")\n\n**Primary technology in Phase 1 (Data Extraction):** Per-chromosome, per-individual extraction from raw VCF files, processing each individual's column to filter SNP variants by allele frequency threshold and producing serialized individual mutation sets as tar.gz archives. The core processing reads VCF lines, splits tab-delimited columns, applies an allele frequency filter (AF ≥ 0.5 for ref alleles, AF < 0.5 for alt alleles), and writes per-individual mutation files.\n\nThe context does not specify the original sequencing technology (e.g., whole-genome sequencing platform) used to generate the 1000 Genomes Project data — only the computational processing applied to the VCF files.",
+  "duration_s": 9.92,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 1.0,
+  "correctness": 1.0
+}

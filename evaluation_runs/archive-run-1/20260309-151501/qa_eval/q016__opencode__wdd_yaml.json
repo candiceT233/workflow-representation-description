@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-09T15:15:01.218169",
+  "qid": "q016",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 3: REPOSITORY USAGE AND SYSTEM MECHANICS",
+  "question": "Where is the official repository hosted for the bioinformatics workflow that identifies these mutational overlaps?",
+  "reference_answer": "The repository is hosted on GitHub under \"pegasus-isi/1000genome-workflow\".",
+  "agent": "opencode",
+  "context_type": "wdd_yaml",
+  "success": false,
+  "model_answer": "stdin and input arguments may not both be used.",
+  "duration_s": 0.0,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": null,
+  "correctness": null
+}

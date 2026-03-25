@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-06T17:06:58.322037",
+  "qid": "q067",
+  "source_file": "1000genome-workflow-knowledge-eval-3.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "Why must the chromosome VCF files be divided into manageable chunks during the first step?",
+  "reference_answer": "The files must be divided because human chromosomes contain hundreds of thousands of variants, making the VCF files exceptionally large.",
+  "agent": "gemini",
+  "context_type": "wdd_yaml",
+  "success": false,
+  "model_answer": "exit 1: An unexpected critical error occurred:Error: EBADF: bad file descriptor, read",
+  "duration_s": 24.06,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": null,
+  "correctness": null
+}

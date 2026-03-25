@@ -1,0 +1,1211 @@
+metadata:
+  workflow_lineage_id: "e6f1a9b8-d2c3-4e5a-b67c-8d9e0f1a2b3c"
+  version: "1.0.0"
+  version_notes: "Initial WDD compiled from daxgen.py."
+  deprecated: false
+  workflow_name: "1000-genome"
+  workflow_description: "The 1000 genomes project provides a reference for human variation, having reconstructed the genomes of 2,504 individuals across 26 different populations to energize these approaches. This workflow identifies mutational overlaps using data from the 1000 genomes project in order to provide a null distribution for rigorous statistical evaluation of potential disease-related mutations. The workflow fetches, parses, and analyzes data from the 1000 genomes Project. It cross-matches the extracted data (which person has which mutations), with the mutation's sift score (how bad it is). Then it performs a few analyses, including plotting."
+  source_repository: "/home/mtang11/scripts/workflow-representation-description/workflows_repo/1000genome-workflow"
+  source_commit: null
+  source_format: "compiled_from_pegasus_dax"
+  source_file: "daxgen.py"
+  schema_version: "wrd-7.0"
+  generated_by: "gemini"
+  generated_at: "2026-02-27T16:30:00Z"
+  last_modified_at: "2026-02-27T16:30:00Z"
+stages:
+  - stage_id: "stage:individuals_processing"
+    name: "Individuals Processing"
+    order: 1
+    description: "Fetches and parses individual genomic data for each chromosome, potentially in parallel chunks."
+    tasks: ["task:individuals"]
+  - stage_id: "stage:merge_and_sifting"
+    name: "Merge and Sifting"
+    order: 2
+    description: "Merges the processed individual data chunks and computes SIFT scores for SNP variants."
+    tasks: ["task:individuals_merge", "task:sifting"]
+  - stage_id: "stage:downstream_analyses"
+    name: "Downstream Analyses"
+    order: 3
+    description: "Performs mutation overlap and frequency analyses across individuals and populations."
+    tasks: ["task:mutation_overlap", "task:frequency"]
+tasks:
+  - task_id: "task:individuals"
+    name: "Individuals"
+    stage: "stage:individuals_processing"
+    executable: "individuals.py"
+    description: "Fetches and parses Phase3 data from the 1000 Genomes Project by chromosome. It identifies SNPs variants and records individuals with mutations on both alleles. It processes a chunk of a VCF file."
+    behavioral_notes: "Reads a portion of a VCF file, processes it, and writes an archive file (.tar.gz) containing results for a specific chunk."
+    parallelism_model:
+      type: "embarrassingly_parallel"
+      description: "Multiple instances process different chunks of the same chromosome, or different chromosomes, in parallel."
+    io_dominance: "io_bound"
+    io_access_type: "python_serial"
+    restart_model: "idempotent"
+    restart_checkpoint_dataset: null
+    hardware_path:
+      has_conditional_execution: true
+      execution_alternatives:
+        - path_id: "standard_python"
+          condition: "use_decaf = false AND use_pmc = false"
+          description: "Standard Python script execution."
+          io_dominance_hint: "io_bound"
+        - path_id: "decaf_mpi"
+          condition: "use_decaf = true"
+          description: "Python script using MPI for Decaf dataflow. Executable changes to individuals_mpi.py."
+          io_dominance_hint: "io_bound"
+        - path_id: "pmc_mpi"
+          condition: "use_pmc = true"
+          description: "Python script using Pegasus MPI Cluster mode. Executable changes to individuals_mpi.py."
+          io_dominance_hint: "io_bound"
+      minimum_resource_assertions: []
+    output_class: "intermediate"
+    inputs: ["data:vcf_chromosome_chunk", "data:columns_config"]
+    outputs: ["data:individuals_chunk_archive"]
+  - task_id: "task:individuals_merge"
+    name: "Individuals Merge"
+    stage: "stage:merge_and_sifting"
+    executable: "individuals_merge.py"
+    description: "Merges multiple individuals_chunk_archive files for a single chromosome into one merged archive."
+    behavioral_notes: "Reads multiple archive files and creates a single larger archive."
+    parallelism_model:
+      type: "serial"
+      description: "For each chromosome, combines chunks from multiple task:individuals instances."
+    io_dominance: "io_bound"
+    io_access_type: "python_serial"
+    restart_model: "idempotent"
+    restart_checkpoint_dataset: null
+    hardware_path:
+      has_conditional_execution: true
+      execution_alternatives:
+        - path_id: "standard_python"
+          condition: "use_decaf = false AND use_pmc = false"
+          description: "Standard Python script execution."
+          io_dominance_hint: "io_bound"
+        - path_id: "decaf_mpi"
+          condition: "use_decaf = true"
+          description: "Python script using MPI for Decaf dataflow. Executable changes to individuals_merge_mpi.py."
+          io_dominance_hint: "io_bound"
+        - path_id: "pmc_mpi"
+          condition: "use_pmc = true"
+          description: "Python script using Pegasus MPI Cluster mode. Executable changes to individuals_merge_mpi.py."
+          io_dominance_hint: "io_bound"
+      minimum_resource_assertions: []
+    output_class: "intermediate"
+    inputs: ["data:individuals_chunk_archive"]
+    outputs: ["data:individuals_merged_archive"]
+  - task_id: "task:sifting"
+    name: "Sifting"
+    stage: "stage:merge_and_sifting"
+    executable: "sifting.py"
+    description: "Computes SIFT scores for SNP variants from a VEP annotation file, selecting only SNPs with SIFT scores. Records the scores and SNP variant IDs in a file per chromosome."
+    behavioral_notes: "Reads a VCF annotation file and writes a text file containing filtered SIFT scores."
+    parallelism_model:
+      type: "embarrassingly_parallel"
+      description: "One instance processes the SIFT scores for each chromosome independently."
+    io_dominance: "balanced"
+    io_access_type: "python_serial"
+    restart_model: "idempotent"
+    restart_checkpoint_dataset: null
+    hardware_path:
+      has_conditional_execution: false
+      execution_alternatives: []
+      minimum_resource_assertions: []
+    output_class: "intermediate"
+    inputs: ["data:vep_annotation_vcf"]
+    outputs: ["data:sifted_scores_txt"]
+  - task_id: "task:mutation_overlap"
+    name: "Mutation Overlap"
+    stage: "stage:downstream_analyses"
+    executable: "mutation_overlap.py"
+    description: "Measures the overlap in mutations (SNPs variants) among pairs of individuals, categorized by population and chromosome."
+    behavioral_notes: "Reads merged individual data, sifted scores, and population files to perform computations. Writes an archive file of results."
+    parallelism_model:
+      type: "embarrassingly_parallel"
+      description: "Multiple instances run in parallel, each processing a specific chromosome and population pair."
+    io_dominance: "compute_bound"
+    io_access_type: "python_serial"
+    restart_model: "idempotent"
+    restart_checkpoint_dataset: null
+    hardware_path:
+      has_conditional_execution: false
+      execution_alternatives: []
+      minimum_resource_assertions: []
+    output_class: "output"
+    inputs: ["data:individuals_merged_archive", "data:sifted_scores_txt", "data:population_file", "data:columns_config"]
+    outputs: ["data:mutation_overlap_archive"]
+  - task_id: "task:frequency"
+    name: "Frequency"
+    stage: "stage:downstream_analyses"
+    executable: "frequency.py"
+    description: "Measures the frequency of overlapping mutations by selecting random individuals and considering all SNPs without SIFT scores."
+    behavioral_notes: "Reads merged individual data, sifted scores, and population files to perform computations. Writes an archive file of results."
+    parallelism_model:
+      type: "embarrassingly_parallel"
+      description: "Multiple instances run in parallel, each processing a specific chromosome and population pair."
+    io_dominance: "compute_bound"
+    io_access_type: "python_serial"
+    restart_model: "idempotent"
+    restart_checkpoint_dataset: null
+    hardware_path:
+      has_conditional_execution: false
+      execution_alternatives: []
+      minimum_resource_assertions: []
+    output_class: "output"
+    inputs: ["data:individuals_merged_archive", "data:sifted_scores_txt", "data:population_file", "data:columns_config"]
+    outputs: ["data:frequency_archive"]
+data_objects:
+  - data_id: "data:vcf_chromosome_chunk"
+    name: "VCF Chromosome Chunk"
+    description: "A chunk of a VCF file containing Single Nucleotide Polymorphisms (SNPs) variants for a specific chromosome, used as input for individual processing tasks."
+    category: "input"
+    persistence: "workflow_scoped"
+    format_hint:
+      container: "text"
+      datasets: []
+      compression: "none"
+      layout_hint: "unknown"
+      typical_request_size_kb: null
+    cardinality: "runtime_determined (depends on ind_jobs parameter and chromosome size)"
+    cardinality_source:
+      type: "config_determined"
+      controlling_parameter: "ind_jobs"
+      config_file: "daxgen.py"
+      possible_values: "any positive integer"
+    estimated_size_hint: "unknown"
+    producer_task: null
+    consumer_tasks: ["task:individuals"]
+    lifecycle:
+      creation_phase: null
+      last_consumer_phase: "task:individuals"
+      retention_window: "from workflow start to task:individuals completion"
+      access_frequency_class: "once"
+      consumer_count: 1
+  - data_id: "data:columns_config"
+    name: "Columns Configuration"
+    description: "A configuration file (e.g., columns.txt) that likely defines column mappings or parsing rules for the genomic data."
+    category: "config"
+    persistence: "workflow_scoped"
+    format_hint:
+      container: "text"
+      datasets: []
+      compression: "none"
+      layout_hint: "unknown"
+      typical_request_size_kb: null
+    cardinality: "fixed"
+    cardinality_source:
+      type: "fixed"
+      controlling_parameter: null
+      config_file: null
+      possible_values: "n/a"
+    estimated_size_hint: "small config file, <1 KB"
+    producer_task: null
+    consumer_tasks: ["task:individuals", "task:mutation_overlap", "task:frequency"]
+    lifecycle:
+      creation_phase: null
+      last_consumer_phase: "task:frequency"
+      retention_window: "from workflow start to task:frequency completion"
+      access_frequency_class: "repeatedly"
+      consumer_count: 3
+  - data_id: "data:vep_annotation_vcf"
+    name: "VEP Annotation VCF"
+    description: "A VCF file containing Variant Effect Predictor (VEP) annotations for SNPs, used to determine SIFT scores."
+    category: "input"
+    persistence: "workflow_scoped"
+    format_hint:
+      container: "text"
+      datasets: []
+      compression: "none"
+      layout_hint: "unknown"
+      typical_request_size_kb: null
+    cardinality: "fixed"
+    cardinality_source:
+      type: "fixed"
+      controlling_parameter: null
+      config_file: null
+      possible_values: "one per chromosome"
+    estimated_size_hint: "unknown"
+    producer_task: null
+    consumer_tasks: ["task:sifting"]
+    lifecycle:
+      creation_phase: null
+      last_consumer_phase: "task:sifting"
+      retention_window: "from workflow start to task:sifting completion"
+      access_frequency_class: "once"
+      consumer_count: 1
+  - data_id: "data:population_file"
+    name: "Population File"
+    description: "Files containing information about specific human populations, used in mutation overlap and frequency analyses."
+    category: "input"
+    persistence: "workflow_scoped"
+    format_hint:
+      container: "text"
+      datasets: []
+      compression: "none"
+      layout_hint: "unknown"
+      typical_request_size_kb: null
+    cardinality: "fixed"
+    cardinality_source:
+      type: "fixed"
+      controlling_parameter: null
+      config_file: null
+      possible_values: "7 (one per super population)"
+    estimated_size_hint: "unknown"
+    producer_task: null
+    consumer_tasks: ["task:mutation_overlap", "task:frequency"]
+    lifecycle:
+      creation_phase: null
+      last_consumer_phase: "task:frequency"
+      retention_window: "from workflow start to task:frequency completion"
+      access_frequency_class: "repeatedly"
+      consumer_count: 2
+  - data_id: "data:individuals_chunk_archive"
+    name: "Individuals Chunk Archive"
+    description: "An archive (tar.gz) containing the processed individual data for a specific chunk of a chromosome."
+    category: "intermediate"
+    persistence: "workflow_scoped"
+    format_hint:
+      container: "tar"
+      datasets: []
+      compression: "gzip"
+      layout_hint: "unknown"
+      typical_request_size_kb: null
+    cardinality: "runtime_determined (multiple per chromosome, depending on ind_jobs)"
+    cardinality_source:
+      type: "config_determined"
+      controlling_parameter: "ind_jobs"
+      config_file: "daxgen.py"
+      possible_values: "any positive integer"
+    estimated_size_hint: "unknown"
+    producer_task: "task:individuals"
+    consumer_tasks: ["task:individuals_merge"]
+    lifecycle:
+      creation_phase: "task:individuals"
+      last_consumer_phase: "task:individuals_merge"
+      retention_window: "from task:individuals completion to task:individuals_merge completion"
+      access_frequency_class: "once"
+      consumer_count: 1
+  - data_id: "data:individuals_merged_archive"
+    name: "Individuals Merged Archive"
+    description: "An archive (tar.gz) containing the merged processed individual data for an entire chromosome."
+    category: "intermediate"
+    persistence: "workflow_scoped"
+    format_hint:
+      container: "tar"
+      datasets: []
+      compression: "gzip"
+      layout_hint: "unknown"
+      typical_request_size_kb: null
+    cardinality: "fixed"
+    cardinality_source:
+      type: "fixed"
+      controlling_parameter: null
+      config_file: null
+      possible_values: "one per chromosome"
+    estimated_size_hint: "unknown"
+    producer_task: "task:individuals_merge"
+    consumer_tasks: ["task:mutation_overlap", "task:frequency"]
+    lifecycle:
+      creation_phase: "task:individuals_merge"
+      last_consumer_phase: "task:frequency" # Assuming mutation_overlap and frequency complete at similar times
+      retention_window: "from task:individuals_merge completion to task:frequency completion"
+      access_frequency_class: "few_times"
+      consumer_count: 2
+  - data_id: "data:sifted_scores_txt"
+    name: "Sifted Scores Text"
+    description: "A text file containing SIFT scores and SNP variant IDs for a specific chromosome, filtered from VEP annotations."
+    category: "intermediate"
+    persistence: "workflow_scoped"
+    format_hint:
+      container: "text"
+      datasets: []
+      compression: "none"
+      layout_hint: "unknown"
+      typical_request_size_kb: null
+    cardinality: "fixed"
+    cardinality_source:
+      type: "fixed"
+      controlling_parameter: null
+      config_file: null
+      possible_values: "one per chromosome"
+    estimated_size_hint: "unknown"
+    producer_task: "task:sifting"
+    consumer_tasks: ["task:mutation_overlap", "task:frequency"]
+    lifecycle:
+      creation_phase: "task:sifting"
+      last_consumer_phase: "task:frequency" # Assuming mutation_overlap and frequency complete at similar times
+      retention_window: "from task:sifting completion to task:frequency completion"
+      access_frequency_class: "few_times"
+      consumer_count: 2
+  - data_id: "data:mutation_overlap_archive"
+    name: "Mutation Overlap Archive"
+    description: "An archive (tar.gz) containing the results of the mutation overlap analysis for a specific chromosome and population."
+    category: "output"
+    persistence: "persistent"
+    format_hint:
+      container: "tar"
+      datasets: []
+      compression: "gzip"
+      layout_hint: "unknown"
+      typical_request_size_kb: null
+    cardinality: "fixed"
+    cardinality_source:
+      type: "fixed"
+      controlling_parameter: null
+      config_file: null
+      possible_values: "one per chromosome-population pair"
+    estimated_size_hint: "unknown"
+    producer_task: "task:mutation_overlap"
+    consumer_tasks: []
+    lifecycle:
+      creation_phase: "task:mutation_overlap"
+      last_consumer_phase: null
+      retention_window: "from task:mutation_overlap completion indefinitely"
+      access_frequency_class: "once"
+      consumer_count: 0
+  - data_id: "data:frequency_archive"
+    name: "Frequency Archive"
+    description: "An archive (tar.gz) containing the results of the frequency analysis for a specific chromosome and population."
+    category: "output"
+    persistence: "persistent"
+    format_hint:
+      container: "tar"
+      datasets: []
+      compression: "gzip"
+      layout_hint: "unknown"
+      typical_request_size_kb: null
+    cardinality: "fixed"
+    cardinality_source:
+      type: "fixed"
+      controlling_parameter: null
+      config_file: null
+      possible_values: "one per chromosome-population pair"
+    estimated_size_hint: "unknown"
+    producer_task: "task:frequency"
+    consumer_tasks: []
+    lifecycle:
+      creation_phase: "task:frequency"
+      last_consumer_phase: null
+      retention_window: "from task:frequency completion indefinitely"
+      access_frequency_class: "once"
+      consumer_count: 0
+pc_edges:
+  - edge_id: "pc:individuals->individuals_merge:n_to_1"
+    producer: "task:individuals"
+    consumer: "task:individuals_merge"
+    data_objects: ["data:individuals_chunk_archive"]
+    pc_pattern: "n_to_1"
+    pc_pattern_rationale: "Multiple task:individuals instances produce data:individuals_chunk_archive files which are all consumed by a single task:individuals_merge instance for a given chromosome."
+    data_flow_description: "Each task:individuals instance writes a tar.gz file. task:individuals_merge reads all these tar.gz files to create a single merged tar.gz."
+    coupling: "tight"
+    coupling_rationale: "The task:individuals_merge explicitly waits for all individual chunk files by receiving them as arguments, implying all individual tasks must complete first."
+    communication_pattern: "file_per_producer"
+    data_volume_class: "large"
+  - edge_id: "pc:individuals_merge->mutation_overlap:1_to_n"
+    producer: "task:individuals_merge"
+    consumer: "task:mutation_overlap"
+    data_objects: ["data:individuals_merged_archive"]
+    pc_pattern: "1_to_n"
+    pc_pattern_rationale: "A single task:individuals_merge instance produces a data:individuals_merged_archive which is consumed by multiple task:mutation_overlap instances (one per population) for that chromosome."
+    data_flow_description: "task:mutation_overlap reads the complete merged archive to perform its analysis."
+    coupling: "tight"
+    coupling_rationale: "task:mutation_overlap takes the merged archive as an input, implying it requires the entire file to be present before starting."
+    communication_pattern: "shared_file"
+    data_volume_class: "medium"
+  - edge_id: "pc:individuals_merge->frequency:1_to_n"
+    producer: "task:individuals_merge"
+    consumer: "task:frequency"
+    data_objects: ["data:individuals_merged_archive"]
+    pc_pattern: "1_to_n"
+    pc_pattern_rationale: "A single task:individuals_merge instance produces a data:individuals_merged_archive which is consumed by multiple task:frequency instances (one per population) for that chromosome."
+    data_flow_description: "task:frequency reads the complete merged archive to perform its analysis."
+    coupling: "tight"
+    coupling_rationale: "task:frequency takes the merged archive as an input, implying it requires the entire file to be present before starting."
+    communication_pattern: "shared_file"
+    data_volume_class: "medium"
+  - edge_id: "pc:sifting->mutation_overlap:1_to_n"
+    producer: "task:sifting"
+    consumer: "task:mutation_overlap"
+    data_objects: ["data:sifted_scores_txt"]
+    pc_pattern: "1_to_n"
+    pc_pattern_rationale: "A single task:sifting instance produces a data:sifted_scores_txt file which is consumed by multiple task:mutation_overlap instances (one per population) for that chromosome."
+    data_flow_description: "task:mutation_overlap reads the sifted scores file to perform its analysis."
+    coupling: "tight"
+    coupling_rationale: "task:mutation_overlap takes the sifted scores file as an input, implying it requires the entire file to be present before starting."
+    communication_pattern: "shared_file"
+    data_volume_class: "small"
+  - edge_id: "pc:sifting->frequency:1_to_n"
+    producer: "task:sifting"
+    consumer: "task:frequency"
+    data_objects: ["data:sifted_scores_txt"]
+    pc_pattern: "1_to_n"
+    pc_pattern_rationale: "A single task:sifting instance produces a data:sifted_scores_txt file which is consumed by multiple task:frequency instances (one per population) for that chromosome."
+    data_flow_description: "task:frequency reads the sifted scores file to perform its analysis."
+    coupling: "tight"
+    coupling_rationale: "task:frequency takes the sifted scores file as an input, implying it requires the entire file to be present before starting."
+    communication_pattern: "shared_file"
+    data_volume_class: "small"
+  - edge_id: "pc:vcf_chromosome_chunk->individuals:1_to_1"
+    producer: null
+    consumer: "task:individuals"
+    data_objects: ["data:vcf_chromosome_chunk"]
+    pc_pattern: "1_to_1"
+    pc_pattern_rationale: "Each task:individuals instance processes one data:vcf_chromosome_chunk file."
+    data_flow_description: "Each task reads its assigned VCF chunk for processing."
+    coupling: "tight"
+    coupling_rationale: "The task requires its input VCF chunk to be available before execution."
+    communication_pattern: "file_per_producer"
+    data_volume_class: "medium"
+  - edge_id: "pc:columns_config->individuals:1_to_n"
+    producer: null
+    consumer: "task:individuals"
+    data_objects: ["data:columns_config"]
+    pc_pattern: "1_to_n"
+    pc_pattern_rationale: "The single data:columns_config file is read by all instances of task:individuals."
+    data_flow_description: "The configuration file is read at the start of each task:individuals instance."
+    coupling: "tight"
+    coupling_rationale: "The task requires the config file to be present at startup."
+    communication_pattern: "shared_file"
+    data_volume_class: "small"
+  - edge_id: "pc:columns_config->mutation_overlap:1_to_n"
+    producer: null
+    consumer: "task:mutation_overlap"
+    data_objects: ["data:columns_config"]
+    pc_pattern: "1_to_n"
+    pc_pattern_rationale: "The single data:columns_config file is read by all instances of task:mutation_overlap."
+    data_flow_description: "The configuration file is read at the start of each task:mutation_overlap instance."
+    coupling: "tight"
+    coupling_rationale: "The task requires the config file to be present at startup."
+    communication_pattern: "shared_file"
+    data_volume_class: "small"
+  - edge_id: "pc:columns_config->frequency:1_to_n"
+    producer: null
+    consumer: "task:frequency"
+    data_objects: ["data:columns_config"]
+    pc_pattern: "1_to_n"
+    pc_pattern_rationale: "The single data:columns_config file is read by all instances of task:frequency."
+    data_flow_description: "The configuration file is read at the start of each task:frequency instance."
+    coupling: "tight"
+    coupling_rationale: "The task requires the config file to be present at startup."
+    communication_pattern: "shared_file"
+    data_volume_class: "small"
+  - edge_id: "pc:vep_annotation_vcf->sifting:1_to_1"
+    producer: null
+    consumer: "task:sifting"
+    data_objects: ["data:vep_annotation_vcf"]
+    pc_pattern: "1_to_1"
+    pc_pattern_rationale: "Each task:sifting instance processes a single data:vep_annotation_vcf file for its chromosome."
+    data_flow_description: "The task reads the VEP annotation file to extract SIFT scores."
+    coupling: "tight"
+    coupling_rationale: "The task requires its input VEP file to be available before execution."
+    communication_pattern: "file_per_producer"
+    data_volume_class: "medium"
+  - edge_id: "pc:population_file->mutation_overlap:1_to_n"
+    producer: null
+    consumer: "task:mutation_overlap"
+    data_objects: ["data:population_file"]
+    pc_pattern: "1_to_n"
+    pc_pattern_rationale: "The data:population_file is read by all instances of task:mutation_overlap for a given population."
+    data_flow_description: "Each task reads its assigned population file for analysis."
+    coupling: "tight"
+    coupling_rationale: "The task requires its input population file to be available before execution."
+    communication_pattern: "shared_file"
+    data_volume_class: "small"
+  - edge_id: "pc:population_file->frequency:1_to_n"
+    producer: null
+    consumer: "task:frequency"
+    data_objects: ["data:population_file"]
+    pc_pattern: "1_to_n"
+    pc_pattern_rationale: "The data:population_file is read by all instances of task:frequency for a given population."
+    data_flow_description: "Each task reads its assigned population file for analysis."
+    coupling: "tight"
+    coupling_rationale: "The task requires its input population file to be available before execution."
+    communication_pattern: "shared_file"
+    data_volume_class: "small"
+workflow_graph:
+  integrity_hash: null # Cannot compute SHA-256 without external tools
+  last_generated: "2026-02-27T16:30:00Z"
+  dag_edges:
+    - {from: "task:individuals", to: "task:individuals_merge", via: "pc:individuals->individuals_merge:n_to_1"}
+    - {from: "task:individuals_merge", to: "task:mutation_overlap", via: "pc:individuals_merge->mutation_overlap:1_to_n"}
+    - {from: "task:individuals_merge", to: "task:frequency", via: "pc:individuals_merge->frequency:1_to_n"}
+    - {from: "task:sifting", to: "task:mutation_overlap", via: "pc:sifting->mutation_overlap:1_to_n"}
+    - {from: "task:sifting", to: "task:frequency", via: "pc:sifting->frequency:1_to_n"}
+    - {from: null, to: "task:individuals", via: "pc:vcf_chromosome_chunk->individuals:1_to_1"}
+    - {from: null, to: "task:individuals", via: "pc:columns_config->individuals:1_to_n"}
+    - {from: null, to: "task:mutation_overlap", via: "pc:columns_config->mutation_overlap:1_to_n"}
+    - {from: null, to: "task:frequency", via: "pc:columns_config->frequency:1_to_n"}
+    - {from: null, to: "task:sifting", via: "pc:vep_annotation_vcf->sifting:1_to_1"}
+    - {from: null, to: "task:mutation_overlap", via: "pc:population_file->mutation_overlap:1_to_n"}
+    - {from: null, to: "task:frequency", via: "pc:population_file->frequency:1_to_n"}
+  loop_groups:
+    - loop_id: "loop:chromosome_processing"
+      tasks: ["task:individuals", "task:individuals_merge", "task:sifting", "task:mutation_overlap", "task:frequency"]
+      loop_type: "data_driven"
+      note: "Iterates over each chromosome, processing it through individuals, merging, sifting, and then the analysis tasks."
+    - loop_id: "loop:individuals_chunking"
+      tasks: ["task:individuals"]
+      loop_type: "parameter_sweep"
+      note: "Within each chromosome, the individuals task is chunked based on the 'ind_jobs' parameter, creating multiple parallel instances."
+    - loop_id: "loop:population_analysis"
+      tasks: ["task:mutation_overlap", "task:frequency"]
+      loop_type: "data_driven"
+      note: "For each chromosome, mutation overlap and frequency analyses are performed for each defined population."
+  critical_path_hint: "indeterminate from static analysis"
+  control_flow:
+    has_iteration: true
+    iteration_description: "The workflow iterates over chromosomes defined in data.csv. For each chromosome, there's an internal iteration for individuals task chunking, controlled by the ind_jobs parameter. Further, for each chromosome, the mutation_overlap and frequency tasks iterate over a predefined set of populations."
+    has_conditional_branches: true
+    conditional_description: "The execution path for task:individuals and task:individuals_merge depends on the --decaf or --pmc flags, which select between standard Python scripts and MPI-enabled versions."
+  stage_execution_order:
+    - "stage:individuals_processing"
+    - "stage:merge_and_sifting"
+    - "stage:downstream_analyses"
+  cross_reference:
+    task_to_stage:
+      "task:individuals": "stage:individuals_processing"
+      "task:individuals_merge": "stage:merge_and_sifting"
+      "task:sifting": "stage:merge_and_sifting"
+      "task:mutation_overlap": "stage:downstream_analyses"
+      "task:frequency": "stage:downstream_analyses"
+    data_to_producer:
+      "data:vcf_chromosome_chunk": null
+      "data:columns_config": null
+      "data:vep_annotation_vcf": null
+      "data:population_file": null
+      "data:individuals_chunk_archive": "task:individuals"
+      "data:individuals_merged_archive": "task:individuals_merge"
+      "data:sifted_scores_txt": "task:sifting"
+      "data:mutation_overlap_archive": "task:mutation_overlap"
+      "data:frequency_archive": "task:frequency"
+    data_to_consumers:
+      "data:vcf_chromosome_chunk": ["task:individuals"]
+      "data:columns_config": ["task:individuals", "task:mutation_overlap", "task:frequency"]
+      "data:vep_annotation_vcf": ["task:sifting"]
+      "data:population_file": ["task:mutation_overlap", "task:frequency"]
+      "data:individuals_chunk_archive": ["task:individuals_merge"]
+      "data:individuals_merged_archive": ["task:mutation_overlap", "task:frequency"]
+      "data:sifted_scores_txt": ["task:mutation_overlap", "task:frequency"]
+      "data:mutation_overlap_archive": []
+      "data:frequency_archive": []
+workflow_patterns:
+  primary_pattern: "hybrid"
+  secondary_patterns:
+    - "scatter_gather"
+    - "iterative"
+    - "broadcast"
+  classification_rationale: "The workflow exhibits a primary iterative pattern over chromosomes. Within each chromosome's processing, there is a scatter-gather pattern for individual data chunks (individuals -> individuals_merge). Subsequently, the merged data and sifted data are broadcast to multiple mutation_overlap and frequency tasks, which then operate in an embarrassingly parallel fashion over populations. The initial input data:columns_config is also broadcast."
+  pattern_table_row: "Workflow | 3 | (depends on ind_jobs * chromosomes * populations) | n_to_1, 1_to_n | Iteration, Scatter-Gather, Broadcast"
+io_behavioral_hints:
+  - hint_id: "hint:individual_chunking_overhead"
+    description: "The task:individuals processes large VCF files in chunks, creating multiple data:individuals_chunk_archive files. This might lead to small file overhead if the chunks are very small or numerous, potentially impacting I/O performance during the merge phase."
+    affected_tasks: ["task:individuals", "task:individuals_merge"]
+    affected_data: ["data:individuals_chunk_archive"]
+    potential_concern: "small_file_overhead"
+  - hint_id: "hint:mpi_io_pattern_risk_individuals_merge"
+    description: "If Decaf or PMC is used, task:individuals_merge might be using MPI I/O. If many ranks are involved in merging and writing to a single shared file using independent MPI-IO operations without proper aggregation, it could lead to metadata storms or contention. (Note: Current analysis doesn't confirm if individuals_merge_mpi.py uses collective I/O)."
+    affected_tasks: ["task:individuals_merge"]
+    affected_data: ["data:individuals_merged_archive"]
+    potential_concern: "mpi_io_pattern_risk"
+execution_profiles:
+  - profile_name: "merged_and_sifted_data_ready"
+    terminal_task_id: "task:sifting"
+    description: "This profile completes the processing of individual genomic data and computes SIFT scores, making the merged and sifted data available for downstream analyses. A scientist might use this stopping point to verify the quality of intermediate data before proceeding to the computationally intensive analysis steps."
+    required_task_set: ["task:individuals", "task:individuals_merge", "task:sifting"]
+    conditional_inclusions: []
+    output_dataset_ids: ["data:individuals_merged_archive", "data:sifted_scores_txt"]
+  - profile_name: "full_analysis_complete"
+    terminal_task_id: "task:frequency"
+    description: "This profile completes the entire workflow, including mutation overlap and frequency analyses, providing the final scientific results."
+    required_task_set: ["task:individuals", "task:individuals_merge", "task:sifting", "task:mutation_overlap", "task:frequency"]
+    conditional_inclusions: []
+    output_dataset_ids: ["data:mutation_overlap_archive", "data:frequency_archive"]
+translation_metadata:
+  source_format: "compiled_from_pegasus_dax"
+  source_file: "daxgen.py"
+  translation_tool: "gemini"
+  translation_timestamp: "2026-02-27T16:30:00Z"
+  unmapped_fields: []
+  round_trip_gaps: []
+  quality_warnings: []
+  field_confidence_records:
+    - field_path: "metadata.workflow_description"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Directly extracted from README.md, meets length and content requirements."
+      requires_human_review: false
+    - field_path: "tasks[0].io_dominance"
+      filled_by: "gemini"
+      confidence_level: "inferred"
+      confidence_reason: "Inferred from task's role of parsing large VCF files and writing archives."
+      requires_human_review: false
+    - field_path: "tasks[0].io_access_type"
+      filled_by: "gemini"
+      confidence_level: "inferred"
+      confidence_reason: "Assumed python_serial as no explicit MPI/HDF5 imports or API calls were observed in daxgen.py for these scripts. Needs verification of underlying python scripts."
+      requires_human_review: true
+    - field_path: "tasks[0].restart_model"
+      filled_by: "gemini"
+      confidence_level: "inferred"
+      confidence_reason: "Inferred idempotent due to chunk-specific outputs, allowing simple re-submission."
+      requires_human_review: false
+    - field_path: "tasks[0].output_class"
+      filled_by: "gemini"
+      confidence_level: "inferred"
+      confidence_reason: "Inferred intermediate as its outputs are consumed by a merge task."
+      requires_human_review: true
+    - field_path: "tasks[1].io_dominance"
+      filled_by: "gemini"
+      confidence_level: "inferred"
+      confidence_reason: "Inferred from task's role of reading many archives and writing one."
+      requires_human_review: false
+    - field_path: "tasks[1].io_access_type"
+      filled_by: "gemini"
+      confidence_level: "inferred"
+      confidence_reason: "Assumed python_serial as no explicit MPI/HDF5 imports or API calls were observed in daxgen.py for these scripts. Needs verification of underlying python scripts."
+      requires_human_review: true
+    - field_path: "tasks[1].restart_model"
+      filled_by: "gemini"
+      confidence_level: "inferred"
+      confidence_reason: "Inferred idempotent due to clear input/output and re-processability."
+      requires_human_review: false
+    - field_path: "tasks[1].output_class"
+      filled_by: "gemini"
+      confidence_level: "inferred"
+      confidence_reason: "Inferred intermediate as its outputs are consumed by downstream analysis tasks."
+      requires_human_review: true
+    - field_path: "tasks[2].io_dominance"
+      filled_by: "gemini"
+      confidence_level: "inferred"
+      confidence_reason: "Inferred balanced due to VCF parsing (I/O) and SIFT score computation (compute)."
+      requires_human_review: false
+    - field_path: "tasks[2].io_access_type"
+      filled_by: "gemini"
+      confidence_level: "inferred"
+      confidence_reason: "Assumed python_serial as no explicit MPI/HDF5 imports or API calls were observed in daxgen.py for these scripts. Needs verification of underlying python scripts."
+      requires_human_review: true
+    - field_path: "tasks[2].restart_model"
+      filled_by: "gemini"
+      confidence_level: "inferred"
+      confidence_reason: "Inferred idempotent due to clear input/output and re-processability."
+      requires_human_review: false
+    - field_path: "tasks[2].output_class"
+      filled_by: "gemini"
+      confidence_level: "inferred"
+      confidence_reason: "Inferred intermediate as its outputs are consumed by downstream analysis tasks."
+      requires_human_review: true
+    - field_path: "tasks[3].io_dominance"
+      filled_by: "gemini"
+      confidence_level: "inferred"
+      confidence_reason: "Inferred compute_bound due to complex mutation overlap calculations."
+      requires_human_review: false
+    - field_path: "tasks[3].io_access_type"
+      filled_by: "gemini"
+      confidence_level: "inferred"
+      confidence_reason: "Assumed python_serial as no explicit MPI/HDF5 imports or API calls were observed in daxgen.py for these scripts. Needs verification of underlying python scripts."
+      requires_human_review: true
+    - field_path: "tasks[3].restart_model"
+      filled_by: "gemini"
+      confidence_level: "inferred"
+      confidence_reason: "Inferred idempotent due to clear input/output and re-processability."
+      requires_human_review: false
+    - field_path: "tasks[3].output_class"
+      filled_by: "gemini"
+      confidence_level: "inferred"
+      confidence_reason: "Inferred output as it produces a final analysis result."
+      requires_human_review: true
+    - field_path: "tasks[4].io_dominance"
+      filled_by: "gemini"
+      confidence_level: "inferred"
+      confidence_reason: "Inferred compute_bound due to complex frequency calculations."
+      requires_human_review: false
+    - field_path: "tasks[4].io_access_type"
+      filled_by: "gemini"
+      confidence_level: "inferred"
+      confidence_reason: "Assumed python_serial as no explicit MPI/HDF5 imports or API calls were observed in daxgen.py for these scripts. Needs verification of underlying python scripts."
+      requires_human_review: true
+    - field_path: "tasks[4].restart_model"
+      filled_by: "gemini"
+      confidence_level: "inferred"
+      confidence_reason: "Inferred idempotent due to clear input/output and re-processability."
+      requires_human_review: false
+    - field_path: "tasks[4].output_class"
+      filled_by: "gemini"
+      confidence_level: "inferred"
+      confidence_reason: "Inferred output as it produces a final analysis result."
+      requires_human_review: true
+    - field_path: "data_objects[0].format_hint.compression"
+      filled_by: "gemini"
+      confidence_level: "inferred"
+      confidence_reason: "Assumed no compression for raw VCF chunks unless explicitly specified."
+      requires_human_review: true
+    - field_path: "data_objects[0].estimated_size_hint"
+      filled_by: "gemini"
+      confidence_level: "low"
+      confidence_reason: "No explicit size information in source code; depends on 'ind_jobs' and VCF structure."
+      requires_human_review: false
+    - field_path: "data_objects[1].estimated_size_hint"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Typical size for a small config file."
+      requires_human_review: false
+    - field_path: "data_objects[2].format_hint.compression"
+      filled_by: "gemini"
+      confidence_level: "inferred"
+      confidence_reason: "Assumed no compression for raw VCF files unless explicitly specified."
+      requires_human_review: true
+    - field_path: "data_objects[2].estimated_size_hint"
+      filled_by: "gemini"
+      confidence_level: "low"
+      confidence_reason: "No explicit size information in source code."
+      requires_human_review: false
+    - field_path: "data_objects[3].format_hint.compression"
+      filled_by: "gemini"
+      confidence_level: "inferred"
+      confidence_reason: "Assumed no compression for population files unless explicitly specified."
+      requires_human_review: true
+    - field_path: "data_objects[3].estimated_size_hint"
+      filled_by: "gemini"
+      confidence_level: "low"
+      confidence_reason: "No explicit size information in source code."
+      requires_human_review: false
+    - field_path: "data_objects[4].estimated_size_hint"
+      filled_by: "gemini"
+      confidence_level: "low"
+      confidence_reason: "No explicit size information in source code; depends on 'ind_jobs' and VCF structure."
+      requires_human_review: false
+    - field_path: "data_objects[5].estimated_size_hint"
+      filled_by: "gemini"
+      confidence_level: "low"
+      confidence_reason: "No explicit size information in source code."
+      requires_human_review: false
+    - field_path: "data_objects[6].estimated_size_hint"
+      filled_by: "gemini"
+      confidence_level: "low"
+      confidence_reason: "No explicit size information in source code."
+      requires_human_review: false
+    - field_path: "data_objects[7].estimated_size_hint"
+      filled_by: "gemini"
+      confidence_level: "low"
+      confidence_reason: "No explicit size information in source code."
+      requires_human_review: false
+    - field_path: "data_objects[8].estimated_size_hint"
+      filled_by: "gemini"
+      confidence_level: "low"
+      confidence_reason: "No explicit size information in source code."
+      requires_human_review: false
+    - field_path: "pc_edges[0].pc_pattern"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Derived from many individuals tasks feeding into one merge task."
+      requires_human_review: false
+    - field_path: "pc_edges[0].pc_pattern_rationale"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Directly explains the n_to_1 pattern."
+      requires_human_review: false
+    - field_path: "pc_edges[0].coupling"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Inferred from merge task requiring all inputs before starting."
+      requires_human_review: false
+    - field_path: "pc_edges[0].coupling_rationale"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Directly explains the tight coupling."
+      requires_human_review: false
+    - field_path: "pc_edges[0].communication_pattern"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Each individual task writes its own file."
+      requires_human_review: false
+    - field_path: "pc_edges[0].data_volume_class"
+      filled_by: "gemini"
+      confidence_level: "inferred"
+      confidence_reason: "Sum of many individual chunk archives, likely large."
+      requires_human_review: false
+    - field_path: "pc_edges[1].pc_pattern"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Derived from one merged archive being consumed by multiple analysis tasks."
+      requires_human_review: false
+    - field_path: "pc_edges[1].pc_pattern_rationale"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Directly explains the 1_to_n pattern."
+      requires_human_review: false
+    - field_path: "pc_edges[1].coupling"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Inferred from analysis task requiring complete merged archive before starting."
+      requires_human_review: false
+    - field_path: "pc_edges[1].coupling_rationale"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Directly explains the tight coupling."
+      requires_human_review: false
+    - field_path: "pc_edges[1].communication_pattern"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Multiple tasks read the same merged archive."
+      requires_human_review: false
+    - field_path: "pc_edges[1].data_volume_class"
+      filled_by: "gemini"
+      confidence_level: "inferred"
+      confidence_reason: "A single merged chromosome archive, likely medium."
+      requires_human_review: false
+    - field_path: "pc_edges[2].pc_pattern"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Derived from one merged archive being consumed by multiple analysis tasks."
+      requires_human_review: false
+    - field_path: "pc_edges[2].pc_pattern_rationale"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Directly explains the 1_to_n pattern."
+      requires_human_review: false
+    - field_path: "pc_edges[2].coupling"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Inferred from analysis task requiring complete merged archive before starting."
+      requires_human_review: false
+    - field_path: "pc_edges[2].coupling_rationale"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Directly explains the tight coupling."
+      requires_human_review: false
+    - field_path: "pc_edges[2].communication_pattern"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Multiple tasks read the same merged archive."
+      requires_human_review: false
+    - field_path: "pc_edges[2].data_volume_class"
+      filled_by: "gemini"
+      confidence_level: "inferred"
+      confidence_reason: "A single merged chromosome archive, likely medium."
+      requires_human_review: false
+    - field_path: "pc_edges[3].pc_pattern"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Derived from one sifted file being consumed by multiple analysis tasks."
+      requires_human_review: false
+    - field_path: "pc_edges[3].pc_pattern_rationale"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Directly explains the 1_to_n pattern."
+      requires_human_review: false
+    - field_path: "pc_edges[3].coupling"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Inferred from analysis task requiring complete sifted file before starting."
+      requires_human_review: false
+    - field_path: "pc_edges[3].coupling_rationale"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Directly explains the tight coupling."
+      requires_human_review: false
+    - field_path: "pc_edges[3].communication_pattern"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Multiple tasks read the same sifted file."
+      requires_human_review: false
+    - field_path: "pc_edges[3].data_volume_class"
+      filled_by: "gemini"
+      confidence_level: "inferred"
+      confidence_reason: "A single sifted scores text file, likely small."
+      requires_human_review: false
+    - field_path: "pc_edges[4].pc_pattern"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Derived from one sifted file being consumed by multiple analysis tasks."
+      requires_human_review: false
+    - field_path: "pc_edges[4].pc_pattern_rationale"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Directly explains the 1_to_n pattern."
+      requires_human_review: false
+    - field_path: "pc_edges[4].coupling"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Inferred from analysis task requiring complete sifted file before starting."
+      requires_human_review: false
+    - field_path: "pc_edges[4].coupling_rationale"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Directly explains the tight coupling."
+      requires_human_review: false
+    - field_path: "pc_edges[4].communication_pattern"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Multiple tasks read the same sifted file."
+      requires_human_review: false
+    - field_path: "pc_edges[4].data_volume_class"
+      filled_by: "gemini"
+      confidence_level: "inferred"
+      confidence_reason: "A single sifted scores text file, likely small."
+      requires_human_review: false
+    - field_path: "pc_edges[5].pc_pattern"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Derived from one VCF chunk being consumed by one individuals task."
+      requires_human_review: false
+    - field_path: "pc_edges[5].pc_pattern_rationale"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Directly explains the 1_to_1 pattern."
+      requires_human_review: false
+    - field_path: "pc_edges[5].coupling"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Inferred from task requiring input before starting."
+      requires_human_review: false
+    - field_path: "pc_edges[5].coupling_rationale"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Directly explains the tight coupling."
+      requires_human_review: false
+    - field_path: "pc_edges[5].communication_pattern"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Each task processes its own chunk file."
+      requires_human_review: false
+    - field_path: "pc_edges[5].data_volume_class"
+      filled_by: "gemini"
+      confidence_level: "inferred"
+      confidence_reason: "Each VCF chunk is a moderate size."
+      requires_human_review: false
+    - field_path: "pc_edges[6].pc_pattern"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Derived from a single config file being read by multiple tasks."
+      requires_human_review: false
+    - field_path: "pc_edges[6].pc_pattern_rationale"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Directly explains the 1_to_n pattern."
+      requires_human_review: false
+    - field_path: "pc_edges[6].coupling"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Inferred from task requiring config file before starting."
+      requires_human_review: false
+    - field_path: "pc_edges[6].coupling_rationale"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Directly explains the tight coupling."
+      requires_human_review: false
+    - field_path: "pc_edges[6].communication_pattern"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Multiple tasks read the same config file."
+      requires_human_review: false
+    - field_path: "pc_edges[6].data_volume_class"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Config files are typically small."
+      requires_human_review: false
+    - field_path: "pc_edges[7].pc_pattern"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Derived from a single config file being read by multiple tasks."
+      requires_human_review: false
+    - field_path: "pc_edges[7].pc_pattern_rationale"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Directly explains the 1_to_n pattern."
+      requires_human_review: false
+    - field_path: "pc_edges[7].coupling"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Inferred from task requiring config file before starting."
+      requires_human_review: false
+    - field_path: "pc_edges[7].coupling_rationale"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Directly explains the tight coupling."
+      requires_human_review: false
+    - field_path: "pc_edges[7].communication_pattern"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Multiple tasks read the same config file."
+      requires_human_review: false
+    - field_path: "pc_edges[7].data_volume_class"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Config files are typically small."
+      requires_human_review: false
+    - field_path: "pc_edges[8].pc_pattern"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Derived from a single config file being read by multiple tasks."
+      requires_human_review: false
+    - field_path: "pc_edges[8].pc_pattern_rationale"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Directly explains the 1_to_n pattern."
+      requires_human_review: false
+    - field_path: "pc_edges[8].coupling"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Inferred from task requiring config file before starting."
+      requires_human_review: false
+    - field_path: "pc_edges[8].coupling_rationale"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Directly explains the tight coupling."
+      requires_human_review: false
+    - field_path: "pc_edges[8].communication_pattern"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Multiple tasks read the same config file."
+      requires_human_review: false
+    - field_path: "pc_edges[8].data_volume_class"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Config files are typically small."
+      requires_human_review: false
+    - field_path: "pc_edges[9].pc_pattern"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Derived from one VEP file being consumed by one sifting task."
+      requires_human_review: false
+    - field_path: "pc_edges[9].pc_pattern_rationale"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Directly explains the 1_to_1 pattern."
+      requires_human_review: false
+    - field_path: "pc_edges[9].coupling"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Inferred from task requiring input before starting."
+      requires_human_review: false
+    - field_path: "pc_edges[9].coupling_rationale"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Directly explains the tight coupling."
+      requires_human_review: false
+    - field_path: "pc_edges[9].communication_pattern"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Each task processes its own VEP file."
+      requires_human_review: false
+    - field_path: "pc_edges[9].data_volume_class"
+      filled_by: "gemini"
+      confidence_level: "inferred"
+      confidence_reason: "Each VEP file is a moderate size."
+      requires_human_review: false
+    - field_path: "pc_edges[10].pc_pattern"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Derived from a single population file being read by multiple tasks."
+      requires_human_review: false
+    - field_path: "pc_edges[10].pc_pattern_rationale"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Directly explains the 1_to_n pattern."
+      requires_human_review: false
+    - field_path: "pc_edges[10].coupling"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Inferred from task requiring input before starting."
+      requires_human_review: false
+    - field_path: "pc_edges[10].coupling_rationale"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Directly explains the tight coupling."
+      requires_human_review: false
+    - field_path: "pc_edges[10].communication_pattern"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Multiple tasks read the same population file."
+      requires_human_review: false
+    - field_path: "pc_edges[10].data_volume_class"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Population files are typically small."
+      requires_human_review: false
+    - field_path: "pc_edges[11].pc_pattern"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Derived from a single population file being read by multiple tasks."
+      requires_human_review: false
+    - field_path: "pc_edges[11].pc_pattern_rationale"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Directly explains the 1_to_n pattern."
+      requires_human_review: false
+    - field_path: "pc_edges[11].coupling"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Inferred from task requiring input before starting."
+      requires_human_review: false
+    - field_path: "pc_edges[11].coupling_rationale"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Directly explains the tight coupling."
+      requires_human_review: false
+    - field_path: "pc_edges[11].communication_pattern"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Multiple tasks read the same population file."
+      requires_human_review: false
+    - field_path: "pc_edges[11].data_volume_class"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Population files are typically small."
+      requires_human_review: false
+    - field_path: "workflow_graph.integrity_hash"
+      filled_by: "gemini"
+      confidence_level: "low"
+      confidence_reason: "Cannot compute SHA-256 without external shell access."
+      requires_human_review: true
+    - field_path: "workflow_patterns.primary_pattern"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "The workflow clearly combines multiple patterns: iteration, scatter-gather, and broadcast."
+      requires_human_review: false
+    - field_path: "workflow_patterns.secondary_patterns"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Identified distinct scatter-gather (individuals to merge), iterative (chromosomes, populations), and broadcast (config, populations) patterns."
+      requires_human_review: false
+    - field_path: "workflow_patterns.classification_rationale"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "The rationale clearly maps observed workflow structure to the classified patterns."
+      requires_human_review: false
+    - field_path: "workflow_patterns.pattern_table_row"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Generated based on the IPDPS '26 Table III summary requirements."
+      requires_human_review: false
+    - field_path: "io_behavioral_hints[0].potential_concern"
+      filled_by: "gemini"
+      confidence_level: "high"
+      confidence_reason: "Observed chunking behavior directly implies potential for small file overhead."
+      requires_human_review: false
+    - field_path: "io_behavioral_hints[1].potential_concern"
+      filled_by: "gemini"
+      confidence_level: "inferred"
+      confidence_reason: "Conditional execution for MPI-enabled scripts raises a flag for potential MPI-IO pattern risks, but implementation details are unknown."
+      requires_human_review: true
+    - field_path: "execution_profiles[0].profile_name"
+      filled_by: "gemini"
+      confidence_level: "inferred"
+      confidence_reason: "Proposed based on the completion of the data preparation and sifting stage, representing a logical intermediate stopping point."
+      requires_human_review: true
+    - field_path: "execution_profiles[0].description"
+      filled_by: "gemini"
+      confidence_level: "inferred"
+      confidence_reason: "Description articulates the scientific value of this intermediate stopping point."
+      requires_human_review: true
+    - field_path: "execution_profiles[1].profile_name"
+      filled_by: "gemini"
+      confidence_level: "inferred"
+      confidence_reason: "Proposed as the completion of the entire workflow, representing the final output."
+      requires_human_review: true
+    - field_path: "execution_profiles[1].description"
+      filled_by: "gemini"
+      confidence_level: "inferred"
+      confidence_reason: "Description articulates the scientific value of the final stopping point."
+      requires_human_review: true

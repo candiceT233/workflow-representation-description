@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-06T17:11:51.196622",
+  "qid": "q073",
+  "source_file": "1000genome-workflow-knowledge-eval-3.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "How does the \"Mutations_Overlap\" task categorize the shared mutation frequencies it calculates?",
+  "reference_answer": "The task calculates the frequency of shared mutations among pairs of individuals, categorizing them by their population and chromosome.",
+  "agent": "gemini",
+  "context_type": "wdd_yaml",
+  "success": false,
+  "model_answer": "exit 1: An unexpected critical error occurred:Error: EBADF: bad file descriptor, read",
+  "duration_s": 23.23,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": null,
+  "correctness": null
+}

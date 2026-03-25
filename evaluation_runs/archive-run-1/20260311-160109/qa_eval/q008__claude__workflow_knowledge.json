@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T16:04:38.477289",
+  "qid": "q008",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "What are the five core task classes that make up the sequence of this workflow?",
+  "reference_answer": "The workflow consists of five core task classes: Individuals, Individuals_Merge, Populations, Sifting, Mutations_Overlap, and Frequency.",
+  "agent": "claude",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "Based on the workflow knowledge document, the five core task classes are:\n\n1. **`individuals`** — Extracts SNP variants from VCF files and creates per-individual mutation records\n2. **`individuals_merge`** — Consolidates chunked per-individual results into a single archive per chromosome\n3. **`sifting`** — Filters variants by SIFT scores from annotated VCF files\n4. **`mutation_overlap`** — Computes pairwise mutation overlap across individuals within each population\n5. **`frequency`** — Estimates mutation frequency distributions via Monte Carlo random sampling",
+  "duration_s": 8.31,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 3.0,
+  "correctness": 3.0
+}

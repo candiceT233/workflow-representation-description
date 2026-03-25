@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-04T11:09:35.576819",
+  "qid": "q004",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 1: SCIENTIFIC PURPOSE AND BIOLOGICAL SEMANTICS",
+  "question": "What is the significance of \"phasing\" in the context of this genomic data?",
+  "reference_answer": "Phasing is a critical component of the data semantics that allows researchers to determine the parental origin of alleles and calculate genotype dosage values.",
+  "agent": "opencode",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "The provided YAML context does not explicitly define or discuss \"phasing.\" However, it mentions processing \"Phase3\" data from the 1000 Genomes Project and identifying \"mutations on both alleles,\" which are concepts typically associated with phased haplotype data in genomics.",
+  "duration_s": 96.34,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 3.0,
+  "correctness": 3.0
+}

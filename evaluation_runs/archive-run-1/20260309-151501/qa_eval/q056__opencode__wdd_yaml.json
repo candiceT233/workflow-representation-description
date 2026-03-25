@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-09T15:15:01.574484",
+  "qid": "q056",
+  "source_file": "1000genome-workflow-knowledge-eval-3.txt",
+  "section": "SECTION 1: SCIENTIFIC PURPOSE AND BIOLOGICAL SEMANTICS",
+  "question": "Why did the project shift away from the multi-platform approach used in Phase 1?",
+  "reference_answer": "The strategic shift to an Illumina-only approach in Phase 3 was driven by the need for higher-quality variant calling and more consistent error profiles.",
+  "agent": "opencode",
+  "context_type": "wdd_yaml",
+  "success": false,
+  "model_answer": "stdin and input arguments may not both be used.",
+  "duration_s": 0.0,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": null,
+  "correctness": null
+}

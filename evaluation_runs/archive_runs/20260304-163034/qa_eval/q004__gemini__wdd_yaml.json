@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-04T16:33:40.466841",
+  "qid": "q004",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 1: SCIENTIFIC PURPOSE AND BIOLOGICAL SEMANTICS",
+  "question": "What is the significance of \"phasing\" in the context of this genomic data?",
+  "reference_answer": "Phasing is a critical component of the data semantics that allows researchers to determine the parental origin of alleles and calculate genotype dosage values.",
+  "agent": "gemini",
+  "context_type": "wdd_yaml",
+  "success": false,
+  "model_answer": "exit 1: (node:3175148) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n(node:3175204) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.\n(Use `node --trace-deprecation ...` to show where the warning was created)\nLoaded cached credentials.\nServer 'jarvis-mcp' supports tool updates. Listening for changes...\nAn un",
+  "duration_s": 24.06,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": null,
+  "correctness": null
+}

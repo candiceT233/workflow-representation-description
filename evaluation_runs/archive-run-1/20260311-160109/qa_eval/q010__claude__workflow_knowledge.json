@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T16:05:35.631340",
+  "qid": "q010",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "How does the workflow architecture handle the massive scale of individual chromosome VCF files?",
+  "reference_answer": "The workflow employs a Scatter/Gather pattern. The large input file is divided into manageable chunks, and multiple \"Individuals\" jobs are executed in parallel to process these chunks.",
+  "agent": "claude",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "## Handling Massive VCF File Scale\n\nThe workflow addresses the scale of chromosome VCF files (6-10 GB each, 250,000 lines, 2,504 individual columns) through several architectural mechanisms:\n\n**1. Within-Chromosome Chunking**\nThe `-i` (individuals-jobs) parameter splits a single chromosome's VCF processing into multiple parallel jobs. For example, `-i 5` divides 250k lines into 5 jobs of 50k lines each. This can scale from 10 individuals tasks (1 per chromosome) up to 2,500 tasks. A merge stage (`individuals_merge`) then consolidates the chunked results back into a single tar archive per chromosome.\n\n**2. Cross-Chromosome Parallelism**\nAll chromosomes are processed independently — the workflow creates the full DAG upfront and each chromosome flows through the pipeline without dependencies on other chromosomes.\n\n**3. Per-Individual File Extraction + Tar Compression**\nEach individuals task produces ~2,504 separate files (one per individual), which are immediately bundled into a `tar.gz` archive. This contains the small-file explosion and reduces filesystem inode pressure, at the cost of serialization/deserialization overhead.\n\n**4. Selective Filtering in Downstream Stages**\nThe sifting stage uses grep-based filtering to extract only lines containing \"deleterious\"/\"tolerated\" SIFT scores, reducing a 5-8 GB annotated VCF down to a 10-50 MB text file — avoiding full file parsing.\n\n**Key Bottleneck:** The individuals task consumes **81.85%** of total execution time and reads the entire VCF into memory line-by-line, making it both the critical path and the primary RAM bottleneck. The chunking parameter (`-i`) is the main lever for mitigating this.",
+  "duration_s": 15.99,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 5.0,
+  "correctness": 5.0
+}

@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T16:03:20.838433",
+  "qid": "q005",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 1: SCIENTIFIC PURPOSE AND BIOLOGICAL SEMANTICS",
+  "question": "How is the genotype dosage mathematically calculated to represent confidence in a genotype call?",
+  "reference_answer": "The dosage, which represents the predicted number of non-reference alleles, is calculated using the relationship $Dosage = Pr(Het|Data) + 2 \\times Pr(Alt|Data)$. This value is derived from imputation engines and complements standard genotype likelihoods.",
+  "agent": "claude",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "The workflow knowledge context does not contain information about genotype dosage calculations or confidence in genotype calls. The context describes allele frequency (AF) filtering with a threshold of 0.5 to decide whether to keep a variant based on reference vs. alternative alleles, but this is a binary filter — not a dosage or confidence calculation.",
+  "duration_s": 7.21,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 1.0,
+  "correctness": 1.0
+}

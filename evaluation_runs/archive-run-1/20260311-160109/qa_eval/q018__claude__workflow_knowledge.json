@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T16:09:59.589446",
+  "qid": "q018",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 3: REPOSITORY USAGE AND SYSTEM MECHANICS",
+  "question": "When evaluating the workflow components, how are the logical file names defined in the workflow mapped to actual data locations?",
+  "reference_answer": "The workflow uses a Replica Catalog (RC) to map the logical file names (LFNs) used in the abstract workflow to their physical file locations (PFNs) on the storage systems.",
+  "agent": "claude",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "Based on the provided context, the mapping of logical file names to actual data locations is handled by the **Pegasus ReplicaCatalog**. The context references it in the Validation Points table, where runtime checks like \"Column file exists\" and \"VCF files readable\" are enforced by `ReplicaCatalog` at runtime.\n\nThe physical data paths are constructed from configurable parameters — primarily `--dataset` (defaulting to `20130502`, affecting paths like `data/{dataset}/`) and `--src-path` (auto-detected source directory for binaries and data). The ReplicaCatalog then maps the logical names used within the workflow DAG (e.g., `ALL.chrX.250000.vcf`, `columns.txt`) to these physical file locations so Pegasus can locate and stage the data at execution time.\n\nBeyond this, the context does not provide further detail on the internal structure or format of the ReplicaCatalog entries themselves.",
+  "duration_s": 12.74,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 5.0,
+  "correctness": 5.0
+}

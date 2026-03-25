@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-06T17:10:14.107645",
+  "qid": "q071",
+  "source_file": "1000genome-workflow-knowledge-eval-3.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "What biological function does the \"Sifting\" task evaluate, and what specific predictive tool does it utilize?",
+  "reference_answer": "The \"Sifting\" task utilizes the Variant Effect Predictor (VEP) to compute SIFT scores. SIFT is a sequence homology-based tool that predicts whether an amino acid substitution will impact protein function.",
+  "agent": "gemini",
+  "context_type": "wdd_yaml",
+  "success": false,
+  "model_answer": "exit 1: An unexpected critical error occurred:Error: EBADF: bad file descriptor, read",
+  "duration_s": 24.82,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": null,
+  "correctness": null
+}

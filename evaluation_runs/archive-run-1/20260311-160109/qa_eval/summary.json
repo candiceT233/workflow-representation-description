@@ -1,0 +1,47 @@
+{
+  "run_start": "2026-03-11T16:01:09.617611",
+  "trial_used": 1,
+  "knowledge_file": "1000genome-knowledge-claude-trial1.md",
+  "wdd_file": "1000genome-wdd-claude-trial1.yaml",
+  "context_by_agent": {
+    "claude": {
+      "knowledge_file": "1000genome-knowledge-claude-trial1.md",
+      "wdd_file": "1000genome-wdd-claude-trial1.yaml",
+      "trial_used": 1
+    }
+  },
+  "agents": [
+    "claude"
+  ],
+  "context_types": [
+    "workflow_knowledge",
+    "wdd_yaml"
+  ],
+  "n_questions": 74,
+  "summary": {
+    "claude__workflow_knowledge": {
+      "n": 74,
+      "success": 74,
+      "correctness_mean": 2.92,
+      "correctness_std": 1.66,
+      "judge_mean": 2.92,
+      "judge_std": 1.66,
+      "duration_mean_s": 10.22,
+      "duration_total_s": 756.43,
+      "total_tokens_sum": null,
+      "total_tokens_mean": null
+    },
+    "claude__wdd_yaml": {
+      "n": 74,
+      "success": 74,
+      "correctness_mean": 2.89,
+      "correctness_std": 1.56,
+      "judge_mean": 2.89,
+      "judge_std": 1.56,
+      "duration_mean_s": 9.81,
+      "duration_total_s": 726.03,
+      "total_tokens_sum": null,
+      "total_tokens_mean": null
+    }
+  }
+}

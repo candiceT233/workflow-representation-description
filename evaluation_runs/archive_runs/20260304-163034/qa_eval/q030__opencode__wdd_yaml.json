@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-04T16:56:55.248371",
+  "qid": "q030",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 4: INPUT FILES, OUTPUT FILES, AND DATA FORMATS",
+  "question": "Where are the core executable scripts that perform the actual genomic analysis located in the repository?",
+  "reference_answer": "The core executables and Python scripts that perform the calculations for sifting, overlapping, and merging are located in the bin/ directory of the repository. These are the scripts the workflow engine calls for each task.",
+  "agent": "opencode",
+  "context_type": "wdd_yaml",
+  "success": false,
+  "model_answer": "exit 1: \u001b[91m\u001b[1mError: \u001b[0mUnexpected error, check log file at /home/mtang11/.local/share/opencode/log/2026-03-04T225657.log for more details\n\nEBADF: bad file descriptor, read\n",
+  "duration_s": 1.95,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": null,
+  "correctness": null
+}

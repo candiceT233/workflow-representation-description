@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T16:12:29.209130",
+  "qid": "q022",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 4: INPUT FILES, OUTPUT FILES, AND DATA FORMATS",
+  "question": "Where does the workflow retrieve its primary genomic input data from?",
+  "reference_answer": "The workflow fetches Phase 3 VCF data from the IGSR FTP mirrors. The \"Individuals\" task is responsible for downloading and parsing these files by chromosome.",
+  "agent": "claude",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "Based on the WDD, the workflow's primary genomic input data consists of **Variant Call Format (VCF) files from the 1000 Genomes Phase3 release**, one per chromosome. These are external input files (no producer task) containing SNP variant data with genotype information for 2,504 individuals.\n\nThe WDD does not specify a retrieval URL or download mechanism — the VCF files are listed as external inputs (`category: \"input\"`, `producer_task: null`) that are expected to already be available when the workflow starts.",
+  "duration_s": 8.37,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 3.0,
+  "correctness": 3.0
+}

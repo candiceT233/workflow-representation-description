@@ -1,0 +1,106 @@
+{
+  "session_id": "1316c734-848f-4e60-8d27-2d8ebb779e8b",
+  "response": "STATUS: failed | OUTPUT: Could not write the workflow knowledge Markdown file due to repeated tool execution errors with `write_file`.",
+  "stats": {
+    "models": {
+      "gemini-2.5-flash": {
+        "api": {
+          "totalRequests": 9,
+          "totalErrors": 0,
+          "totalLatencyMs": 89019
+        },
+        "tokens": {
+          "input": 19879,
+          "prompt": 177165,
+          "candidates": 7893,
+          "total": 192330,
+          "cached": 157286,
+          "thoughts": 7272,
+          "tool": 0
+        },
+        "roles": {
+          "main": {
+            "totalRequests": 9,
+            "totalErrors": 0,
+            "totalLatencyMs": 89019,
+            "tokens": {
+              "input": 19879,
+              "prompt": 177165,
+              "candidates": 7893,
+              "total": 192330,
+              "cached": 157286,
+              "thoughts": 7272,
+              "tool": 0
+            }
+          }
+        }
+      }
+    },
+    "tools": {
+      "totalCalls": 8,
+      "totalSuccess": 4,
+      "totalFail": 4,
+      "totalDurationMs": 39,
+      "totalDecisions": {
+        "accept": 4,
+        "reject": 0,
+        "modify": 0,
+        "auto_accept": 0
+      },
+      "byName": {
+        "list_directory": {
+          "count": 2,
+          "success": 2,
+          "fail": 0,
+          "durationMs": 21,
+          "decisions": {
+            "accept": 2,
+            "reject": 0,
+            "modify": 0,
+            "auto_accept": 0
+          }
+        },
+        "read_file": {
+          "count": 2,
+          "success": 2,
+          "fail": 0,
+          "durationMs": 17,
+          "decisions": {
+            "accept": 2,
+            "reject": 0,
+            "modify": 0,
+            "auto_accept": 0
+          }
+        },
+        "write_todos": {
+          "count": 1,
+          "success": 0,
+          "fail": 1,
+          "durationMs": 1,
+          "decisions": {
+            "accept": 0,
+            "reject": 0,
+            "modify": 0,
+            "auto_accept": 0
+          }
+        },
+        "write_file": {
+          "count": 3,
+          "success": 0,
+          "fail": 3,
+          "durationMs": 0,
+          "decisions": {
+            "accept": 0,
+            "reject": 0,
+            "modify": 0,
+            "auto_accept": 0
+          }
+        }
+      }
+    },
+    "files": {
+      "totalLinesAdded": 0,
+      "totalLinesRemoved": 0
+    }
+  }
+}

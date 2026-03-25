@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T16:06:56.075707",
+  "qid": "q012",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "How does the workflow establish the categorical framework necessary for analyzing different demographic groups?",
+  "reference_answer": "The \"Populations\" task runs simultaneously to the parsing steps and downloads demographic metadata for the 26 global populations.",
+  "agent": "claude",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "The workflow establishes its demographic group framework through two key mechanisms:\n\n1. **Population files** (`data:population_file`): External config files — one per population (ALL, AFR, EUR, EAS, AMR, SAS, GBR) — each containing space-separated individual sample identifiers belonging to that population. These define the categorical membership.\n\n2. **Column headers file** (`data:columns_file`): A tab-separated file listing all 2,504 individual sample IDs in the same column order as the VCF files, used to map VCF column indices to individual names and match them against population membership lists.\n\nTogether, these config inputs allow the analysis-stage tasks (`mutation_overlap` and `frequency`) to filter the full set of individuals down to a specific population. Each analysis task runs once **per chromosome per population** (70 total in test config: 10 chromosomes × 7 populations), receiving the relevant population file alongside the merged individuals data and sifted variants via a 1-to-N broadcast pattern from upstream tasks.",
+  "duration_s": 15.61,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 2.0,
+  "correctness": 2.0
+}

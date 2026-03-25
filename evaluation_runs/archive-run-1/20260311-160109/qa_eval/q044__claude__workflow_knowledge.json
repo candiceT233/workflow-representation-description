@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T16:23:41.703642",
+  "qid": "q044",
+  "source_file": "1000genome-workflow-knowledge-eval-2.txt",
+  "section": "SECTION 3: REPOSITORY USAGE AND SYSTEM MECHANICS",
+  "question": "Where is the source code and implementation for this bioinformatics workflow hosted?",
+  "reference_answer": "The workflow implementation is hosted on GitHub under the repository `pegasus-isi/1000genome-workflow`.",
+  "agent": "claude",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "The provided context does not contain information about where the source code or implementation is hosted. The knowledge report references internal files like `daxgen.py` and mentions the workflow uses **Pegasus WMS** as its execution framework, but it does not include a repository URL, GitHub link, or any other hosting location.",
+  "duration_s": 8.0,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 2.0,
+  "correctness": 2.0
+}

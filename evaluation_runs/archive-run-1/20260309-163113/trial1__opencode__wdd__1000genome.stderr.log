@@ -1,0 +1,239 @@
+[0m
+> build · minimax-m2.5-free
+[0m
+[0m→ [0mRead template_separate_docs/template_WDD.yml
+[0m→ [0mRead template_separate_docs/WIDGET_conventions.md
+[0m
+[0m$ [0mls -la /mnt/common/mtang11/scripts/workflow-representation-description/workflows_repo/1000genome-workflow/
+total 84
+drwxrwxr-x 7 mtang11 mtang11  4096 Mar  9 15:59 .
+drwxrwxr-x 4 mtang11 mtang11   151 Mar  4 09:38 ..
+drwxrwxr-x 2 mtang11 mtang11  4096 Feb 23 01:44 analysis
+drwxrwxr-x 2 mtang11 mtang11  4096 Feb 23 01:44 bin
+drwxrwxr-x 4 mtang11 mtang11    53 Feb 23 01:49 data
+-rw-rw-r-- 1 mtang11 mtang11  1042 Feb 23 01:49 data.csv
+-rwxrwxr-x 1 mtang11 mtang11 24554 Feb 23 01:49 daxgen.py
+drwxrwxr-x 3 mtang11 mtang11    28 Feb 23 01:49 docs
+-rw-rw-r-- 1 mtang11 mtang11   481 Feb 23 01:49 env.sh
+-rw-rw-r-- 1 mtang11 mtang11    44 Feb 23 01:49 .git
+-rw-rw-r-- 1 mtang11 mtang11    75 Feb 23 01:49 .gitignore
+drwxrwxr-x 2 mtang11 mtang11  4096 Feb 23 01:49 lib
+-rw-rw-r-- 1 mtang11 mtang11 11368 Feb 23 01:49 LICENSE
+-rwxrwxr-x 1 mtang11 mtang11   483 Feb 23 01:49 prepare_input.sh
+-rw-rw-r-- 1 mtang11 mtang11 10090 Feb 23 01:49 README.md
+[0m
+[0m→ [0mRead workflows_repo/1000genome-workflow/README.md
+[0m→ [0mRead workflows_repo/1000genome-workflow/daxgen.py
+[0m
+[0m$ [0mls -la /mnt/common/mtang11/scripts/workflow-representation-description/workflows_repo/1000genome-workflow/bin/
+total 84
+drwxrwxr-x 2 mtang11 mtang11  4096 Feb 23 01:44 .
+drwxrwxr-x 7 mtang11 mtang11  4096 Mar  9 15:59 ..
+-rwxrwxr-x 1 mtang11 mtang11 10747 Feb 23 01:44 frequency.py
+-rwxrwxr-x 1 mtang11 mtang11  2576 Feb 23 01:44 individuals
+-rwxrwxr-x 1 mtang11 mtang11   373 Feb 23 01:44 individuals_merge
+-rwxrwxr-x 1 mtang11 mtang11  3809 Feb 23 01:44 individuals_merge_mpi.py
+-rwxrwxr-x 1 mtang11 mtang11  2076 Feb 23 01:44 individuals_merge.py
+-rwxrwxr-x 1 mtang11 mtang11  6599 Feb 23 01:44 individuals_mpi.py
+-rwxrwxr-x 1 mtang11 mtang11  4976 Feb 23 01:44 individuals.py
+-rwxrwxr-x 1 mtang11 mtang11 17109 Feb 23 01:44 mutation_overlap.py
+-rwxrwxr-x 1 mtang11 mtang11   167 Feb 23 01:44 pmc-wrapper
+-rwxrwxr-x 1 mtang11 mtang11   952 Feb 23 01:44 sifting
+-rwxrwxr-x 1 mtang11 mtang11  2910 Feb 23 01:44 sifting.py
+[0m
+[0m$ [0mls -la /mnt/common/mtang11/scripts/workflow-representation-description/workflows_repo/1000genome-workflow/data/
+total 12
+drwxrwxr-x 4 mtang11 mtang11   53 Feb 23 01:49 .
+drwxrwxr-x 7 mtang11 mtang11 4096 Mar  9 15:59 ..
+drwxrwxr-x 6 mtang11 mtang11 4096 Feb 23 01:49 20130502
+drwxrwxr-x 2 mtang11 mtang11  115 Feb 23 01:49 populations
+[0m
+[0m→ [0mRead workflows_repo/1000genome-workflow/data.csv
+[0m→ [0mRead workflows_repo/1000genome-workflow/bin/individuals.py
+[0m→ [0mRead workflows_repo/1000genome-workflow/bin/sifting.py
+[0m
+[0m$ [0mls -la /mnt/common/mtang11/scripts/workflow-representation-description/workflows_repo/1000genome-workflow/data/populations/
+total 72
+drwxrwxr-x 2 mtang11 mtang11   115 Feb 23 01:49 .
+drwxrwxr-x 4 mtang11 mtang11    53 Feb 23 01:49 ..
+-rw-rw-r-- 1 mtang11 mtang11  8088 Feb 23 01:49 AFR
+-rw-rw-r-- 1 mtang11 mtang11 28000 Feb 23 01:49 ALL
+-rw-rw-r-- 1 mtang11 mtang11  4248 Feb 23 01:49 AMR
+-rw-rw-r-- 1 mtang11 mtang11  4896 Feb 23 01:49 EAS
+-rw-rw-r-- 1 mtang11 mtang11  5312 Feb 23 01:49 EUR
+-rw-rw-r-- 1 mtang11 mtang11   856 Feb 23 01:49 GBR
+-rw-rw-r-- 1 mtang11 mtang11  5248 Feb 23 01:49 SAS
+[0m
+[0m→ [0mRead workflows_repo/1000genome-workflow/bin/individuals_merge.py
+[0m→ [0mRead workflows_repo/1000genome-workflow/bin/mutation_overlap.py[90m [limit=80][0m
+[0m
+[0m$ [0mgit -C /mnt/common/mtang11/scripts/workflow-representation-description/workflows_repo/1000genome-workflow log -1 --format=%H
+fatal: not a git repository: /mnt/common/mtang11/scripts/workflow-representation-description/workflows_repo/1000genome-workflow/../.git/modules/1000genome-workflow
+[0m
+[0m$ [0mcd /mnt/common/mtang11/scripts/workflow-representation-description/workflows_repo/1000genome-workflow && git log -1 --format=%H 2>/dev/null || echo "not available"
+not available
+[0m
+[0m← [0mWrite workflow_wdd/1000genome-wdd-opencode-trial1.yaml
+Wrote file successfully.
+
+LSP errors detected in other files:
+<diagnostics file="/mnt/common/mtang11/scripts/workflow-representation-description/workflows_repo/1000genome-workflow/daxgen.py">
+ERROR [11:6] Import "Pegasus.api" could not be resolved
+ERROR [55:24] "File" is not defined
+ERROR [85:19] "File" is not defined
+ERROR [125:19] "SiteCatalog" is not defined
+ERROR [106:22] "Properties" is not defined
+ERROR [94:20] "write" is not a known attribute of "None"
+ERROR [177:19] "TransformationCatalog" is not defined
+ERROR [95:17] "write" is not a known attribute of "None"
+ERROR [347:19] "ReplicaCatalog" is not defined
+ERROR [96:17] "write" is not a known attribute of "None"
+ERROR [359:19] "Workflow" is not defined
+ERROR [97:17] "write" is not a known attribute of "None"
+ERROR [101:21] "graph" is not a known attribute of "None"
+ERROR [101:92] Operator "+" not supported for "None"
+ERROR [127:17] "Site" is not defined
+ERROR [128:13] "Directory" is not defined
+ERROR [128:23] "Directory" is not defined
+ERROR [129:17] "FileServer" is not defined
+ERROR [129:65] "Operation" is not defined
+ERROR [131:13] "Directory" is not defined
+... and 63 more
+</diagnostics>
+
+LSP errors detected in other files:
+<diagnostics file="/mnt/common/mtang11/scripts/workflow-representation-description/workflows_repo/1000genome-workflow/bin/mutation_overlap.py">
+ERROR [6:8] Import "numpy" could not be resolved
+ERROR [7:8] Import "numpy.ma" could not be resolved
+ERROR [11:8] Import "matplotlib" could not be resolved
+ERROR [13:8] Import "matplotlib.pyplot" could not be resolved
+ERROR [14:8] Import "matplotlib.colors" could not be resolved
+ERROR [15:8] Import "matplotlib.cm" could not be resolved
+ERROR [16:6] Import "mpl_toolkits.axes_grid1" could not be resolved
+ERROR [20:6] Import "pylab" could not be resolved
+ERROR [21:6] Import "matplotlib" could not be resolved
+ERROR [22:8] Import "matplotlib" could not be resolved
+</diagnostics>
+[0m
+[0m$ [0mpython3 -c "import uuid; print(str(uuid.uuid4()))"
+ee81ad46-bc10-4e2f-bd59-99ec2f3d8402
+[0m
+[0m$ [0mpython3 -c "
+import hashlib
+import json
+
+pc_edges = [
+    {'producer': 'task:individuals', 'consumer': 'task:individuals_merge', 'data_objects': ['data:individuals_chunk_output']},
+    {'producer': 'task:individuals_merge', 'consumer': 'task:mutation_overlap', 'data_objects': ['data:merged_individuals']},
+    {'producer': 'task:individuals_merge', 'consumer': 'task:frequency', 'data_objects': ['data:merged_individuals']},
+    {'producer': 'task:sifting', 'consumer': 'task:mutation_overlap', 'data_objects': ['data:sifted_output']},
+    {'producer': 'task:sifting', 'consumer': 'task:frequency', 'data_objects': ['data:sifted_output']}
+]
+
+# Sort edges for consistent hashing
+sorted_edges = sorted(pc_edges, key=lambda x: (x['producer'], x['consumer']))
+hash_input = json.dumps(sorted_edges, sort_keys=True)
+hash_value = hashlib.sha256(hash_input.encode()).hexdigest()
+print(hash_value)
+"
+02b906d0849c1e99715b9b5d8a7e5f6fe176563eb638fbdd6e1f772ddf9a187c
+[0m
+[0m← [0mEdit workflow_wdd/1000genome-wdd-opencode-trial1.yaml
+Index: /mnt/common/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial1.yaml
+===================================================================
+--- /mnt/common/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial1.yaml
++++ /mnt/common/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial1.yaml
+@@ -1,6 +1,6 @@
+ metadata:
+-  workflow_lineage_id: wrd:1000genome
++  workflow_lineage_id: wrd:1000genome-ee81ad46-bc10-4e2f-bd59-99ec2f3d8402
+   version: "1.0.0"
+   version_notes: Initial WDD compiled from daxgen.py Pegasus workflow generator.
+   deprecated: false
+   workflow_name: 1000genome
+
+[0m
+[0m← [0mEdit workflow_wdd/1000genome-wdd-opencode-trial1.yaml
+Index: /mnt/common/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial1.yaml
+===================================================================
+--- /mnt/common/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial1.yaml
++++ /mnt/common/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial1.yaml
+@@ -429,9 +429,9 @@
+     communication_pattern: file_per_producer
+     data_volume_class: small
+ 
+ workflow_graph:
+-  integrity_hash: null
++  integrity_hash: 02b906d0849c1e99715b9b5d8a7e5f6fe176563eb638fbdd6e1f772ddf9a187c
+   last_generated: "2026-03-09T00:00:00Z"
+   dag_edges:
+     - from: task:individuals
+       to: task:individuals_merge
+
+[0m
+[0m$ [0mpython3 -c "from datetime import datetime; print(datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ'))"
+2026-03-09T21:40:14Z
+[0m
+[0m← [0mEdit workflow_wdd/1000genome-wdd-opencode-trial1.yaml
+Index: /mnt/common/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial1.yaml
+===================================================================
+--- /mnt/common/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial1.yaml
++++ /mnt/common/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial1.yaml
+@@ -10,10 +10,10 @@
+   source_format: native
+   source_file: daxgen.py
+   schema_version: wrd-7.0
+   generated_by: opencode
+-  generated_at: "2026-03-09T00:00:00Z"
+-  last_modified_at: "2026-03-09T00:00:00Z"
++  generated_at: "2026-03-09T21:40:14Z"
++  last_modified_at: "2026-03-09T21:40:14Z"
+ 
+ stages:
+   - stage_id: stage:data_preparation
+     name: Data Preparation
+
+[0m
+[0m← [0mEdit workflow_wdd/1000genome-wdd-opencode-trial1.yaml
+Index: /mnt/common/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial1.yaml
+===================================================================
+--- /mnt/common/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial1.yaml
++++ /mnt/common/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial1.yaml
+@@ -430,9 +430,9 @@
+     data_volume_class: small
+ 
+ workflow_graph:
+   integrity_hash: 02b906d0849c1e99715b9b5d8a7e5f6fe176563eb638fbdd6e1f772ddf9a187c
+-  last_generated: "2026-03-09T00:00:00Z"
++  last_generated: "2026-03-09T21:40:14Z"
+   dag_edges:
+     - from: task:individuals
+       to: task:individuals_merge
+       via: pc:individuals->individuals_merge:n_to_1
+
+[0m
+[0m← [0mEdit workflow_wdd/1000genome-wdd-opencode-trial1.yaml
+Index: /mnt/common/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial1.yaml
+===================================================================
+--- /mnt/common/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial1.yaml
++++ /mnt/common/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial1.yaml
+@@ -556,9 +556,9 @@
+ translation_metadata:
+   source_format: native
+   source_file: daxgen.py
+   translation_tool: opencode
+-  translation_timestamp: "2026-03-09T00:00:00Z"
++  translation_timestamp: "2026-03-09T21:40:14Z"
+   unmapped_fields: []
+   round_trip_gaps: []
+   quality_warnings: []
+   field_confidence_records:
+
+[0m
+[0m→ [0mRead workflow_wdd/1000genome-wdd-opencode-trial1.yaml[90m [limit=30][0m
+[0m✱ [0mGrep "integrity_hash"[90m in workflow_wdd · 7 matches[0m
+[0m→ [0mRead workflow_wdd/1000genome-wdd-opencode-trial1.yaml[90m [offset=600][0m
+[0m
+[0m$ [0mls -la /mnt/common/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial1.yaml
+-rw-rw-r-- 1 mtang11 mtang11 25741 Mar  9 16:40 /mnt/common/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial1.yaml
+[0m

@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T16:15:29.967150",
+  "qid": "q029",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 4: INPUT FILES, OUTPUT FILES, AND DATA FORMATS",
+  "question": "What are the final output files produced by the workflow?",
+  "reference_answer": "The workflow produces two final outputs: (1) overlap metrics from the \"Mutations_Overlap\" task, recording shared mutation frequencies between pairs of individuals categorized by population and chromosome; and (2) a null distribution from the \"Frequency\" task, representing the baseline rate of random variant sharing used for statistical comparison.",
+  "agent": "claude",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "## Final Output Files\n\nThe workflow produces these final outputs:\n\n1. **Mutation Overlap results:** `chrX-{population_id}.tar.gz` — one per (chromosome, population) pair, containing:\n   - Overlap matrices and counts in `chrX-{population_id}/output_no_sift/*.txt`\n   - Heatmap/visualization plots in `chrX-{population_id}/plots_no_sift/*.png`\n\n2. **Frequency analysis results:** `chrX-{population_id}-freq.tar.gz` — one per (chromosome, population) pair, containing:\n   - Frequency distributions and statistical summaries in `chrX-{population_id}-freq/output_no_sift/*.txt`\n   - Distribution plots in `chrX-{population_id}-freq/plots_no_sift/*.png`\n\nAt full scale (10 chromosomes × 7 populations × 2 analysis types), this yields **140 output tar archives** with their associated data files and PNG plots.",
+  "duration_s": 9.75,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 4.0,
+  "correctness": 4.0
+}

@@ -1,0 +1,266 @@
+{
+  "run_started_at": "2026-03-10T23:47:16.466541+00:00",
+  "run_finished_at": "2026-03-10T23:47:35.871700+00:00",
+  "trials": 3,
+  "random_seed": 20260223,
+  "records": [
+    {
+      "task_id": "trial3__claude__wdd__1000genome",
+      "trial": 3,
+      "agent": "claude",
+      "mode": "wdd",
+      "workflow": "1000genome",
+      "status": "failed",
+      "started_at": "2026-03-10T23:47:16.479038+00:00",
+      "finished_at": "2026-03-10T23:47:19.660198+00:00",
+      "duration_s": 3.181,
+      "exit_code": 1,
+      "error": "non-zero exit 1",
+      "prompt_path": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260310-184716/trial3__claude__wdd__1000genome.prompt.txt",
+      "stdout_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260310-184716/trial3__claude__wdd__1000genome.stdout.log",
+      "stderr_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260310-184716/trial3__claude__wdd__1000genome.stderr.log",
+      "output_path": "/home/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-claude-trial3.yaml",
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "total_tokens": null
+      },
+      "validation": {
+        "valid": false,
+        "score": 0.0,
+        "issues": [
+          "file_missing"
+        ]
+      },
+      "output_metrics": {
+        "exists": false,
+        "bytes": 0,
+        "lines": 0,
+        "words": 0,
+        "chars": 0
+      },
+      "model_control": {
+        "model": "haiku",
+        "temperature": "<SET_TEMP>",
+        "seed": "<SET_SEED>",
+        "max_tokens": "<SET_MAX_TOKENS>",
+        "cmd_template": "claude --model haiku --dangerously-skip-permissions --output-format json -p {prompt}"
+      }
+    },
+    {
+      "task_id": "trial2__claude__knowledge__1000genome",
+      "trial": 2,
+      "agent": "claude",
+      "mode": "knowledge",
+      "workflow": "1000genome",
+      "status": "failed",
+      "started_at": "2026-03-10T23:47:19.663447+00:00",
+      "finished_at": "2026-03-10T23:47:22.884055+00:00",
+      "duration_s": 3.221,
+      "exit_code": 1,
+      "error": "non-zero exit 1",
+      "prompt_path": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260310-184716/trial2__claude__knowledge__1000genome.prompt.txt",
+      "stdout_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260310-184716/trial2__claude__knowledge__1000genome.stdout.log",
+      "stderr_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260310-184716/trial2__claude__knowledge__1000genome.stderr.log",
+      "output_path": "/home/mtang11/scripts/workflow-representation-description/workflow_knowledge/1000genome-knowledge-claude-trial2.md",
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "total_tokens": null
+      },
+      "validation": {
+        "valid": false,
+        "score": 0.0,
+        "issues": [
+          "file_missing"
+        ]
+      },
+      "output_metrics": {
+        "exists": false,
+        "bytes": 0,
+        "lines": 0,
+        "words": 0,
+        "chars": 0
+      },
+      "model_control": {
+        "model": "haiku",
+        "temperature": "<SET_TEMP>",
+        "seed": "<SET_SEED>",
+        "max_tokens": "<SET_MAX_TOKENS>",
+        "cmd_template": "claude --model haiku --dangerously-skip-permissions --output-format json -p {prompt}"
+      }
+    },
+    {
+      "task_id": "trial3__claude__knowledge__1000genome",
+      "trial": 3,
+      "agent": "claude",
+      "mode": "knowledge",
+      "workflow": "1000genome",
+      "status": "failed",
+      "started_at": "2026-03-10T23:47:22.887085+00:00",
+      "finished_at": "2026-03-10T23:47:26.233100+00:00",
+      "duration_s": 3.346,
+      "exit_code": 1,
+      "error": "non-zero exit 1",
+      "prompt_path": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260310-184716/trial3__claude__knowledge__1000genome.prompt.txt",
+      "stdout_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260310-184716/trial3__claude__knowledge__1000genome.stdout.log",
+      "stderr_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260310-184716/trial3__claude__knowledge__1000genome.stderr.log",
+      "output_path": "/home/mtang11/scripts/workflow-representation-description/workflow_knowledge/1000genome-knowledge-claude-trial3.md",
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "total_tokens": null
+      },
+      "validation": {
+        "valid": false,
+        "score": 0.0,
+        "issues": [
+          "file_missing"
+        ]
+      },
+      "output_metrics": {
+        "exists": false,
+        "bytes": 0,
+        "lines": 0,
+        "words": 0,
+        "chars": 0
+      },
+      "model_control": {
+        "model": "haiku",
+        "temperature": "<SET_TEMP>",
+        "seed": "<SET_SEED>",
+        "max_tokens": "<SET_MAX_TOKENS>",
+        "cmd_template": "claude --model haiku --dangerously-skip-permissions --output-format json -p {prompt}"
+      }
+    },
+    {
+      "task_id": "trial2__claude__wdd__1000genome",
+      "trial": 2,
+      "agent": "claude",
+      "mode": "wdd",
+      "workflow": "1000genome",
+      "status": "failed",
+      "started_at": "2026-03-10T23:47:26.236232+00:00",
+      "finished_at": "2026-03-10T23:47:29.445212+00:00",
+      "duration_s": 3.209,
+      "exit_code": 1,
+      "error": "non-zero exit 1",
+      "prompt_path": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260310-184716/trial2__claude__wdd__1000genome.prompt.txt",
+      "stdout_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260310-184716/trial2__claude__wdd__1000genome.stdout.log",
+      "stderr_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260310-184716/trial2__claude__wdd__1000genome.stderr.log",
+      "output_path": "/home/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-claude-trial2.yaml",
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "total_tokens": null
+      },
+      "validation": {
+        "valid": false,
+        "score": 0.0,
+        "issues": [
+          "file_missing"
+        ]
+      },
+      "output_metrics": {
+        "exists": false,
+        "bytes": 0,
+        "lines": 0,
+        "words": 0,
+        "chars": 0
+      },
+      "model_control": {
+        "model": "haiku",
+        "temperature": "<SET_TEMP>",
+        "seed": "<SET_SEED>",
+        "max_tokens": "<SET_MAX_TOKENS>",
+        "cmd_template": "claude --model haiku --dangerously-skip-permissions --output-format json -p {prompt}"
+      }
+    },
+    {
+      "task_id": "trial1__claude__knowledge__1000genome",
+      "trial": 1,
+      "agent": "claude",
+      "mode": "knowledge",
+      "workflow": "1000genome",
+      "status": "failed",
+      "started_at": "2026-03-10T23:47:29.448293+00:00",
+      "finished_at": "2026-03-10T23:47:32.672726+00:00",
+      "duration_s": 3.224,
+      "exit_code": 1,
+      "error": "non-zero exit 1",
+      "prompt_path": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260310-184716/trial1__claude__knowledge__1000genome.prompt.txt",
+      "stdout_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260310-184716/trial1__claude__knowledge__1000genome.stdout.log",
+      "stderr_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260310-184716/trial1__claude__knowledge__1000genome.stderr.log",
+      "output_path": "/home/mtang11/scripts/workflow-representation-description/workflow_knowledge/1000genome-knowledge-claude-trial1.md",
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "total_tokens": null
+      },
+      "validation": {
+        "valid": false,
+        "score": 0.0,
+        "issues": [
+          "file_missing"
+        ]
+      },
+      "output_metrics": {
+        "exists": false,
+        "bytes": 0,
+        "lines": 0,
+        "words": 0,
+        "chars": 0
+      },
+      "model_control": {
+        "model": "haiku",
+        "temperature": "<SET_TEMP>",
+        "seed": "<SET_SEED>",
+        "max_tokens": "<SET_MAX_TOKENS>",
+        "cmd_template": "claude --model haiku --dangerously-skip-permissions --output-format json -p {prompt}"
+      }
+    },
+    {
+      "task_id": "trial1__claude__wdd__1000genome",
+      "trial": 1,
+      "agent": "claude",
+      "mode": "wdd",
+      "workflow": "1000genome",
+      "status": "failed",
+      "started_at": "2026-03-10T23:47:32.675786+00:00",
+      "finished_at": "2026-03-10T23:47:35.871265+00:00",
+      "duration_s": 3.195,
+      "exit_code": 1,
+      "error": "non-zero exit 1",
+      "prompt_path": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260310-184716/trial1__claude__wdd__1000genome.prompt.txt",
+      "stdout_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260310-184716/trial1__claude__wdd__1000genome.stdout.log",
+      "stderr_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260310-184716/trial1__claude__wdd__1000genome.stderr.log",
+      "output_path": "/home/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-claude-trial1.yaml",
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "total_tokens": null
+      },
+      "validation": {
+        "valid": false,
+        "score": 0.0,
+        "issues": [
+          "file_missing"
+        ]
+      },
+      "output_metrics": {
+        "exists": false,
+        "bytes": 0,
+        "lines": 0,
+        "words": 0,
+        "chars": 0
+      },
+      "model_control": {
+        "model": "haiku",
+        "temperature": "<SET_TEMP>",
+        "seed": "<SET_SEED>",
+        "max_tokens": "<SET_MAX_TOKENS>",
+        "cmd_template": "claude --model haiku --dangerously-skip-permissions --output-format json -p {prompt}"
+      }
+    }
+  ]
+}

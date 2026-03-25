@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T16:15:02.118954",
+  "qid": "q028",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 4: INPUT FILES, OUTPUT FILES, AND DATA FORMATS",
+  "question": "What output does the \"Sifting\" task produce, and which downstream task consumes it?",
+  "reference_answer": "The \"Sifting\" task produces phased SIFT score annotations — a filtered list of variants with their rs numbers and gene IDs annotated with functional impact predictions. This output is consumed by the \"Frequency\" task.",
+  "agent": "claude",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "The **Sifting** task produces a text file named `sifted.SIFT.chrX.txt` (one per chromosome) — a space-delimited file containing filtered variant records with fields: line number, rs ID, optional ENSEMBL gene ID, optional SIFT prediction, and phenotype.\n\nThis file is consumed by two downstream tasks:\n1. **Mutation_Overlap** — uses it for variant annotations when computing pairwise mutation similarity\n2. **Frequency** — uses the same annotations for the Monte Carlo random sampling analysis",
+  "duration_s": 8.16,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 4.0,
+  "correctness": 4.0
+}

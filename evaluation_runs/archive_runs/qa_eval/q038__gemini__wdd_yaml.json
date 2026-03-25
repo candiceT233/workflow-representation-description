@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-06T16:43:00.051806",
+  "qid": "q038",
+  "source_file": "1000genome-workflow-knowledge-eval-2.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "How does the workflow manage the exceptionally large size of the Phase 3 chromosome VCF files?",
+  "reference_answer": "The workflow handles this scale by dividing the input file into manageable chunks. Multiple \"Individuals\" jobs are then executed in parallel to identify SNPs and determine which individuals possess mutations on both alleles.",
+  "agent": "gemini",
+  "context_type": "wdd_yaml",
+  "success": false,
+  "model_answer": "exit 1: An unexpected critical error occurred:Error: EBADF: bad file descriptor, read",
+  "duration_s": 24.31,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": null,
+  "correctness": null
+}

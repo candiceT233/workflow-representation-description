@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T16:04:09.394400",
+  "qid": "q007",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 1: SCIENTIFIC PURPOSE AND BIOLOGICAL SEMANTICS",
+  "question": "What is the biological function of the \"SIFT\" scores computed during the workflow?",
+  "reference_answer": "SIFT stands for \"Sorts Intolerant From Tolerant,\" and it is a sequence homology-based tool that predicts whether an amino acid substitution will impact protein function.",
+  "agent": "claude",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "Based on the workflow knowledge context, SIFT (Sorting Intolerant From Tolerant) is a **sequence homology tool that predicts the effects of amino acid substitutions**. In the workflow, variants are classified as either **\"deleterious\"** or **\"tolerated\"** based on their SIFT scores.\n\nThe sifting stage filters variants from VEP-annotated VCF files to extract those with SIFT predictions, along with associated metadata like ENSEMBL gene IDs and phenotype information. These filtered annotations are then used downstream by the mutation_overlap and frequency analysis tasks.\n\nThe context does not go into further biological detail about how SIFT computes its predictions beyond identifying it as a sequence homology-based tool.",
+  "duration_s": 8.57,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 5.0,
+  "correctness": 5.0
+}

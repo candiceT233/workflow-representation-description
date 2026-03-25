@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-06T16:31:13.303980",
+  "qid": "q024",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 4: INPUT FILES, OUTPUT FILES, AND DATA FORMATS",
+  "question": "What is the role of the data.csv file in the repository, and what does it contain?",
+  "reference_answer": "The data.csv file acts as the workflow's input manifest. It specifies exactly which input data files are available and should be included in the run — effectively a \"shopping list\" that tells daxgen.py which chromosomes and files to process.",
+  "agent": "gemini",
+  "context_type": "workflow_knowledge",
+  "success": false,
+  "model_answer": "exit 1: An unexpected critical error occurred:Error: EBADF: bad file descriptor, read",
+  "duration_s": 24.58,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": null,
+  "correctness": null
+}

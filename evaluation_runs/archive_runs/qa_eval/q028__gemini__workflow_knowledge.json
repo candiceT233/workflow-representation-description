@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-06T16:34:31.785890",
+  "qid": "q028",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 4: INPUT FILES, OUTPUT FILES, AND DATA FORMATS",
+  "question": "What output does the \"Sifting\" task produce, and which downstream task consumes it?",
+  "reference_answer": "The \"Sifting\" task produces phased SIFT score annotations — a filtered list of variants with their rs numbers and gene IDs annotated with functional impact predictions. This output is consumed by the \"Frequency\" task.",
+  "agent": "gemini",
+  "context_type": "workflow_knowledge",
+  "success": false,
+  "model_answer": "exit 1: An unexpected critical error occurred:Error: EBADF: bad file descriptor, read",
+  "duration_s": 24.52,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": null,
+  "correctness": null
+}

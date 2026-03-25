@@ -1,0 +1,92 @@
+[
+  {
+    "task_id": "trial2__opencode__knowledge__1000genome",
+    "agent": "opencode",
+    "mode": "knowledge"
+  },
+  {
+    "task_id": "trial3__claude__knowledge__1000genome",
+    "agent": "claude",
+    "mode": "knowledge"
+  },
+  {
+    "task_id": "trial2__claude__knowledge__1000genome",
+    "agent": "claude",
+    "mode": "knowledge"
+  },
+  {
+    "task_id": "trial3__opencode__knowledge__1000genome",
+    "agent": "opencode",
+    "mode": "knowledge"
+  },
+  {
+    "task_id": "trial1__opencode__knowledge__1000genome",
+    "agent": "opencode",
+    "mode": "knowledge"
+  },
+  {
+    "task_id": "trial3__gemini__knowledge__1000genome",
+    "agent": "gemini",
+    "mode": "knowledge"
+  },
+  {
+    "task_id": "trial3__opencode__wdd__1000genome",
+    "agent": "opencode",
+    "mode": "wdd"
+  },
+  {
+    "task_id": "trial3__claude__wdd__1000genome",
+    "agent": "claude",
+    "mode": "wdd"
+  },
+  {
+    "task_id": "trial1__claude__wdd__1000genome",
+    "agent": "claude",
+    "mode": "wdd"
+  },
+  {
+    "task_id": "trial2__gemini__knowledge__1000genome",
+    "agent": "gemini",
+    "mode": "knowledge"
+  },
+  {
+    "task_id": "trial1__opencode__wdd__1000genome",
+    "agent": "opencode",
+    "mode": "wdd"
+  },
+  {
+    "task_id": "trial3__gemini__wdd__1000genome",
+    "agent": "gemini",
+    "mode": "wdd"
+  },
+  {
+    "task_id": "trial1__gemini__knowledge__1000genome",
+    "agent": "gemini",
+    "mode": "knowledge"
+  },
+  {
+    "task_id": "trial2__opencode__wdd__1000genome",
+    "agent": "opencode",
+    "mode": "wdd"
+  },
+  {
+    "task_id": "trial1__gemini__wdd__1000genome",
+    "agent": "gemini",
+    "mode": "wdd"
+  },
+  {
+    "task_id": "trial2__claude__wdd__1000genome",
+    "agent": "claude",
+    "mode": "wdd"
+  },
+  {
+    "task_id": "trial2__gemini__wdd__1000genome",
+    "agent": "gemini",
+    "mode": "wdd"
+  },
+  {
+    "task_id": "trial1__claude__knowledge__1000genome",
+    "agent": "claude",
+    "mode": "knowledge"
+  }
+]

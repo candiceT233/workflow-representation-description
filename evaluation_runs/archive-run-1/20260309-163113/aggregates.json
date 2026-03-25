@@ -1,0 +1,30 @@
+{
+  "claude__knowledge": {
+    "n": 3,
+    "duration_mean_s": 3.474,
+    "duration_std_s": 0.252,
+    "validation_mean": 0.0,
+    "validation_pass_rate": 0.0
+  },
+  "opencode__wdd": {
+    "n": 3,
+    "duration_mean_s": 189.92,
+    "duration_std_s": 111.064,
+    "validation_mean": 0.333,
+    "validation_pass_rate": 0.333
+  },
+  "opencode__knowledge": {
+    "n": 3,
+    "duration_mean_s": 7.745,
+    "duration_std_s": 1.965,
+    "validation_mean": 0.0,
+    "validation_pass_rate": 0.0
+  },
+  "claude__wdd": {
+    "n": 3,
+    "duration_mean_s": 3.274,
+    "duration_std_s": 0.084,
+    "validation_mean": 0.0,
+    "validation_pass_rate": 0.0
+  }
+}

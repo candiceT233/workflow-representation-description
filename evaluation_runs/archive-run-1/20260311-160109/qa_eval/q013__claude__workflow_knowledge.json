@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T16:07:15.913810",
+  "qid": "q013",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "What are the direct dependencies required before the \"Mutations_Overlap\" task can begin execution?",
+  "reference_answer": "The \"Mutations_Overlap\" task depends on the successful completion of both the \"Individuals_Merge\" task and the \"Populations\" task.",
+  "agent": "claude",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "Based on the workflow knowledge, the **Mutation_Overlap** task requires the following direct dependencies before it can begin:\n\n1. **`chrXn.tar.gz`** — the merged individuals tar archive (produced by **Individuals_Merge**), containing per-individual mutation files\n2. **`sifted.SIFT.chrX.txt`** — the filtered SIFT annotations file (produced by **Sifting**)\n3. **Population file** (`{population_id}`) — list of individual IDs for the target population (workspace input)\n4. **`columns.txt`** — the columns mapping file that maps individual IDs to VCF columns (workspace input)\n\nIn terms of upstream **task** dependencies, both **Individuals_Merge** and **Sifting** must complete before Mutation_Overlap can execute. These two tasks run independently of each other (sifting is independent from individuals processing), so they can execute in parallel, but both must finish before Mutation_Overlap begins. Pegasus infers these dependencies automatically from the input/output file declarations (`infer_dependencies=True`).",
+  "duration_s": 10.41,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 3.0,
+  "correctness": 3.0
+}

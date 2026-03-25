@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T16:07:49.363815",
+  "qid": "q014",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "How does the pipeline generate the baseline data needed to distinguish common variations from disease-associated mutations?",
+  "reference_answer": "The \"Frequency\" task establishes a null distribution. It does this by selecting random individuals and analyzing variants without regard for their SIFT scores.",
+  "agent": "claude",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "The **Frequency task (Stage 4)** generates the baseline data through Monte Carlo random sampling. It repeatedly selects random subsets of 52 individuals from a population (1,000 iterations) and computes mutation overlap for each sample. Aggregating these results establishes a **null distribution** of expected mutation overlap under random sampling.\n\nThis null distribution serves as the baseline: the **Mutation Overlap task (Stage 3)** computes the *actual* pairwise mutation overlap within each population, and the frequency-derived distribution provides the expected range for common variation. Deviations from this baseline can highlight variants that are over- or under-represented relative to chance — potentially indicating disease association rather than normal population-level variation.\n\nBoth tasks also receive **SIFT annotations** from the Sifting stage, which classify variants as \"deleterious\" or \"tolerated,\" providing an independent functional signal for distinguishing damaging mutations from benign ones. However, the current analysis runs in \"NO-SIFT\" mode, meaning the overlap/frequency analyses operate on all mutations without SIFT filtering applied.",
+  "duration_s": 15.01,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 4.0,
+  "correctness": 4.0
+}

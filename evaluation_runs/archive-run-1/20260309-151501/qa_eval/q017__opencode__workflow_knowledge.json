@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-09T15:15:01.220488",
+  "qid": "q017",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 3: REPOSITORY USAGE AND SYSTEM MECHANICS",
+  "question": "Which script within the implementation is responsible for the dynamic generation of workflow dependencies?",
+  "reference_answer": "The `daxgen.py` script governs the dynamic generation of dependencies, particularly handling the transition between parallelized VCF chunks and the synchronized merge task.",
+  "agent": "opencode",
+  "context_type": "workflow_knowledge",
+  "success": false,
+  "model_answer": "stdin and input arguments may not both be used.",
+  "duration_s": 0.0,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": null,
+  "correctness": null
+}

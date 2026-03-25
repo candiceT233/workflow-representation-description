@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T16:13:06.240903",
+  "qid": "q024",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 4: INPUT FILES, OUTPUT FILES, AND DATA FORMATS",
+  "question": "What is the role of the data.csv file in the repository, and what does it contain?",
+  "reference_answer": "The data.csv file acts as the workflow's input manifest. It specifies exactly which input data files are available and should be included in the run — effectively a \"shopping list\" that tells daxgen.py which chromosomes and files to process.",
+  "agent": "claude",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "Based on the workflow knowledge context, `data.csv` is a **configuration/metadata file** that defines the input datasets for the workflow.\n\n**What it contains:**\n- Metadata referencing VCF files, row counts, and VEP file references for each chromosome\n- It lists **10 chromosomes** (chr1–chr10) in the example data\n\n**Its role:**\n- Serves as the input metadata file that drives workflow generation — it tells the workflow which chromosomes to process and where to find the corresponding VCF and annotation files\n- It is loaded during the **initialization phase** to define the per-chromosome DAG\n- Configurable via the `-f, --datafile` command-line parameter (defaults to `data.csv`)\n\nThe file itself is small (<1 KB) and acts as a lookup table rather than containing actual genomic data.",
+  "duration_s": 9.64,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 5.0,
+  "correctness": 5.0
+}

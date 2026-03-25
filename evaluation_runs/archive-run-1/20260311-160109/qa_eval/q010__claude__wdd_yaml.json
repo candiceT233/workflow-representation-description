@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T16:05:57.183987",
+  "qid": "q010",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "How does the workflow architecture handle the massive scale of individual chromosome VCF files?",
+  "reference_answer": "The workflow employs a Scatter/Gather pattern. The large input file is divided into manageable chunks, and multiple \"Individuals\" jobs are executed in parallel to process these chunks.",
+  "agent": "claude",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "Based on the WDD, the workflow handles the massive scale of per-chromosome VCF files (~250 MB each, ~250,000 lines, 2504 individuals) through a **scatter-gather** architecture:\n\n1. **Chunked parallel processing (scatter):** The `individuals` task splits each chromosome's VCF file into non-overlapping row ranges, controlled by the `--individuals-jobs` parameter (1–250 jobs per chromosome). Each job processes only its assigned chunk independently — an embarrassingly parallel model with no synchronization between instances.\n\n2. **Per-chromosome merging (gather):** The `individuals_merge` task aggregates all chunk outputs for a given chromosome into a single consolidated tar.gz archive (n-to-1 fan-in pattern).\n\n3. **Cross-chromosome parallelism:** This scatter-gather pattern runs independently and concurrently for each chromosome (10–22 depending on configuration), so multiple chromosomes are processed in parallel.\n\n4. **Broadcast to analysis:** After merging, each chromosome's consolidated data is broadcast (1-to-n) to multiple analysis tasks — one `mutation_overlap` and one `frequency` job per population (7 populations), yielding up to 70 analysis jobs per chromosome.\n\nThe WDD also notes several scale-related concerns: the `individuals` task reads the entire VCF file into memory then processes its row range sequentially; all I/O is Python serial (POSIX) rather than MPI-IO, which may saturate shared filesystem metadata servers at scale; and analysis tasks load full individual/SIFT data into numpy arrays for in-memory matrix operations, creating potentially multi-GB allocations per task.",
+  "duration_s": 14.43,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 5.0,
+  "correctness": 5.0
+}

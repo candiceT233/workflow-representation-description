@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T16:20:28.195493",
+  "qid": "q038",
+  "source_file": "1000genome-workflow-knowledge-eval-2.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "How does the workflow manage the exceptionally large size of the Phase 3 chromosome VCF files?",
+  "reference_answer": "The workflow handles this scale by dividing the input file into manageable chunks. Multiple \"Individuals\" jobs are then executed in parallel to identify SNPs and determine which individuals possess mutations on both alleles.",
+  "agent": "claude",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "The workflow manages the large VCF files (~250 MB each, ~250,000 lines) by **splitting each chromosome's file into non-overlapping row-range chunks** processed by parallel `individuals` tasks. The number of chunks per chromosome is controlled by the `--individuals-jobs` parameter (default 1, up to 250), so each job handles a subset of rows from the file.\n\nThese per-chunk outputs are then gathered back together by a single `individuals_merge` task per chromosome (an **n-to-1 fan-in** pattern) that consolidates all chunk archives into one merged archive.\n\nHowever, the WDD also notes a caveat: despite the chunking, each `individuals` job **\"reads entire VCF file into memory at startup\"** and then processes only its assigned row range line-by-line. So the chunking parallelizes the *processing* work but does not reduce the per-job *memory footprint* of reading the input file.",
+  "duration_s": 16.51,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 5.0,
+  "correctness": 5.0
+}

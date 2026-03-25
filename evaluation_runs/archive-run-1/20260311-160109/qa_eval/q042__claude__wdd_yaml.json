@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T16:22:54.185641",
+  "qid": "q042",
+  "source_file": "1000genome-workflow-knowledge-eval-2.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "How does the workflow establish a baseline or \"null distribution\" to compare against disease-associated cohorts?",
+  "reference_answer": "The \"Frequency\" task establishes a null distribution by selecting random individuals and analyzing variants without regard for their SIFT scores. This task depends on the completion of the Merge and Sifting tasks.",
+  "agent": "claude",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "The WDD does not explicitly describe establishing a \"null distribution\" or comparing against disease-associated cohorts. The closest mechanism is the **frequency task**, which \"applies random sampling of individuals\" (via `random.sample()`) and \"computes frequency statistics of variant overlaps\" across populations. This random sampling approach could serve as a baseline distribution of mutation overlap frequencies, but the YAML does not frame it in terms of null distributions or disease-cohort comparisons. The context does not contain enough information to confirm that intent.",
+  "duration_s": 13.83,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 3.0,
+  "correctness": 3.0
+}

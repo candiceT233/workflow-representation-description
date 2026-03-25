@@ -1,0 +1,23 @@
+{
+  "timestamp": "2026-03-06T16:07:42.461660",
+  "qid": "q009",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "What is the specific role of the \"Individuals\" task at the start of the pipeline?",
+  "reference_answer": "The \"Individuals\" task is the first and most intensive step, responsible for fetching and parsing Phase 3 VCF data by chromosome to identify SNPs and determine which individuals possess mutations on both alleles.",
+  "agent": "gemini",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "The `individuals` task processes a segment of a chromosome's VCF (Variant Call Format) file. It extracts information related to Single Nucleotide Polymorphisms (SNPs) for specific individuals, focusing on mutations on both alleles. This task can be parallelized to process defined line ranges from a large input VCF.",
+  "duration_s": 30.03,
+  "total_tokens": 15028,
+  "input_tokens": 325,
+  "output_tokens": 0,
+  "tokens": {
+    "total": 15028,
+    "input": 325,
+    "output": 0
+  },
+  "judge_score": 4.0,
+  "correctness": 4.0
+}

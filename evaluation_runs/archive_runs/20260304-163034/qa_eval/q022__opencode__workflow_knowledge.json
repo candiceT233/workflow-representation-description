@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-04T16:49:53.877946",
+  "qid": "q022",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 4: INPUT FILES, OUTPUT FILES, AND DATA FORMATS",
+  "question": "Where does the workflow retrieve its primary genomic input data from?",
+  "reference_answer": "The workflow fetches Phase 3 VCF data from the IGSR FTP mirrors. The \"Individuals\" task is responsible for downloading and parsing these files by chromosome.",
+  "agent": "opencode",
+  "context_type": "workflow_knowledge",
+  "success": false,
+  "model_answer": "exit 1: \u001b[91m\u001b[1mError: \u001b[0mUnexpected error, check log file at /home/mtang11/.local/share/opencode/log/2026-03-04T224955.log for more details\n\nEBADF: bad file descriptor, read\n",
+  "duration_s": 1.91,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": null,
+  "correctness": null
+}

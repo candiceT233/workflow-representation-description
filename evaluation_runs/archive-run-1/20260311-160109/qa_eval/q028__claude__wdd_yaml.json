@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T16:15:14.568679",
+  "qid": "q028",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 4: INPUT FILES, OUTPUT FILES, AND DATA FORMATS",
+  "question": "What output does the \"Sifting\" task produce, and which downstream task consumes it?",
+  "reference_answer": "The \"Sifting\" task produces phased SIFT score annotations — a filtered list of variants with their rs numbers and gene IDs annotated with functional impact predictions. This output is consumed by the \"Frequency\" task.",
+  "agent": "claude",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "The **Sifting** task produces **Sifted Variants** (`data:sifted_variants`) — tabular text files containing filtered SNP variants with SIFT pathogenicity scores, one file per chromosome. Each line includes a variant line number, rs identifier, ENSEMBL gene ID, SIFT score, and phenotype prediction.\n\nTwo downstream tasks consume it:\n\n1. **Mutation Overlap** (`task:mutation_overlap`) — uses the SIFT scores in its pairwise overlap analysis across populations.\n2. **Frequency** (`task:frequency`) — reads the SIFT score and pathogenicity information for its frequency analysis.\n\nBoth consume the sifted variants via a **1-to-n broadcast** pattern, where one sifted file per chromosome is shared across multiple population-specific analysis jobs.",
+  "duration_s": 10.75,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 4.0,
+  "correctness": 4.0
+}

@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-09T15:15:01.433764",
+  "qid": "q029",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 4: INPUT FILES, OUTPUT FILES, AND DATA FORMATS",
+  "question": "What are the final output files produced by the workflow?",
+  "reference_answer": "The workflow produces two final outputs: (1) overlap metrics from the \"Mutations_Overlap\" task, recording shared mutation frequencies between pairs of individuals categorized by population and chromosome; and (2) a null distribution from the \"Frequency\" task, representing the baseline rate of random variant sharing used for statistical comparison.",
+  "agent": "opencode",
+  "context_type": "workflow_knowledge",
+  "success": false,
+  "model_answer": "stdin and input arguments may not both be used.",
+  "duration_s": 0.0,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": null,
+  "correctness": null
+}

@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-04T16:35:50.209178",
+  "qid": "q006",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 1: SCIENTIFIC PURPOSE AND BIOLOGICAL SEMANTICS",
+  "question": "Why was the transition to the GRCh38 human genome assembly considered a critical development for this data?",
+  "reference_answer": "The GRCh38 assembly corrected over 1,000 issues found in the previous GRCh37 assembly. It also incorporated alternative loci to better reflect global genetic diversity.",
+  "agent": "opencode",
+  "context_type": "workflow_knowledge",
+  "success": false,
+  "model_answer": "exit 1: \u001b[91m\u001b[1mError: \u001b[0mUnexpected error, check log file at /home/mtang11/.local/share/opencode/log/2026-03-04T223552.log for more details\n\nEBADF: bad file descriptor, read\n",
+  "duration_s": 1.95,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": null,
+  "correctness": null
+}

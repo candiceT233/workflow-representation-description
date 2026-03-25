@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-09T15:15:01.617955",
+  "qid": "q067",
+  "source_file": "1000genome-workflow-knowledge-eval-3.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "Why must the chromosome VCF files be divided into manageable chunks during the first step?",
+  "reference_answer": "The files must be divided because human chromosomes contain hundreds of thousands of variants, making the VCF files exceptionally large.",
+  "agent": "opencode",
+  "context_type": "wdd_yaml",
+  "success": false,
+  "model_answer": "stdin and input arguments may not both be used.",
+  "duration_s": 0.0,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": null,
+  "correctness": null
+}

@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T16:10:34.258628",
+  "qid": "q019",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 3: REPOSITORY USAGE AND SYSTEM MECHANICS",
+  "question": "How does the system locate the specific software executables needed to run the repository's tasks on a remote execution site?",
+  "reference_answer": "The Transformation Catalog (TC) identifies the physical locations of the software executables required for each task, specifying if they are already installed remotely or need to be staged in.",
+  "agent": "claude",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "The provided context does not contain enough detail to fully answer this. It mentions a few relevant pieces:\n\n- The **`-p, --src-path`** parameter specifies the \"Source directory for binaries and data\"\n- The **`-S, --sites-catalog`** parameter allows a \"Custom Pegasus site catalog\"\n- The workflow uses **Pegasus WMS**, which typically uses a Transformation Catalog to map logical task names to physical executable paths per site\n\nHowever, the knowledge report does not describe the actual mechanism (e.g., a Pegasus Transformation Catalog configuration, executable staging, or site-specific path mappings) by which executables are resolved and located on remote execution sites like NERSC/Cori.",
+  "duration_s": 11.81,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 3.0,
+  "correctness": 3.0
+}

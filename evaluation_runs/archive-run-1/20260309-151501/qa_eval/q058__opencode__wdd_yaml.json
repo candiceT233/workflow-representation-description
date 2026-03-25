@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-09T15:15:01.582285",
+  "qid": "q058",
+  "source_file": "1000genome-workflow-knowledge-eval-3.txt",
+  "section": "SECTION 1: SCIENTIFIC PURPOSE AND BIOLOGICAL SEMANTICS",
+  "question": "Which organization facilitated the critical transition to the GRCh38 human genome assembly?",
+  "reference_answer": "The transition to the GRCh38 human genome assembly was facilitated by the International Genome Sample Resource (IGSR).",
+  "agent": "opencode",
+  "context_type": "wdd_yaml",
+  "success": false,
+  "model_answer": "stdin and input arguments may not both be used.",
+  "duration_s": 0.0,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": null,
+  "correctness": null
+}

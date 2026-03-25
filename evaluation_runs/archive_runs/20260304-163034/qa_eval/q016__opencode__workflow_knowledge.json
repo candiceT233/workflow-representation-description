@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-04T16:44:44.267836",
+  "qid": "q016",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 3: REPOSITORY USAGE AND SYSTEM MECHANICS",
+  "question": "Where is the official repository hosted for the bioinformatics workflow that identifies these mutational overlaps?",
+  "reference_answer": "The repository is hosted on GitHub under \"pegasus-isi/1000genome-workflow\".",
+  "agent": "opencode",
+  "context_type": "workflow_knowledge",
+  "success": false,
+  "model_answer": "exit 1: \u001b[91m\u001b[1mError: \u001b[0mUnexpected error, check log file at /home/mtang11/.local/share/opencode/log/2026-03-04T224446.log for more details\n\nEBADF: bad file descriptor, read\n",
+  "duration_s": 1.9,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": null,
+  "correctness": null
+}

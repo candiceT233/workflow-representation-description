@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-06T16:29:09.214203",
+  "qid": "q021",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 4: INPUT FILES, OUTPUT FILES, AND DATA FORMATS",
+  "question": "What is the primary input file format consumed by the workflow?",
+  "reference_answer": "The primary input format is VCF (Variant Call Format). Phase 3 VCF files are fetched per chromosome from the IGSR (International Genome Sample Resource) FTP server. Each chromosomal VCF file can exceed 250,000 lines and contains variant records for all 2,504 individuals.",
+  "agent": "gemini",
+  "context_type": "wdd_yaml",
+  "success": false,
+  "model_answer": "exit 1: An unexpected critical error occurred:Error: EBADF: bad file descriptor, read",
+  "duration_s": 25.03,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": null,
+  "correctness": null
+}

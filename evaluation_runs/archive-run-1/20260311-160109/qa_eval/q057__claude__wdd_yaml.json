@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T16:30:08.273968",
+  "qid": "q057",
+  "source_file": "1000genome-workflow-knowledge-eval-3.txt",
+  "section": "SECTION 1: SCIENTIFIC PURPOSE AND BIOLOGICAL SEMANTICS",
+  "question": "What types of complex genetic variants were newly introduced for calling in Phase 3?",
+  "reference_answer": "Phase 3 introduced multi-allelic variant calling, which encompasses single nucleotide polymorphisms (SNPs), insertions/deletions (INDELs), and complex structural variants (SVs).",
+  "agent": "claude",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "The provided WDD YAML does not contain information about what types of complex genetic variants were newly introduced for calling in Phase 3. The document only references \"Phase3 VCF data\" as an input source but does not describe the variant calling methods or variant types introduced in that phase.",
+  "duration_s": 8.92,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 1.0,
+  "correctness": 1.0
+}

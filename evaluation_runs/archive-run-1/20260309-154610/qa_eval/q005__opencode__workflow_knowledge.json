@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-09T15:54:43.721874",
+  "qid": "q005",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 1: SCIENTIFIC PURPOSE AND BIOLOGICAL SEMANTICS",
+  "question": "How is the genotype dosage mathematically calculated to represent confidence in a genotype call?",
+  "reference_answer": "The dosage, which represents the predicted number of non-reference alleles, is calculated using the relationship $Dosage = Pr(Het|Data) + 2 \\times Pr(Alt|Data)$. This value is derived from imputation engines and complements standard genotype likelihoods.",
+  "agent": "opencode",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "{\"type\":\"step_start\",\"timestamp\":1773089688300,\"sessionID\":\"ses_32b9e7e97ffetYUYVqSlHjLKg2\",\"part\":{\"id\":\"prt_cd4618adb001v6eKXbhx9Cyy3D\",\"sessionID\":\"ses_32b9e7e97ffetYUYVqSlHjLKg2\",\"messageID\":\"msg_cd461822100167z7Q3H0pcNiwF\",\"type\":\"step-start\",\"snapshot\":\"2f6fad489ebcf73de309c96d1d523713edd71a03\"}}\n{\"type\":\"text\",\"timestamp\":1773089692696,\"sessionID\":\"ses_32b9e7e97ffetYUYVqSlHjLKg2\",\"part\":{\"id\":\"prt_cd4619a87001HGCWWjZOU6VQL3\",\"sessionID\":\"ses_32b9e7e97ffetYUYVqSlHjLKg2\",\"messageID\":\"msg_cd461822100167z7Q3H0pcNiwF\",\"type\":\"text\",\"text\":\"The provided workflow knowledge does not contain information regarding the mathematical calculation of genotype dosage or confidence in genotype calls.\",\"time\":{\"start\":1773089692689,\"end\":1773089692689}}}\n{\"type\":\"step_finish\",\"timestamp\":1773089692890,\"sessionID\":\"ses_32b9e7e97ffetYUYVqSlHjLKg2\",\"part\":{\"id\":\"prt_cd4619c33001kiAwSDGbPURO4v\",\"sessionID\":\"ses_32b9e7e97ffetYUYVqSlHjLKg2\",\"messageID\":\"msg_cd461822100167z7Q3H0pcNiwF\",\"type\":\"step-finish\",\"reason\":\"stop\",\"snapshot\":\"2f6fad489ebcf73de309c96d1d523713edd71a03\",\"cost\":0,\"tokens\":{\"total\":12602,\"input\":78,\"output\":224,\"reasoning\":0,\"cache\":{\"read\":510,\"write\":11790}}}}",
+  "duration_s": 9.42,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": null,
+  "correctness": null
+}

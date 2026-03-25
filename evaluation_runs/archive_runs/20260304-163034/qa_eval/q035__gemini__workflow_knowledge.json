@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-04T17:00:27.888466",
+  "qid": "q035",
+  "source_file": "1000genome-workflow-knowledge-eval-2.txt",
+  "section": "SECTION 1: SCIENTIFIC PURPOSE AND BIOLOGICAL SEMANTICS",
+  "question": "How did the GRCh38 human genome assembly improve upon the previous assembly?",
+  "reference_answer": "The GRCh38 assembly corrected over 1,000 issues found in the previous GRCh37 assembly. It also incorporated alternative loci to better reflect global genetic diversity.",
+  "agent": "gemini",
+  "context_type": "workflow_knowledge",
+  "success": false,
+  "model_answer": "exit 1: (node:3190527) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n(node:3190578) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.\n(Use `node --trace-deprecation ...` to show where the warning was created)\nLoaded cached credentials.\nServer 'jarvis-mcp' supports tool updates. Listening for changes...\nAn un",
+  "duration_s": 23.84,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": null,
+  "correctness": null
+}

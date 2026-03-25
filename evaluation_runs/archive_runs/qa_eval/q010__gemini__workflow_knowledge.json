@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-06T16:19:45.311358",
+  "qid": "q010",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "How does the workflow architecture handle the massive scale of individual chromosome VCF files?",
+  "reference_answer": "The workflow employs a Scatter/Gather pattern. The large input file is divided into manageable chunks, and multiple \"Individuals\" jobs are executed in parallel to process these chunks.",
+  "agent": "gemini",
+  "context_type": "workflow_knowledge",
+  "success": false,
+  "model_answer": "exit 1: An unexpected critical error occurred:Error: EBADF: bad file descriptor, read",
+  "duration_s": 25.05,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": null,
+  "correctness": null
+}

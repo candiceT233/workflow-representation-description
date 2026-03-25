@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-04T16:50:45.018374",
+  "qid": "q023",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 4: INPUT FILES, OUTPUT FILES, AND DATA FORMATS",
+  "question": "What secondary input file does the workflow use to provide population-level demographic context?",
+  "reference_answer": "The \"Populations\" task downloads demographic metadata for the 26 global populations from the IGSR. This metadata maps individual sample IDs to their population and super-population categories (AFR, AMR, EAS, EUR, SAS, GBR).",
+  "agent": "opencode",
+  "context_type": "workflow_knowledge",
+  "success": false,
+  "model_answer": "exit 1: \u001b[91m\u001b[1mError: \u001b[0mUnexpected error, check log file at /home/mtang11/.local/share/opencode/log/2026-03-04T225046.log for more details\n\nEBADF: bad file descriptor, read\n",
+  "duration_s": 1.96,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": null,
+  "correctness": null
+}

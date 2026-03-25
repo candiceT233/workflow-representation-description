@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T16:33:49.074250",
+  "qid": "q065",
+  "source_file": "1000genome-workflow-knowledge-eval-3.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "How many core task classes make up the sequential data retrieval and analysis of the workflow?",
+  "reference_answer": "The 1000 Genomes workflow consists of five core task classes.",
+  "agent": "claude",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "**4 core task classes** make up the sequential data retrieval and analysis pipeline:\n\n1. **`individuals`** — extracts per-individual SNP variants from VCF files\n2. **`sifting`** — filters variants by SIFT scores\n3. **`mutation_overlap`** — computes pairwise mutation similarity across individuals\n4. **`frequency`** — estimates mutation frequency via Monte Carlo sampling\n\n(A 5th task, `individuals_merge`, exists but is conditional — only created when `ind_jobs > 1`.)",
+  "duration_s": 6.87,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 5.0,
+  "correctness": 5.0
+}

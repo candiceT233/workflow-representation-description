@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T16:02:32.472729",
+  "qid": "q004",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 1: SCIENTIFIC PURPOSE AND BIOLOGICAL SEMANTICS",
+  "question": "What is the significance of \"phasing\" in the context of this genomic data?",
+  "reference_answer": "Phasing is a critical component of the data semantics that allows researchers to determine the parental origin of alleles and calculate genotype dosage values.",
+  "agent": "claude",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "The provided workflow knowledge document does not contain information about the significance of \"phasing\" in genomic data. The term \"phase3\" appears only as part of a filename (`ALL.chrX.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.annotation.vcf`), but the document does not explain what phasing means or its significance in this context.",
+  "duration_s": 12.91,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 1.0,
+  "correctness": 1.0
+}

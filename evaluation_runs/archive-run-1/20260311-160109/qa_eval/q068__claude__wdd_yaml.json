@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T16:35:38.164551",
+  "qid": "q068",
+  "source_file": "1000genome-workflow-knowledge-eval-3.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "What design pattern is utilized to effectively manage the sheer scale of the genomic releases during the Individuals task?",
+  "reference_answer": "The workflow uses the Scatter/Gather pattern, which remains the most effective strategy for managing the massive scale of the data by executing multiple Individuals jobs in parallel.",
+  "agent": "claude",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "The Individuals task uses an **embarrassingly parallel** pattern, where each job processes a non-overlapping row range (chunk) of a single chromosome's VCF file independently. The number of parallel chunks per chromosome is controlled by the `--individuals-jobs` parameter (default 1, up to 250), and multiple jobs can process different chunks of the same chromosome or different chromosomes entirely with no data sharing or synchronization between instances. This effectively scatters the large-scale VCF data (approximately 250,000 lines per chromosome) into smaller, independently processable units.",
+  "duration_s": 10.08,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 4.0,
+  "correctness": 4.0
+}

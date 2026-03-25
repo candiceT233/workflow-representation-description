@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T16:20:03.822701",
+  "qid": "q038",
+  "source_file": "1000genome-workflow-knowledge-eval-2.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "How does the workflow manage the exceptionally large size of the Phase 3 chromosome VCF files?",
+  "reference_answer": "The workflow handles this scale by dividing the input file into manageable chunks. Multiple \"Individuals\" jobs are then executed in parallel to identify SNPs and determine which individuals possess mutations on both alleles.",
+  "agent": "claude",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "Based on the provided context, the workflow uses several strategies to manage large VCF files:\n\n1. **Within-chromosome chunking:** The `-i` (individuals-jobs) parameter splits a chromosome's VCF processing into multiple parallel jobs. For example, `-i 5` divides the 250,000-line VCF into 5 jobs of 50,000 lines each. Results are then consolidated by the `individuals_merge` task.\n\n2. **Grep-based selective filtering (Sifting):** For the large annotated VCF files (5-8 GB), the sifting task uses a `grep` subprocess to extract only lines containing \"deleterious\"/\"tolerated\" and \"rs\", avoiding full file parsing. This reduces output to 10-50 MB per chromosome.\n\n3. **Tar+gzip serialization:** Per-individual output files (~2,504 per chromosome) are bundled into compressed tar archives to reduce storage footprint and avoid filesystem pressure from many small files.\n\n4. **Chromosome-level parallelism:** Each chromosome is processed independently, so the full dataset is never loaded at once — only one chromosome's VCF (6-10 GB) per task.\n\nHowever, the context also notes a limitation: the individuals task reads the **entire VCF into memory** line-by-line, which is flagged as a potential RAM bottleneck if the file exceeds available memory.",
+  "duration_s": 18.56,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 5.0,
+  "correctness": 5.0
+}

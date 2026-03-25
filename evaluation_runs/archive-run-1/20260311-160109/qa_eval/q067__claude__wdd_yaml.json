@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T16:35:03.139190",
+  "qid": "q067",
+  "source_file": "1000genome-workflow-knowledge-eval-3.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "Why must the chromosome VCF files be divided into manageable chunks during the first step?",
+  "reference_answer": "The files must be divided because human chromosomes contain hundreds of thousands of variants, making the VCF files exceptionally large.",
+  "agent": "claude",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "According to the WDD, each chromosome VCF file contains approximately 250,000 lines of variant data with genotype information for 2,504 individuals. The `individuals` task divides each file into non-overlapping row-range chunks (controlled by the `--individuals-jobs` parameter, supporting up to 250 parallel chunks) so they can be processed as **embarrassingly parallel** jobs — multiple jobs process different chunks of the same chromosome concurrently without any data sharing or synchronization. The task reads the entire VCF file into memory and then processes its assigned row range, so splitting into chunks enables parallel speedup across what would otherwise be a large sequential scan. The chunks are later reunified by the `individuals_merge` task in a classic scatter-gather pattern.",
+  "duration_s": 9.82,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 4.0,
+  "correctness": 4.0
+}

@@ -1,0 +1,661 @@
+metadata:
+  workflow_lineage_id: wrd:1000genome
+  version: 1.0.0
+  version_notes: Initial WDD compiled from daxgen.py (Pegasus workflow generator).
+  deprecated: false
+  workflow_name: 1000genome
+  workflow_description: The 1000 Genomes workflow identifies mutational overlaps using data from the 1000 genomes project to provide a null distribution for statistical-related mutations. It evaluation of disease fetches, parses, and analyzes Phase3 data by chromosome, cross-matches extracted data with SIFT scores (predicting amino acid substitution effects), and performs overlap analysis and frequency measurements across populations.
+  source_repository: /home/mtang11/scripts/workflow-representation-description/workflows_repo/1000genome-workflow
+  source_commit: null
+  source_format: compiled_from_pegasus_dax
+  source_file: daxgen.py
+  schema_version: wrd-7.0
+  generated_by: opencode
+  generated_at: 2026-03-04T00:00:00Z
+  last_modified_at: 2026-03-04T00:00:00Z
+
+stages:
+  - stage_id: stage:data_ingestion
+    name: Data Ingestion
+    order: 1
+    description: Downloads and processes VCF files for each chromosome to extract individual-level mutation data. Parallelized across chromosomes and individuals within each chromosome.
+    tasks:
+      - task:individuals
+      - task:individuals_merge
+
+  - stage_id: stage:sifting
+    name: Sifting
+    order: 2
+    description: Filters SNP variants using SIFT scores from Variant Effect Predictor (VEP) annotations to identify deleterious mutations.
+    tasks:
+      - task:sifting
+
+  - stage_id: stage:analysis
+    name: Analysis
+    order: 3
+    description: Performs mutation overlap analysis and frequency calculations across populations for each chromosome.
+    tasks:
+      - task:mutation_overlap
+      - task:frequency
+
+tasks:
+  - task_id: task:individuals
+    name: Individuals Processing
+    stage: stage:data_ingestion
+    executable: bin/individuals.py
+    description: Processes chromosome VCF files to extract per-individual mutation data. For each chromosome, it reads the VCF file and creates individual mutation files containing only the positions where each individual has mutations (either homozygous or heterozygous with allele frequency >= 0.5). Each job processes a subset of lines from the VCF file.
+    behavioral_notes: Reads entire VCF file at startup, processes line by line, writes output files per individual in a chromosome, then compresses to tar.gz. Reads columns.txt for individual identifiers.
+    parallelism_model:
+      type: embarrassingly_parallel
+      description: Each instance processes one chromosome segment independently. Number of instances per chromosome is configurable via ind_jobs parameter (default 1).
+    io_dominance: io_bound
+    io_access_type: python_serial
+    restart_model: idempotent
+    restart_checkpoint_dataset: null
+    hardware_path:
+      has_conditional_execution: false
+      execution_alternatives: []
+      minimum_resource_assertions:
+        - resource: host_memory_gb
+          condition: ">= 2.93 (varies by ind_jobs setting)"
+          source_location: bin/individuals.py:1
+    output_class: intermediate
+    inputs:
+      - data:vcf_file
+      - data:columns_file
+    outputs:
+      - data:individual_chr_tar
+
+  - task_id: task:individuals_merge
+    name: Individuals Merge
+    stage: stage:data_ingestion
+    executable: bin/individuals_merge.py
+    description: Merges the output tar.gz files from multiple individuals jobs for a single chromosome into a single consolidated tar.gz file containing all individuals for that chromosome.
+    behavioral_notes: Extracts all tar files to temporary directory, merges content by filename (combining individual files), then recompresses into single tar.gz. Reads all input tar files before writing merged output.
+    parallelism_model:
+      type: serial
+      description: One merge job per chromosome after all individuals jobs for that chromosome complete.
+    io_dominance: io_bound
+    io_access_type: python_serial
+    restart_model: idempotent
+    restart_checkpoint_dataset: null
+    hardware_path:
+      has_conditional_execution: false
+      execution_alternatives: []
+      minimum_resource_assertions: []
+    output_class: intermediate
+    inputs:
+      - data:individual_chr_tar
+    outputs:
+      - data:merged_individuals_tar
+
+  - task_id: task:sifting
+    name: Sifting
+    stage: stage:sifting
+    executable: bin/sifting.py
+    description: Filters SNP variants using SIFT scores from VEP annotation files. Extracts only variants with deleterious or tolerated SIFT predictions, capturing rs numbers, ENSEMBL gene IDs, and phenotype information.
+    behavioral_notes: Reads entire VCF annotation file, filters using grep for SIFT keywords, parses line numbers and annotations, writes selected fields to output file.
+    parallelism_model:
+      type: embarrassingly_parallel
+      description: One sifting job per chromosome, processing VEP annotation files independently.
+    io_dominance: balanced
+    io_access_type: python_serial
+    restart_model: idempotent
+    restart_checkpoint_dataset: null
+    hardware_path:
+      has_conditional_execution: false
+      execution_alternatives: []
+      minimum_resource_assertions: []
+    output_class: intermediate
+    inputs:
+      - data:sift_annotation_file
+    outputs:
+      - data:sifted_chr_file
+
+  - task_id: task:mutation_overlap
+    name: Mutation Overlap Analysis
+    stage: stage:analysis
+    executable: bin/mutation_overlap.py
+    description: Measures overlap in mutations among pairs of individuals by population and chromosome. Performs cross-matching of mutation sets, generates histograms and colormap visualizations of overlap distributions.
+    behavioral_notes: Extracts merged tar.gz, reads individual mutation files, performs pairwise intersection calculations, generates numpy arrays and matplotlib plots. Creates multiple output files per chromosome-population combination.
+    parallelism_model:
+      type: embarrassingly_parallel
+      description: One job per chromosome-population pair. Processes each combination independently.
+    io_dominance: io_bound
+    io_access_type: python_serial
+    restart_model: idempotent
+    restart_checkpoint_dataset: null
+    hardware_path:
+      has_conditional_execution: false
+      execution_alternatives: []
+      minimum_resource_assertions: []
+    output_class: checkpoint
+    inputs:
+      - data:merged_individuals_tar
+      - data:sifted_chr_file
+      - data:population_file
+      - data:columns_file
+    outputs:
+      - data:mutation_overlap_output
+
+  - task_id: task:frequency
+    name: Frequency Analysis
+    stage: stage:analysis
+    executable: bin/frequency.py
+    description: Measures frequency of overlapping mutations by selecting random individuals and analyzing SNP distributions without SIFT score filtering. Generates histogram plots of mutation overlap frequencies.
+    behavioral_notes: Extracts merged tar.gz, performs random sampling of individuals (1000 runs with 52 individuals per run), calculates overlap histograms, generates matplotlib plots. Creates frequency output files per chromosome-population combination.
+    parallelism_model:
+      type: embarrassingly_parallel
+      description: One job per chromosome-population pair, similar to mutation_overlap but with random sampling approach.
+    io_dominance: io_bound
+    io_access_type: python_serial
+    restart_model: idempotent
+    restart_checkpoint_dataset: null
+    hardware_path:
+      has_conditional_execution: false
+      execution_alternatives: []
+      minimum_resource_assertions: []
+    output_class: checkpoint
+    inputs:
+      - data:merged_individuals_tar
+      - data:sifted_chr_file
+      - data:population_file
+      - data:columns_file
+    outputs:
+      - data:frequency_output
+
+data_objects:
+  - data_id: data:vcf_file
+    name: VCF Chromosome File
+    description: Phase3 VCF files from 1000 Genomes project containing SNP variant calls for each chromosome. Format is standard VCF with genotype information for 2504 individuals.
+    category: input
+    persistence: workflow_scoped
+    format_hint:
+      container: plain_binary
+      datasets: []
+      compression: gzip
+      layout_hint: unknown
+      typical_request_size_kb: null
+    cardinality: config-determined (see cardinality_source)
+    cardinality_source:
+      type: config_determined
+      controlling_parameter: dataset
+      config_file: data.csv
+      possible_values: "1-22 chromosomes (from data.csv rows)"
+    estimated_size_hint: "~80-150 MB per chromosome (250k lines)"
+    producer_task: null
+    consumer_tasks:
+      - task:individuals
+    lifecycle:
+      creation_phase: null
+      last_consumer_phase: task:individuals
+      retention_window: "from task:individuals start to completion"
+      access_frequency_class: repeatedly
+      consumer_count: 1
+
+  - data_id: data:columns_file
+    name: Columns File
+    description: Tab-separated file containing column headers from VCF files listing all 2504 individual sample identifiers.
+    category: config
+    persistence: workflow_scoped
+    format_hint:
+      container: text
+      datasets: []
+      compression: none
+      layout_hint: unknown
+      typical_request_size_kb: "< 1 KB"
+    cardinality: fixed
+    cardinality_source:
+      type: fixed
+      controlling_parameter: null
+      config_file: null
+      possible_values: "n/a"
+    estimated_size_hint: "< 1 KB"
+    producer_task: null
+    consumer_tasks:
+      - task:individuals
+      - task:mutation_overlap
+      - task:frequency
+    lifecycle:
+      creation_phase: null
+      last_consumer_phase: task:frequency
+      retention_window: "entire workflow"
+      access_frequency_class: repeatedly
+      consumer_count: 3
+
+  - data_id: data:population_file
+    name: Population File
+    description: Text files listing individual identifiers belonging to each of 6 super populations (AFR, AMR, EAS, EUR, GBR, SAS) plus ALL population.
+    category: input
+    persistence: workflow_scoped
+    format_hint:
+      container: text
+      datasets: []
+      compression: none
+      layout_hint: unknown
+      typical_request_size_kb: "< 1 KB"
+    cardinality: fixed
+    cardinality_source:
+      type: fixed
+      controlling_parameter: null
+      config_file: null
+      possible_values: "7 files (6 populations + ALL)"
+    estimated_size_hint: "< 1 KB per population file"
+    producer_task: null
+    consumer_tasks:
+      - task:mutation_overlap
+      - task:frequency
+    lifecycle:
+      creation_phase: null
+      last_consumer_phase: task:frequency
+      retention_window: "entire workflow"
+      access_frequency_class: repeatedly
+      consumer_count: 2
+
+  - data_id: data:sift_annotation_file
+    name: SIFT Annotation VCF
+    description: VEP (Variant Effect Predictor) annotation files containing SIFT scores for SNP variants in each chromosome. Contains rs numbers, ENSEMBL gene IDs, SIFT predictions (deleterious/tolerated), and phenotype information.
+    category: input
+    persistence: workflow_scoped
+    format_hint:
+      container: plain_binary
+      datasets: []
+      compression: gzip
+      layout_hint: unknown
+      typical_request_size_kb: null
+    cardinality: config-determined (see cardinality_source)
+    cardinality_source:
+      type: config_determined
+      controlling_parameter: dataset
+      config_file: data.csv
+      possible_values: "1-22 chromosomes (from data.csv column 3)"
+    estimated_size_hint: "~20-50 MB per chromosome"
+    producer_task: null
+    consumer_tasks:
+      - task:sifting
+    lifecycle:
+      creation_phase: null
+      last_consumer_phase: task:sifting
+      retention_window: "from task:sifting start to completion"
+      access_frequency_class: once
+      consumer_count: 1
+
+  - data_id: data:individual_chr_tar
+    name: Individual Chromosome Tarball
+    description: Compressed tar archive containing per-individual mutation files for a chromosome segment. Each individual file lists positions and mutations for that individual.
+    category: intermediate
+    persistence: stage_scoped
+    format_hint:
+      container: tar
+      datasets: []
+      compression: gzip
+      layout_hint: unknown
+      typical_request_size_kb: null
+    cardinality: config-determined (see cardinality_source)
+    cardinality_source:
+      type: config_determined
+      controlling_parameter: ind_jobs
+      config_file: daxgen.py (--individuals-jobs)
+      possible_values: "ind_jobs per chromosome (default 1, max 250000)"
+    estimated_size_hint: "~1-10 MB per tarball depending on mutation density"
+    producer_task: task:individuals
+    consumer_tasks:
+      - task:individuals_merge
+    lifecycle:
+      creation_phase: task:individuals
+      last_consumer_phase: task:individuals_merge
+      retention_window: "from task:individuals completion to task:individuals_merge completion"
+      access_frequency_class: once
+      consumer_count: 1
+
+  - data_id: data:merged_individuals_tar
+    name: Merged Individuals Tarball
+    description: Compressed tar archive containing all individual mutation files for a chromosome, merged from multiple individuals jobs.
+    category: intermediate
+    persistence: workflow_scoped
+    format_hint:
+      container: tar
+      datasets: []
+      compression: gzip
+      layout_hint: unknown
+      typical_request_size_kb: null
+    cardinality: runtime-determined (see cardinality_source)
+    cardinality_source:
+      type: runtime_determined
+      controlling_parameter: null
+      config_file: null
+      possible_values: "runtime-determined (one per chromosome processed)"
+    estimated_size_hint: "~50-200 MB per chromosome"
+    producer_task: task:individuals_merge
+    consumer_tasks:
+      - task:mutation_overlap
+      - task:frequency
+    lifecycle:
+      creation_phase: task:individuals_merge
+      last_consumer_phase: task:frequency
+      retention_window: "from task:individuals_merge completion to task:frequency completion"
+      access_frequency_class: repeatedly
+      consumer_count: 2
+
+  - data_id: data:sifted_chr_file
+    name: Sifted Chromosome File
+    description: Text file containing filtered SNP variants with SIFT scores. Includes line numbers, rs numbers, ENSEMBL gene IDs, SIFT scores, and phenotypes.
+    category: intermediate
+    persistence: workflow_scoped
+    format_hint:
+      container: text
+      datasets: []
+      compression: none
+      layout_hint: unknown
+      typical_request_size_kb: null
+    cardinality: runtime-determined (see cardinality_source)
+    cardinality_source:
+      type: runtime_determined
+      controlling_parameter: null
+      config_file: null
+      possible_values: "runtime-determined (one per chromosome processed)"
+    estimated_size_hint: "~1-5 MB per chromosome (filtered subset)"
+    producer_task: task:sifting
+    consumer_tasks:
+      - task:mutation_overlap
+      - task:frequency
+    lifecycle:
+      creation_phase: task:sifting
+      last_consumer_phase: task:frequency
+      retention_window: "from task:sifting completion to task:frequency completion"
+      access_frequency_class: repeatedly
+      consumer_count: 2
+
+  - data_id: data:mutation_overlap_output
+    name: Mutation Overlap Output
+    description: Compressed tar archive containing pairwise mutation overlap analysis results including text files with overlap counts and PNG visualizations (histograms, colormaps) for each chromosome-population combination.
+    category: checkpoint
+    persistence: persistent
+    format_hint:
+      container: tar
+      datasets: []
+      compression: gzip
+      layout_hint: unknown
+      typical_request_size_kb: null
+    cardinality: runtime-determined (see cardinality_source)
+    cardinality_source:
+      type: runtime_determined
+      controlling_parameter: null
+      config_file: null
+      possible_values: "runtime-determined (# chromosomes x # populations)"
+    estimated_size_hint: "~1-10 MB per output file"
+    producer_task: task:mutation_overlap
+    consumer_tasks: []
+    lifecycle:
+      creation_phase: task:mutation_overlap
+      last_consumer_phase: task:mutation_overlap
+      retention_window: "from task:mutation_overlap completion (final output)"
+      access_frequency_class: once
+      consumer_count: 0
+
+  - data_id: data:frequency_output
+    name: Frequency Analysis Output
+    description: Compressed tar archive containing frequency analysis results with random sampling histograms and overlap distributions for each chromosome-population combination.
+    category: checkpoint
+    persistence: persistent
+    format_hint:
+      container: tar
+      datasets: []
+      compression: gzip
+      layout_hint: unknown
+      typical_request_size_kb: null
+    cardinality: runtime-determined (see cardinality_source)
+    cardinality_source:
+      type: runtime_determined
+      controlling_parameter: null
+      config_file: null
+      possible_values: "runtime-determined (# chromosomes x # populations)"
+    estimated_size_hint: "~1-10 MB per output file"
+    producer_task: task:frequency
+    consumer_tasks: []
+    lifecycle:
+      creation_phase: task:frequency
+      last_consumer_phase: task:frequency
+      retention_window: "from task:frequency completion (final output)"
+      access_frequency_class: once
+      consumer_count: 0
+
+pc_edges:
+  - edge_id: pc:individuals->individuals_merge:n_to_1
+    producer: task:individuals
+    consumer: task:individuals_merge
+    data_objects:
+      - data:individual_chr_tar
+    pc_pattern: n_to_1
+    pc_pattern_rationale: Multiple individuals jobs (ind_jobs parameter, typically 1-250 per chromosome) produce tar files consumed by a single merge job per chromosome.
+    data_flow_description: Each individuals job outputs a tar.gz file containing mutation data for a subset of individuals. All tar files for a chromosome are passed to a single merge job.
+    coupling: tight
+    coupling_rationale: Merge job must wait for all individuals jobs to complete before it can read and merge all input tar files.
+    communication_pattern: file_per_producer
+    data_volume_class: medium
+
+  - edge_id: pc:individuals_merge->mutation_overlap:1_to_n
+    producer: task:individuals_merge
+    consumer: task:mutation_overlap
+    data_objects:
+      - data:merged_individuals_tar
+    pc_pattern: 1_to_n
+    pc_pattern_rationale: One merged tar file per chromosome is consumed by multiple mutation_overlap jobs (one per population).
+    data_flow_description: Single merged individuals tar file per chromosome is read by multiple analysis jobs, each processing a different population.
+    coupling: tight
+    coupling_rationale: Each analysis job reads the full merged tar file after merge job completes.
+    communication_pattern: file_per_producer
+    data_volume_class: medium
+
+  - edge_id: pc:individuals_merge->frequency:1_to_n
+    producer: task:individuals_merge
+    consumer: task:frequency
+    data_objects:
+      - data:merged_individuals_tar
+    pc_pattern: 1_to_n
+    pc_pattern_rationale: Same merged individuals tar is consumed by multiple frequency analysis jobs (one per population).
+    data_flow_description: Single merged tar file per chromosome shared across population-specific frequency analysis jobs.
+    coupling: tight
+    coupling_rationale: Each frequency job reads the full merged tar file after merge job completes.
+    communication_pattern: file_per_producer
+    data_volume_class: medium
+
+  - edge_id: pc:sifting->mutation_overlap:1_to_n
+    producer: task:sifting
+    consumer: task:mutation_overlap
+    data_objects:
+      - data:sifted_chr_file
+    pc_pattern: 1_to_n
+    pc_pattern_rationale: One sifted file per chromosome consumed by multiple mutation_overlap jobs (one per population).
+    data_flow_description: Single sifted file per chromosome is read by multiple analysis jobs, each processing a different population.
+    coupling: tight
+    coupling_rationale: Each analysis job reads sifted file after sifting job completes.
+    communication_pattern: file_per_producer
+    data_volume_class: small
+
+  - edge_id: pc:sifting->frequency:1_to_n
+    producer: task:sifting
+    consumer: task:frequency
+    data_objects:
+      - data:sifted_chr_file
+    pc_pattern: 1_to_n
+    pc_pattern_rationale: Same sifted file shared across frequency analysis jobs for different populations.
+    data_flow_description: Single sifted file per chromosome shared across population-specific frequency analysis jobs.
+    coupling: tight
+    coupling_rationale: Each frequency job reads sifted file after sifting job completes.
+    communication_pattern: file_per_producer
+    data_volume_class: small
+
+workflow_graph:
+  integrity_hash: 75e91e92078276e31d515c5ae7f53097af7bae0c1ea175b7a7a6b0c0e1e91fd846
+  last_generated: 2026-03-04T00:00:00Z
+  dag_edges:
+    - from: task:individuals
+      to: task:individuals_merge
+      via: pc:individuals->individuals_merge:1_to_1
+    - from: task:individuals_merge
+      to: task:mutation_overlap
+      via: pc:individuals_merge->mutation_overlap:1_to_n
+    - from: task:individuals_merge
+      to: task:frequency
+      via: pc:individuals_merge->frequency:1_to_n
+    - from: task:sifting
+      to: task:mutation_overlap
+      via: pc:sifting->mutation_overlap:1_to_n
+    - from: task:sifting
+      to: task:frequency
+      via: pc:sifting->frequency:1_to_n
+
+  loop_groups: []
+  critical_path_hint: "individuals -> individuals_merge -> mutation_overlap/frequency (varies by chromosome and population count)"
+  control_flow:
+    has_iteration: false
+    iteration_description: null
+    has_conditional_branches: false
+    conditional_description: null
+
+  stage_execution_order:
+    - stage:data_ingestion
+    - stage:sifting
+    - stage:analysis
+
+  cross_reference:
+    task_to_stage:
+      task:individuals: stage:data_ingestion
+      task:individuals_merge: stage:data_ingestion
+      task:sifting: stage:sifting
+      task:mutation_overlap: stage:analysis
+      task:frequency: stage:analysis
+    data_to_producer:
+      data:individual_chr_tar: task:individuals
+      data:merged_individuals_tar: task:individuals_merge
+      data:sifted_chr_file: task:sifting
+      data:mutation_overlap_output: task:mutation_overlap
+      data:frequency_output: task:frequency
+    data_to_consumers:
+      data:vcf_file:
+        - task:individuals
+      data:columns_file:
+        - task:individuals
+        - task:mutation_overlap
+        - task:frequency
+      data:population_file:
+        - task:mutation_overlap
+        - task:frequency
+      data:sift_annotation_file:
+        - task:sifting
+      data:individual_chr_tar:
+        - task:individuals_merge
+      data:merged_individuals_tar:
+        - task:mutation_overlap
+        - task:frequency
+      data:sifted_chr_file:
+        - task:mutation_overlap
+        - task:frequency
+      data:mutation_overlap_output: []
+      data:frequency_output: []
+
+workflow_patterns:
+  primary_pattern: scatter_gather
+  secondary_patterns:
+    - cascading
+  classification_rationale: >
+    The workflow exhibits scatter-gather pattern at multiple levels:
+    (1) individuals jobs scatter across chromosome segments, gather into merge job;
+    (2) merge output scatters to multiple population-specific analysis jobs.
+    The overall flow follows cascading stages (data_ingestion -> sifting -> analysis).
+    The n_to_1 edges from individuals to merge and 1_to_n edges from merge/sifting
+    to analysis tasks demonstrate the scatter-gather structure.
+  pattern_table_row: "1000genome | 3 stages | 5 task types (multiple instances) | n_to_1, 1_to_n | parallel file processing, sequential merge, multi-population analysis"
+
+io_behavioral_hints:
+  - hint_id: hint:small_file_overhead_individuals
+    description: Individuals task creates one output file per individual (2504 files per chromosome) before tar compression. This creates small-file overhead during the file creation phase before compression reduces the count.
+    affected_tasks:
+      - task:individuals
+    affected_data:
+      - data:individual_chr_tar
+    potential_concern: small_file_overhead
+
+  - hint_id: hint:data_reuse_merged_individuals
+    description: The merged_individuals_tar file (created once per chromosome) is read multiple times - once by each population-specific mutation_overlap job and once by each frequency job. This creates redundant I/O as the same file is extracted and processed repeatedly.
+    affected_tasks:
+      - task:mutation_overlap
+      - task:frequency
+    affected_data:
+      - data:merged_individuals_tar
+    potential_concern: data_reuse
+
+  - hint_id: hint:data_reuse_sifted_file
+    description: The sifted_chr_file (created once per chromosome) is read by multiple population-specific analysis jobs, causing the same file to be read repeatedly across different analysis tasks.
+    affected_tasks:
+      - task:mutation_overlap
+      - task:frequency
+    affected_data:
+      - data:sifted_chr_file
+    potential_concern: data_reuse
+
+execution_profiles:
+  - profile_name: full
+    terminal_task_id: task:frequency
+    description: Complete workflow execution including all chromosomes specified in data.csv, processing all populations, producing both mutation overlap analysis and frequency analysis outputs.
+    required_task_set:
+      - task:individuals
+      - task:individuals_merge
+      - task:sifting
+      - task:mutation_overlap
+      - task:frequency
+    conditional_inclusions: []
+    output_dataset_ids:
+      - data:mutation_overlap_output
+      - data:frequency_output
+
+translation_metadata:
+  source_format: compiled_from_pegasus_dax
+  source_file: daxgen.py
+  translation_tool: opencode
+  translation_timestamp: 2026-03-04T00:00:00Z
+  unmapped_fields: []
+  round_trips_gaps:
+    - field_path: execution_profiles
+      note: Execution profiles have no Pegasus DAX equivalent; must be derived from checkpoint tasks
+    - field_path: workflow_patterns
+      note: Pattern classification is inference-based, not represented in Pegasus DAX
+  quality_warnings: []
+  field_confidence_records:
+    - field_path: tasks[*].description
+      confidence_level: high
+      confidence_reason: Inferred from code analysis of task executables and README documentation
+      requires_human_review: false
+    - field_path: tasks[*].behavioral_notes
+      confidence_level: high
+      confidence_reason: Inferred from code inspection of task scripts
+      requires_human_review: false
+    - field_path: tasks[*].io_dominance
+      confidence_level: medium
+      confidence_reason: Inferred from code structure and I/O patterns
+      requires_human_review: false
+    - field_path: tasks[*].io_access_type
+      confidence_level: high
+      confidence_reason: Inferred from Python imports and standard library usage (no MPI/HDF5 imports found)
+      requires_human_review: false
+    - field_path: tasks[*].restart_model
+      confidence_level: high
+      confidence_reason: No checkpoint logic found in task scripts; idempotent behavior confirmed
+      requires_human_review: false
+    - field_path: pc_edges[*].pc_pattern
+      confidence_level: high
+      confidence_reason: Derived from workflow DAG structure in daxgen.py
+      requires_human_review: false
+    - field_path: pc_edges[*].coupling
+      confidence_level: high
+      confidence_reason: Inferred from Pegasus job dependencies and file read patterns
+      requires_human_review: false
+    - field_path: workflow_patterns.primary_pattern
+      confidence_level: high
+      confidence_reason: Inferred from scatter-gather structure visible in daxgen.py
+      requires_human_review: false
+    - field_path: io_behavioral_hints
+      confidence_level: medium
+      confidence_reason: Inferred from code analysis of file creation and consumption patterns
+      requires_human_review: false

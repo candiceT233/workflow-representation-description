@@ -1,0 +1,26 @@
+Now let me look at the main workflow generator file to understand the tasks and data flow:
+Now I have a complete understanding of the workflow. Let me compile all the information to create the WDD YAML file.
+
+Based on my analysis:
+
+**Workflow Structure:**
+1. **Stage 1: Data Preparation** - Individuals jobs process VCF files per chromosome, creating individual-specific mutation data
+2. **Stage 2: Merge** - individuals_merge jobs combine the chunks per chromosome  
+3. **Stage 3: Sifting** - Sifting tasks process VEP annotation files per chromosome
+4. **Stage 4: Analysis** - mutation_overlap and frequency jobs analyze mutations across populations
+
+**Tasks:**
+- `individuals` - processes chromosome VCF files, extracts individual-specific mutations
+- `individuals_merge` - merges chunk outputs from individuals jobs per chromosome
+- `sifting` - processes SIFT scores from VEP annotation files
+- `mutation_overlap` - measures mutation overlap between individuals by population
+- `frequency` - measures frequency of overlapping mutations
+
+**Data Objects:**
+- Input VCF files (per chromosome)
+- SIFT annotation files (per chromosome)
+- Population files
+- Output mutation data (tar.gz files)
+- Final analysis results (tar.gz files)
+
+Let me create the WDD:

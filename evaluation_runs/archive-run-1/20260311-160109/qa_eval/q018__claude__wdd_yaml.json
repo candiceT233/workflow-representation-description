@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T16:10:17.366400",
+  "qid": "q018",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 3: REPOSITORY USAGE AND SYSTEM MECHANICS",
+  "question": "When evaluating the workflow components, how are the logical file names defined in the workflow mapped to actual data locations?",
+  "reference_answer": "The workflow uses a Replica Catalog (RC) to map the logical file names (LFNs) used in the abstract workflow to their physical file locations (PFNs) on the storage systems.",
+  "agent": "claude",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "The provided WDD YAML does not contain enough information to answer this question. The document defines logical data object identifiers (e.g., `data:vcf_input`, `data:individuals_output_chunk`) and describes their formats, cardinalities, and producer/consumer relationships, but it does not specify how these logical names are mapped to actual file paths or data locations on disk. The `cardinality_source` fields reference controlling parameters (e.g., `datafile` in `data.csv`, `ind_jobs` in `daxgen.py`) that influence how many instances exist, but the physical path resolution mechanism is not documented in this WDD.",
+  "duration_s": 12.08,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 2.0,
+  "correctness": 2.0
+}

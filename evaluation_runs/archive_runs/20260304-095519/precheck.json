@@ -1,0 +1,35 @@
+{
+  "api": {
+    "gemini": {
+      "configured": true,
+      "env_var": "GEMINI_API_KEY"
+    },
+    "claude": {
+      "configured": true,
+      "env_var": "ANTHROPIC_API_KEY"
+    },
+    "opencode": {
+      "configured": true,
+      "env_var": "OPENCODE_API_KEY"
+    }
+  },
+  "cli": {
+    "gemini": {
+      "ok": true,
+      "info": "/home/mtang11/.npm-global/bin/gemini"
+    },
+    "claude": {
+      "ok": true,
+      "info": "/home/mtang11/.npm-global/bin/claude"
+    },
+    "opencode": {
+      "ok": true,
+      "info": "/home/mtang11/.opencode/bin/opencode"
+    }
+  },
+  "active_agents": [
+    "gemini",
+    "claude",
+    "opencode"
+  ]
+}

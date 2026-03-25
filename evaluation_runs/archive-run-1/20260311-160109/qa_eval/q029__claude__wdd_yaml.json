@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T16:15:44.601989",
+  "qid": "q029",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 4: INPUT FILES, OUTPUT FILES, AND DATA FORMATS",
+  "question": "What are the final output files produced by the workflow?",
+  "reference_answer": "The workflow produces two final outputs: (1) overlap metrics from the \"Mutations_Overlap\" task, recording shared mutation frequencies between pairs of individuals categorized by population and chromosome; and (2) a null distribution from the \"Frequency\" task, representing the baseline rate of random variant sharing used for statistical comparison.",
+  "agent": "claude",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "Based on the WDD YAML, the workflow produces two types of final output files:\n\n1. **Mutation Overlap Results** (`data:mutation_overlap_results`) — Tar.gz archives containing pairwise mutation overlap matrices, summary statistics, and matplotlib visualization plots (PNG files) for each population-chromosome combination. Includes Python pickle matrices. Cardinality: one per chromosome per population (70 total in test config: 10 chromosomes x 7 populations).\n\n2. **Frequency Analysis Results** (`data:frequency_results`) — Tar.gz archives containing frequency distribution matrices (numpy arrays), overlap statistics from random sampling of individuals, and matplotlib visualization plots (PNG files) for each population-chromosome combination. Same cardinality: 70 total in test config.\n\nBoth are classified as `\"checkpoint\"` output class with `\"workflow_scoped\"` persistence, and neither has any downstream consumer tasks (`consumer_tasks: []`), confirming they are terminal outputs.",
+  "duration_s": 11.03,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 5.0,
+  "correctness": 5.0
+}

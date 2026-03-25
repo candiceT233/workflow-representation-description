@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-09T15:15:01.088897",
+  "qid": "q002",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 1: SCIENTIFIC PURPOSE AND BIOLOGICAL SEMANTICS",
+  "question": "Why did the project transition to using only the Illumina platform with 70 base pair read lengths during Phase 3?",
+  "reference_answer": "This strategic shift from the multi-platform approach of Phase 1 was driven by the need for higher-quality variant calling and more consistent error profiles across the data.",
+  "agent": "opencode",
+  "context_type": "workflow_knowledge",
+  "success": false,
+  "model_answer": "stdin and input arguments may not both be used.",
+  "duration_s": 0.0,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": null,
+  "correctness": null
+}

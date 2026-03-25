@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T16:09:26.448171",
+  "qid": "q017",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 3: REPOSITORY USAGE AND SYSTEM MECHANICS",
+  "question": "Which script within the implementation is responsible for the dynamic generation of workflow dependencies?",
+  "reference_answer": "The `daxgen.py` script governs the dynamic generation of dependencies, particularly handling the transition between parallelized VCF chunks and the synchronized merge task.",
+  "agent": "claude",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "Based on the workflow knowledge context, **`daxgen.py`** is the script responsible for dynamic generation of workflow dependencies.\n\nIt handles:\n- Workflow generation with `Workflow(self.wf_name, infer_dependencies=True)`, which tells Pegasus to automatically infer task dependencies from input/output file declarations\n- Iterating over chromosomes and populations to create the full DAG of jobs\n- Configuring parallelism (e.g., chunking via the `-i` parameter and creating merge tasks when `ind_jobs > 1`)\n- Validation checks like ensuring `ind_jobs` evenly divides the row count (referenced at lines 376-377)",
+  "duration_s": 8.19,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 5.0,
+  "correctness": 5.0
+}

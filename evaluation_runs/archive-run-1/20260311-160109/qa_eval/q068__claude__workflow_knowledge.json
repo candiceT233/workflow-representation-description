@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T16:35:17.987587",
+  "qid": "q068",
+  "source_file": "1000genome-workflow-knowledge-eval-3.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "What design pattern is utilized to effectively manage the sheer scale of the genomic releases during the Individuals task?",
+  "reference_answer": "The workflow uses the Scatter/Gather pattern, which remains the most effective strategy for managing the massive scale of the data by executing multiple Individuals jobs in parallel.",
+  "agent": "claude",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "The Individuals task uses a **fan-out / map-reduce style chunking pattern** to manage scale:\n\n1. **Partitioning via the `-i` (individuals-jobs) parameter:** The VCF file (250,000 lines per chromosome) can be split into multiple chunks processed in parallel. For example, `-i 5` divides each chromosome into 5 jobs of 50k lines each, scaling from 10 to 2,500 individual tasks.\n\n2. **Merge/consolidation step (Individuals_Merge):** When chunking is used (`ind_jobs > 1`), partial tar archives (`chrXn-{counter}-{stop}.tar.gz`) are consolidated back into a single `chrXn.tar.gz` per chromosome by extracting, concatenating files with matching names, and re-compressing.\n\n3. **Tar+gzip serialization:** The ~2,504 per-individual output files generated per chromosome are bundled into a single tar.gz archive, containing the \"per-individual output explosion\" that would otherwise create massive filesystem metadata pressure (many small files of 100 KB–1 MB each).\n\nIn short: **split-process-merge with archive-based serialization** — partition the large input for parallel processing, then consolidate the numerous small outputs into compressed archives for efficient downstream consumption.",
+  "duration_s": 16.22,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 5.0,
+  "correctness": 5.0
+}

@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T16:23:55.474819",
+  "qid": "q044",
+  "source_file": "1000genome-workflow-knowledge-eval-2.txt",
+  "section": "SECTION 3: REPOSITORY USAGE AND SYSTEM MECHANICS",
+  "question": "Where is the source code and implementation for this bioinformatics workflow hosted?",
+  "reference_answer": "The workflow implementation is hosted on GitHub under the repository `pegasus-isi/1000genome-workflow`.",
+  "agent": "claude",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "Based on the WDD YAML, the source repository is:\n\n```\n/home/mtang11/scripts/workflow-representation-description/workflows_repo/1000genome-workflow\n```\n\nThe source implementation file is `daxgen.py` (a Pegasus DAX generator), with executable task scripts located under `bin/` (e.g., `bin/individuals.py`, `bin/individuals_merge.py`, `bin/sifting.py`, `bin/mutation_overlap.py`, `bin/frequency.py`).\n\nThe source format is noted as `\"native\"` (Pegasus DAX generator format). No remote repository URL or version control commit hash is recorded (`source_commit: null`).",
+  "duration_s": 8.97,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 2.0,
+  "correctness": 2.0
+}

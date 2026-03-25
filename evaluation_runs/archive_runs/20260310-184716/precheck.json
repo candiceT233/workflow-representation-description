@@ -1,0 +1,17 @@
+{
+  "api": {
+    "claude": {
+      "configured": true,
+      "env_var": "ANTHROPIC_API_KEY"
+    }
+  },
+  "cli": {
+    "claude": {
+      "ok": true,
+      "info": "/home/mtang11/.npm-global/bin/claude"
+    }
+  },
+  "active_agents": [
+    "claude"
+  ]
+}

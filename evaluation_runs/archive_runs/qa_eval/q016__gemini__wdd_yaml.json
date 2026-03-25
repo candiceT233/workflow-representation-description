@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-06T16:25:04.623095",
+  "qid": "q016",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 3: REPOSITORY USAGE AND SYSTEM MECHANICS",
+  "question": "Where is the official repository hosted for the bioinformatics workflow that identifies these mutational overlaps?",
+  "reference_answer": "The repository is hosted on GitHub under \"pegasus-isi/1000genome-workflow\".",
+  "agent": "gemini",
+  "context_type": "wdd_yaml",
+  "success": false,
+  "model_answer": "exit 1: An unexpected critical error occurred:Error: EBADF: bad file descriptor, read",
+  "duration_s": 23.74,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": null,
+  "correctness": null
+}

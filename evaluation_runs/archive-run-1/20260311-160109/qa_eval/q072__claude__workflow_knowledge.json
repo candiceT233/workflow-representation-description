@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T16:37:32.287566",
+  "qid": "q072",
+  "source_file": "1000genome-workflow-knowledge-eval-3.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "When adding the functional annotation layer, what specific data fields does the \"Sifting\" task record?",
+  "reference_answer": "The \"Sifting\" task specifically filters for variants with SIFT scores and records their rs numbers and gene IDs.",
+  "agent": "claude",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "Based on the workflow knowledge, the Sifting task records the following fields in its output (`sifted.SIFT.chrX.txt`):\n\n1. **Line number** — position in the source VCF\n2. **rs number** (SNP ID) — the variant identifier\n3. **ENSEMBL gene ID** (ENSG ID) — extracted from field 5 of the pipe-delimited VCF INFO column\n4. **SIFT prediction** — extracted from field 17 (e.g., \"deleterious\" or \"tolerated\")\n5. **Phenotype** — extracted from field 18\n\nThe output format is space-delimited, and the ENSG ID, SIFT prediction, and phenotype fields are **variable/optional** — not every record will have all columns. Only variants containing both a SIFT annotation (\"deleterious\" or \"tolerated\") and an \"rs\" prefix are included.",
+  "duration_s": 13.61,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 5.0,
+  "correctness": 5.0
+}

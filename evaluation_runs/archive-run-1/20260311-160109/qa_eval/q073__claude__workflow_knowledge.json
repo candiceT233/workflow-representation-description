@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T16:38:08.668404",
+  "qid": "q073",
+  "source_file": "1000genome-workflow-knowledge-eval-3.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "How does the \"Mutations_Overlap\" task categorize the shared mutation frequencies it calculates?",
+  "reference_answer": "The task calculates the frequency of shared mutations among pairs of individuals, categorizing them by their population and chromosome.",
+  "agent": "claude",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "The provided context does not contain enough detail to answer how the Mutation_Overlap task specifically **categorizes** shared mutation frequencies. What the context does say is:\n\n- It computes **pairwise mutation overlap** (number of shared variants) for each pair of individuals within a population.\n- The analysis scope is **NO-SIFT** (mutations analyzed without SIFT filtering).\n- It produces **overlap matrices**, overlap counts, and **heatmap visualizations** (PNG plots).\n- Output files go into directories like `output_no_sift/` and `plots_no_sift/`.\n\nBut the context does not describe specific categories, bins, or classification schemes applied to the overlap values. For that level of detail, you would need to inspect the actual analysis scripts (e.g., the mutation overlap Python code) rather than this knowledge report.",
+  "duration_s": 12.57,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 3.0,
+  "correctness": 3.0
+}

@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T16:13:35.060264",
+  "qid": "q025",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 4: INPUT FILES, OUTPUT FILES, AND DATA FORMATS",
+  "question": "What setup must be done before the workflow can process any input data, and which script handles it?",
+  "reference_answer": "The prepare_input.sh script must be run first. It unzips the included data and sets up the local environment so that the workflow has the necessary files in place to begin execution.",
+  "agent": "claude",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "Based on the provided context, the setup before processing involves **workflow generation**, handled by **`daxgen.py`**. This script:\n\n1. **Loads metadata** from `data.csv` (defines chromosomes, row counts, and VEP file references)\n2. **Reads population files** from `data/populations/` (validates they are readable)\n3. **Validates configuration** — e.g., ensures `ind_jobs` evenly divides the chromosome row count (exits via `sys.exit` if not)\n4. **Registers input files** in the Pegasus `ReplicaCatalog` (VCF files, `columns.txt`, population files)\n5. **Constructs the full DAG** upfront using `Workflow(self.wf_name, infer_dependencies=True)`, defining all jobs across chromosomes and populations before execution begins\n\nConfiguration is supplied via command-line parameters (dataset version, parallelism factor, execution site, etc.) parsed by `daxgen.py`.\n\nThe context does not describe any separate data download, indexing, or environment provisioning steps beyond what `daxgen.py` performs.",
+  "duration_s": 13.67,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 1.0,
+  "correctness": 1.0
+}

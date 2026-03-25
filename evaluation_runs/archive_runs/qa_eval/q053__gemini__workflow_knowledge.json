@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-06T16:54:59.115839",
+  "qid": "q053",
+  "source_file": "1000genome-workflow-knowledge-eval-3.txt",
+  "section": "SECTION 1: SCIENTIFIC PURPOSE AND BIOLOGICAL SEMANTICS",
+  "question": "What frequency threshold did the pilot phase establish as feasible for identifying genetic variants?",
+  "reference_answer": "The early efforts of the pilot phase established the feasibility of identifying variants with frequencies as low as 1% by combining data across multiple samples.",
+  "agent": "gemini",
+  "context_type": "workflow_knowledge",
+  "success": false,
+  "model_answer": "exit 1: An unexpected critical error occurred:Error: EBADF: bad file descriptor, read",
+  "duration_s": 24.54,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": null,
+  "correctness": null
+}

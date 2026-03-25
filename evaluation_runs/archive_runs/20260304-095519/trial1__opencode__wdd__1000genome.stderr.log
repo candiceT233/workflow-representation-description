@@ -1,0 +1,93 @@
+[0m
+> build · minimax-m2.5-free
+[0m
+[0m→ [0mRead template_separate_docs/template_WDD.yml
+[0m→ [0mRead template_separate_docs/WIDGET_conventions.md
+[0m
+[0m$ [0mls -la /mnt/common/mtang11/scripts/workflow-representation-description/workflows_repo/1000genome-workflow
+total 96
+drwxrwxr-x 7 mtang11 mtang11  4096 Feb 24 14:42 .
+drwxrwxr-x 4 mtang11 mtang11   151 Mar  4 09:38 ..
+drwxrwxr-x 2 mtang11 mtang11  4096 Feb 23 01:44 analysis
+-rw-rw-r-- 1 mtang11 mtang11  8476 Feb 24 14:52 ares_1kgenome_parallel.sbatch
+drwxrwxr-x 2 mtang11 mtang11  4096 Feb 23 01:44 bin
+drwxrwxr-x 4 mtang11 mtang11    53 Feb 23 01:49 data
+-rw-rw-r-- 1 mtang11 mtang11  1042 Feb 23 01:49 data.csv
+-rwxrwxr-x 1 mtang11 mtang11 24554 Feb 23 01:49 daxgen.py
+drwxrwxr-x 3 mtang11 mtang11    28 Feb 23 01:49 docs
+-rw-rw-r-- 1 mtang11 mtang11   481 Feb 23 01:49 env.sh
+-rw-rw-r-- 1 mtang11 mtang11    44 Feb 23 01:49 .git
+-rw-rw-r-- 1 mtang11 mtang11    75 Feb 23 01:49 .gitignore
+drwxrwxr-x 2 mtang11 mtang11  4096 Feb 23 01:49 lib
+-rw-rw-r-- 1 mtang11 mtang11 11368 Feb 23 01:49 LICENSE
+-rwxrwxr-x 1 mtang11 mtang11   483 Feb 23 01:49 prepare_input.sh
+-rw-rw-r-- 1 mtang11 mtang11 10090 Feb 23 01:49 README.md
+[0m
+[0m→ [0mRead workflows_repo/1000genome-workflow/README.md
+[0m→ [0mRead workflows_repo/1000genome-workflow/daxgen.py
+[0m
+[0m$ [0mls -la /mnt/common/mtang11/scripts/workflow-representation-description/workflows_repo/1000genome-workflow/bin
+total 84
+drwxrwxr-x 2 mtang11 mtang11  4096 Feb 23 01:44 .
+drwxrwxr-x 7 mtang11 mtang11  4096 Feb 24 14:42 ..
+-rwxrwxr-x 1 mtang11 mtang11 10747 Feb 23 01:44 frequency.py
+-rwxrwxr-x 1 mtang11 mtang11  2576 Feb 23 01:44 individuals
+-rwxrwxr-x 1 mtang11 mtang11   373 Feb 23 01:44 individuals_merge
+-rwxrwxr-x 1 mtang11 mtang11  3809 Feb 23 01:44 individuals_merge_mpi.py
+-rwxrwxr-x 1 mtang11 mtang11  2076 Feb 23 01:44 individuals_merge.py
+-rwxrwxr-x 1 mtang11 mtang11  6599 Feb 23 01:44 individuals_mpi.py
+-rwxrwxr-x 1 mtang11 mtang11  4976 Feb 23 01:44 individuals.py
+-rwxrwxr-x 1 mtang11 mtang11 17109 Feb 23 01:44 mutation_overlap.py
+-rwxrwxr-x 1 mtang11 mtang11   167 Feb 23 01:44 pmc-wrapper
+-rwxrwxr-x 1 mtang11 mtang11   952 Feb 23 01:44 sifting
+-rwxrwxr-x 1 mtang11 mtang11  2910 Feb 23 01:44 sifting.py
+[0m
+[0m→ [0mRead workflows_repo/1000genome-workflow/data.csv
+[0m
+[0m$ [0mls -la /mnt/common/mtang11/scripts/workflow-representation-description/workflows_repo/1000genome-workflow/data
+total 12
+drwxrwxr-x 4 mtang11 mtang11   53 Feb 23 01:49 .
+drwxrwxr-x 7 mtang11 mtang11 4096 Feb 24 14:42 ..
+drwxrwxr-x 6 mtang11 mtang11 4096 Feb 23 01:49 20130502
+drwxrwxr-x 2 mtang11 mtang11  115 Feb 23 01:49 populations
+[0m
+[0m→ [0mRead workflows_repo/1000genome-workflow/bin/individuals
+[0m→ [0mRead workflows_repo/1000genome-workflow/bin/individuals_merge
+[0m→ [0mRead workflows_repo/1000genome-workflow/bin/sifting
+[0m→ [0mRead workflows_repo/1000genome-workflow/bin/mutation_overlap.py[90m [limit=100][0m
+[0m→ [0mRead workflows_repo/1000genome-workflow/bin/frequency.py[90m [limit=80][0m
+[0m
+[0m$ [0mls /mnt/common/mtang11/scripts/workflow-representation-description/workflows_repo/1000genome-workflow/data/populations/
+AFR
+ALL
+AMR
+EAS
+EUR
+GBR
+SAS
+[0m
+[0m$ [0mls -la /mnt/common/mtang11/scripts/workflow-representation-description/workflows_repo/1000genome-workflow/data/20130502/ | head -20
+total 38737756
+drwxrwxr-x 6 mtang11 mtang11       4096 Feb 23 01:49 .
+drwxrwxr-x 4 mtang11 mtang11         53 Feb 23 01:49 ..
+lrwxrwxrwx 1 mtang11 mtang11         18 Feb 23 01:45 ALL -> ../populations/ALL
+-rw-rw-r-- 1 mtang11 mtang11 2539707224 Feb 23 01:49 ALL.chr10.250000.vcf
+-rw-rw-r-- 1 mtang11 mtang11   45006565 Feb 23 01:49 ALL.chr10.250000.vcf.gz
+-rw-rw-r-- 1 mtang11 mtang11  962745794 Feb 23 01:45 ALL.chr10.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.annotation.vcf
+-rw-rw-r-- 1 mtang11 mtang11   99116445 Feb 23 01:45 ALL.chr10.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.annotation.vcf.gz
+-rw-rw-r-- 1 mtang11 mtang11 2539456345 Feb 23 01:45 ALL.chr1.250000.vcf
+-rw-rw-r-- 1 mtang11 mtang11   41797653 Feb 23 01:49 ALL.chr1.250000.vcf.gz
+-rw-rw-r-- 1 mtang11 mtang11 1580478841 Feb 23 01:44 ALL.chr1.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.annotation.vcf
+-rw-rw-r-- 1 mtang11 mtang11  162413455 Feb 23 01:44 ALL.chr1.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.annotation.vcf.gz
+-rw-rw-r-- 1 mtang11 mtang11 2539377276 Feb 23 01:46 ALL.chr2.250000.vcf
+-rw-rw-r-- 1 mtang11 mtang11   44955360 Feb 23 01:49 ALL.chr2.250000.vcf.gz
+-rw-rw-r-- 1 mtang11 mtang11 1708156254 Feb 23 01:44 ALL.chr2.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.annotation.vcf
+-rw-rw-r-- 1 mtang11 mtang11  174259105 Feb 23 01:44 ALL.chr2.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.annotation.vcf.gz
+-rw-rw-r-- 1 mtang11 mtang11 2539415370 Feb 23 01:46 ALL.chr3.250000.vcf
+-rw-rw-r-- 1 mtang11 mtang11   45506330 Feb 23 01:49 ALL.chr3.250000.vcf.gz
+-rw-rw-r-- 1 mtang11 mtang11 1411549292 Feb 23 01:45 ALL.chr3.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.annotation.vcf
+-rw-rw-r-- 1 mtang11 mtang11  143698975 Feb 23 01:44 ALL.chr3.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.annotation.vcf.gz
+[0m
+[93m[1m! [0mpermission requested: external_directory (/home/mtang11/scripts/workflow-representation-description/workflow_wdd/*); auto-rejecting
+[0m✗ [0mwrite failed
+[91m[1mError: [0mThe user rejected permission to use this specific tool call.

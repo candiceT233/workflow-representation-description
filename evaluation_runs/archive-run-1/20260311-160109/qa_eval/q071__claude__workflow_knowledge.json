@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T16:37:02.940442",
+  "qid": "q071",
+  "source_file": "1000genome-workflow-knowledge-eval-3.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "What biological function does the \"Sifting\" task evaluate, and what specific predictive tool does it utilize?",
+  "reference_answer": "The \"Sifting\" task utilizes the Variant Effect Predictor (VEP) to compute SIFT scores. SIFT is a sequence homology-based tool that predicts whether an amino acid substitution will impact protein function.",
+  "agent": "claude",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "The Sifting task evaluates the **predicted effect of amino acid substitutions** on protein function — specifically whether variants are **\"deleterious\" or \"tolerated.\"** It utilizes **SIFT (Sorting Intolerant From Tolerant)**, a sequence homology-based tool that predicts whether an amino acid substitution affects protein function.\n\nThe task filters VEP (Variant Effect Predictor)-annotated VCF files, extracting variants that have SIFT score annotations along with their ENSEMBL gene IDs and phenotype information.",
+  "duration_s": 8.03,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 5.0,
+  "correctness": 5.0
+}

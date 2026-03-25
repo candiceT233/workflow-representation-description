@@ -1,0 +1,26 @@
+(node:223823) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:223914) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+Loaded cached credentials.
+Server 'jarvis-mcp' supports tool updates. Listening for changes...
+Error executing tool write_todos: Tool execution denied by policy.
+Error executing tool run_shell_command: Tool "run_shell_command" not found. Did you mean one of: "run_pipeline", "jm_save_config", "grep_search"?
+Error executing tool run_shell_command: Tool "run_shell_command" not found. Did you mean one of: "run_pipeline", "jm_save_config", "grep_search"?
+Error executing tool run_shell_command: Tool "run_shell_command" not found. Did you mean one of: "run_pipeline", "jm_save_config", "grep_search"?
+Error executing tool write_file: Tool "write_file" not found. Did you mean one of: "read_file", "write_todos", "cli_help"?
+{
+  "session_id": "f9d20495-9cd9-4117-b8e5-d62cf3836b34",
+  "error": {
+    "type": "FatalCancellationError",
+    "message": "Operation cancelled.",
+    "code": 130
+  }
+}[ERROR] {
+  "session_id": "f9d20495-9cd9-4117-b8e5-d62cf3836b34",
+  "error": {
+    "type": "FatalCancellationError",
+    "message": "Operation cancelled.",
+    "code": 130
+  }
+}

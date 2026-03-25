@@ -1,0 +1,7 @@
+I'll analyze the workflow repository and create the WDD YAML file. Let me start by reading the templates and exploring the workflow structure.
+Let me examine the key executable scripts and population files to understand the tasks better.
+Now I have enough information to create the WDD. Let me verify the git commit and prepare the output.
+Now I'll create the WDD YAML file based on my analysis:
+Now let me compute the integrity_hash by creating a simple hash of the pc_edges and fix the lineage_id to be a proper UUID format:
+The WDD file has been successfully created. Let me verify the output file path:
+STATUS: success | OUTPUT: /home/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial1.yaml

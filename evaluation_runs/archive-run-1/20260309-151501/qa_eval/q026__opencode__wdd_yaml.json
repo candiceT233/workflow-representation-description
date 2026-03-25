@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-09T15:15:01.424990",
+  "qid": "q026",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 4: INPUT FILES, OUTPUT FILES, AND DATA FORMATS",
+  "question": "What intermediate data format is passed between the \"Individuals\" tasks and the \"Individuals_Merge\" task?",
+  "reference_answer": "The \"Individuals\" tasks produce chunked SNP lists — partial mutation files, one per VCF chunk, each identifying which individuals possess mutations on both alleles for a set of rs numbers. These chunks are the direct input to \"Individuals_Merge\".",
+  "agent": "opencode",
+  "context_type": "wdd_yaml",
+  "success": false,
+  "model_answer": "stdin and input arguments may not both be used.",
+  "duration_s": 0.0,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": null,
+  "correctness": null
+}

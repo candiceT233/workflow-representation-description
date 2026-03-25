@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T16:08:32.884471",
+  "qid": "q015",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "What specific data fields does the \"Sifting\" task record when filtering variants?",
+  "reference_answer": "The \"Sifting\" task specifically filters for variants with SIFT scores and records their rs numbers, ENSEMBL GEN IDs, and HGNC IDs.",
+  "agent": "claude",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "From the workflow knowledge, the Sifting task writes the following fields per matching variant:\n\n**Output format:** `{line_num} {rs_id} {ENSG_id} {SIFT_pred} {phenotype}`\n\nSpecifically:\n1. **Line number** — position in the VCF file\n2. **rs number (SNP id)** — the variant identifier\n3. **ENSEMBL gene ID** — extracted from VEP INFO field 5\n4. **SIFT prediction** — extracted from INFO field 17 (e.g., \"deleterious\" or \"tolerated\")\n5. **Phenotype** — extracted from INFO field 18\n\nThe ENSG ID, SIFT prediction, and phenotype fields are variable/optional — the output format notes them with brackets: `[{ENSG_id}] [{SIFT_pred} {phenotype}]`. The output file is space-delimited.",
+  "duration_s": 9.51,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 3.0,
+  "correctness": 3.0
+}

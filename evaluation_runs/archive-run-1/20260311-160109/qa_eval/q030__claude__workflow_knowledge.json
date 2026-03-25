@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T16:16:00.168501",
+  "qid": "q030",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 4: INPUT FILES, OUTPUT FILES, AND DATA FORMATS",
+  "question": "Where are the core executable scripts that perform the actual genomic analysis located in the repository?",
+  "reference_answer": "The core executables and Python scripts that perform the calculations for sifting, overlapping, and merging are located in the bin/ directory of the repository. These are the scripts the workflow engine calls for each task.",
+  "agent": "claude",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "The provided workflow knowledge context does not specify the exact file paths or directory locations of the core executable scripts (for the `individuals`, `sifting`, `mutation_overlap`, and `frequency` tasks). It only mentions that:\n\n- The `-p, --src-path` parameter controls the \"source directory for binaries and data\" and is auto-detected by default.\n- The `-b, --bash-jobs` flag toggles between Python and bash script implementations for the `individuals` and `sifting` tasks.\n- Workflow generation logic resides in `daxgen.py`.\n\nTo find the actual script locations, you'd need to inspect the repository directly rather than rely on this knowledge report.",
+  "duration_s": 13.28,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 2.0,
+  "correctness": 2.0
+}

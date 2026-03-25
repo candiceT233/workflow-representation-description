@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T16:08:10.558059",
+  "qid": "q014",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "How does the pipeline generate the baseline data needed to distinguish common variations from disease-associated mutations?",
+  "reference_answer": "The \"Frequency\" task establishes a null distribution. It does this by selecting random individuals and analyzing variants without regard for their SIFT scores.",
+  "agent": "claude",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "The WDD describes two main mechanisms the pipeline uses to build this baseline:\n\n1. **Allele frequency filtering (Individuals task):** The `task:individuals` filters variants \"based on allele frequency thresholds\" when processing VCF genotype data. This separates common polymorphisms from rarer variants across the 2504 individuals.\n\n2. **SIFT pathogenicity scoring (Sifting task):** The `task:sifting` processes VEP annotation files to extract SIFT (Sorting Intolerant From Tolerant) scores, which predict whether a variant is tolerated or damaging. The output is a per-chromosome table of variants with their SIFT scores and phenotype predictions.\n\nThese two data products then feed into the analysis stage:\n\n- **Mutation Overlap** computes pairwise overlap statistics among individuals *accounting for SIFT scores*, measuring shared mutation patterns within each population (AFR, AMR, EAS, EUR, GBR, SAS, and ALL).\n- **Frequency** measures how often overlapping mutations occur across randomly sampled individuals per population, providing population-level frequency distributions.\n\nBy combining allele frequency filtering, SIFT pathogenicity predictions, and cross-population statistical analysis, the pipeline establishes population-specific baselines of variant prevalence against which disease-associated mutations can be identified. However, the WDD does not describe an explicit classification step that labels variants as \"disease-associated\" — it stops at producing the overlap and frequency statistics.",
+  "duration_s": 17.67,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 2.0,
+  "correctness": 2.0
+}

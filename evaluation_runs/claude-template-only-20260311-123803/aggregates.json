@@ -1,0 +1,16 @@
+{
+  "claude__wdd": {
+    "n": 3,
+    "duration_mean_s": 169.977,
+    "duration_std_s": 39.416,
+    "validation_mean": 1.0,
+    "validation_pass_rate": 1.0
+  },
+  "claude__knowledge": {
+    "n": 3,
+    "duration_mean_s": 114.778,
+    "duration_std_s": 5.551,
+    "validation_mean": 0.907,
+    "validation_pass_rate": 1.0
+  }
+}

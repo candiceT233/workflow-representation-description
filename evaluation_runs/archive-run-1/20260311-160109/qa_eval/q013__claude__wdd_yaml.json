@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T16:07:32.505587",
+  "qid": "q013",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "What are the direct dependencies required before the \"Mutations_Overlap\" task can begin execution?",
+  "reference_answer": "The \"Mutations_Overlap\" task depends on the successful completion of both the \"Individuals_Merge\" task and the \"Populations\" task.",
+  "agent": "claude",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "Based on the WDD, the **Mutation Overlap** task (`task:mutation_overlap`) requires two upstream tasks to complete before it can execute:\n\n1. **Individuals Merge** (`task:individuals_merge`) — provides the merged individuals archive (`data:individuals_merged`) via the `pc:individuals_merge->mutation_overlap:1_to_n` edge.\n2. **Sifting** (`task:sifting`) — provides the SIFT-scored variants file (`data:sifted_variants`) via the `pc:sifting->mutation_overlap:1_to_n` edge.\n\nIt also consumes two config/input files that are available from the start: `data:population_file` and `data:columns_file`.",
+  "duration_s": 9.31,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 2.0,
+  "correctness": 2.0
+}

@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T16:29:45.068232",
+  "qid": "q056",
+  "source_file": "1000genome-workflow-knowledge-eval-3.txt",
+  "section": "SECTION 1: SCIENTIFIC PURPOSE AND BIOLOGICAL SEMANTICS",
+  "question": "Why did the project shift away from the multi-platform approach used in Phase 1?",
+  "reference_answer": "The strategic shift to an Illumina-only approach in Phase 3 was driven by the need for higher-quality variant calling and more consistent error profiles.",
+  "agent": "claude",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "The WDD YAML does not contain any information about a \"Phase 1\" or a multi-platform approach, nor does it discuss any historical shifts in project strategy. It only describes the current workflow structure. I cannot answer this question based on the provided context.",
+  "duration_s": 6.27,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 1.0,
+  "correctness": 1.0
+}

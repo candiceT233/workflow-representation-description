@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-06T16:45:27.667426",
+  "qid": "q041",
+  "source_file": "1000genome-workflow-knowledge-eval-2.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "Which two prior tasks must complete before the \"Mutations_Overlap\" task can calculate shared mutation frequencies?",
+  "reference_answer": "The \"Mutations_Overlap\" task requires the successful completion of both the \"Individuals_Merge\" task and the \"Populations\" task.",
+  "agent": "gemini",
+  "context_type": "wdd_yaml",
+  "success": false,
+  "model_answer": "exit 1: An unexpected critical error occurred:Error: EBADF: bad file descriptor, read",
+  "duration_s": 24.71,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": null,
+  "correctness": null
+}

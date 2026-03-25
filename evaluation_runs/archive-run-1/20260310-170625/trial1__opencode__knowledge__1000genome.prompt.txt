@@ -1,0 +1,75 @@
+Task: produce exactly one workflow knowledge Markdown file.
+        Context:
+        - workflow_name: 1000genome
+        - workflow_repo_path: /home/mtang11/scripts/workflow-representation-description/workflows_repo/1000genome-workflow
+        - output_path: /home/mtang11/scripts/workflow-representation-description/workflow_knowledge/1000genome-knowledge-opencode-trial1.md
+        - agent_name: opencode
+        Constraints:
+        - static analysis only
+        - no deployment/runtime tuning details
+        - follow template instructions exactly
+        - write final output to output_path (if you have file access)
+        - INCLUDE THE COMPLETE FILE CONTENT IN YOUR RESPONSE so the script can save it to output_path
+        - end response with: STATUS: success | OUTPUT: <output_path>
+        TEMPLATE START
+        TASK: Generate a Workflow Knowledge Report
+You are analyzing a scientific workflow codebase to produce a workflow knowledge report as a structured Markdown document that captures workflow logic, independent of deployment/runtime choices.
+
+What You Are Producing
+A single Markdown file that describes:
+1. Stages and tasks in the workflow
+2. Data objects flowing between tasks
+3. Producer-consumer dependencies
+4. Workflow structure and high-level pattern
+5. I/O behavior hints visible from static code analysis
+
+Critical Constraints
+Only include what is derivable from the workflow repository code and config files.
+Do not speculate about performance, hardware, scheduler strategy, or deployment policy.
+If a value cannot be determined, use `unknown` with a short note.
+If an assumption is needed, mark it with `[ASSUMPTION]`.
+
+Input Scope
+Use only the workflow repository as input.
+
+Analysis Procedure
+Follow this sequence. Do not skip steps.
+
+Step 1: Survey repository structure
+- Read top-level files, README, and orchestration files.
+- Identify workflow entry points and key configuration files.
+
+Step 2: Identify stages and tasks
+- Enumerate executable units and their stage grouping.
+- Record each task's inputs and outputs from code evidence.
+
+Step 3: Build data object registry
+- Create a deduplicated list of data objects.
+- Capture format hints if visible in code.
+- Use `unknown` where evidence is missing.
+
+Step 4: Map producer-consumer edges
+- Identify task-level data dependencies.
+- Classify edge patterns with rationale.
+
+Step 5: Analyze workflow-level pattern
+- Classify overall workflow structure using observed DAG/control flow.
+- Note iteration/branching behavior when present.
+
+Step 6: Extract I/O behavioral hints
+- Record static signs of I/O concerns (small-file overhead, partial reads, format mismatch, unnecessary serialization, data reuse, metadata-heavy patterns).
+
+Step 7: Assemble and validate
+- Assemble the workflow knowledge report in Markdown.
+- Validate cross-references and internal consistency.
+- Ensure no deployment leakage.
+
+Output
+Produce exactly one Markdown file:
+`workflow_knowledge/<workflow_name>-knowledge-<agent_name>.md`
+
+Examples
+- `workflow_knowledge/1000genome-knowledge-gemini.md`
+- `workflow_knowledge/1000genome-knowledge-claude.md`
+
+        TEMPLATE END

@@ -1,0 +1,266 @@
+{
+  "run_started_at": "2026-03-11T17:17:38.737053+00:00",
+  "run_finished_at": "2026-03-11T17:17:38.867177+00:00",
+  "trials": 3,
+  "random_seed": 20260223,
+  "records": [
+    {
+      "task_id": "trial3__claude__wdd__1000genome",
+      "trial": 3,
+      "agent": "claude",
+      "mode": "wdd",
+      "workflow": "1000genome",
+      "status": "failed",
+      "started_at": "2026-03-11T17:17:38.844514+00:00",
+      "finished_at": "2026-03-11T17:17:38.844547+00:00",
+      "duration_s": 0.003,
+      "exit_code": 1,
+      "error": "claude-agent-sdk not installed: No module named 'claude_agent_sdk'",
+      "prompt_path": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260311-121738/trial3__claude__wdd__1000genome.prompt.txt",
+      "stdout_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260311-121738/trial3__claude__wdd__1000genome.stdout.log",
+      "stderr_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260311-121738/trial3__claude__wdd__1000genome.stderr.log",
+      "output_path": "/home/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-claude-trial3.yaml",
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "total_tokens": null
+      },
+      "validation": {
+        "valid": false,
+        "score": 0.0,
+        "issues": [
+          "file_missing"
+        ]
+      },
+      "output_metrics": {
+        "exists": false,
+        "bytes": 0,
+        "lines": 0,
+        "words": 0,
+        "chars": 0
+      },
+      "model_control": {
+        "model": "haiku",
+        "temperature": "<SET_TEMP>",
+        "seed": "<SET_SEED>",
+        "max_tokens": "<SET_MAX_TOKENS>",
+        "cmd_template": "claude --model haiku --dangerously-skip-permissions --output-format json -p {prompt}"
+      }
+    },
+    {
+      "task_id": "trial2__claude__knowledge__1000genome",
+      "trial": 2,
+      "agent": "claude",
+      "mode": "knowledge",
+      "workflow": "1000genome",
+      "status": "failed",
+      "started_at": "2026-03-11T17:17:38.848906+00:00",
+      "finished_at": "2026-03-11T17:17:38.848935+00:00",
+      "duration_s": 0.003,
+      "exit_code": 1,
+      "error": "claude-agent-sdk not installed: No module named 'claude_agent_sdk'",
+      "prompt_path": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260311-121738/trial2__claude__knowledge__1000genome.prompt.txt",
+      "stdout_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260311-121738/trial2__claude__knowledge__1000genome.stdout.log",
+      "stderr_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260311-121738/trial2__claude__knowledge__1000genome.stderr.log",
+      "output_path": "/home/mtang11/scripts/workflow-representation-description/workflow_knowledge/1000genome-knowledge-claude-trial2.md",
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "total_tokens": null
+      },
+      "validation": {
+        "valid": false,
+        "score": 0.0,
+        "issues": [
+          "file_missing"
+        ]
+      },
+      "output_metrics": {
+        "exists": false,
+        "bytes": 0,
+        "lines": 0,
+        "words": 0,
+        "chars": 0
+      },
+      "model_control": {
+        "model": "haiku",
+        "temperature": "<SET_TEMP>",
+        "seed": "<SET_SEED>",
+        "max_tokens": "<SET_MAX_TOKENS>",
+        "cmd_template": "claude --model haiku --dangerously-skip-permissions --output-format json -p {prompt}"
+      }
+    },
+    {
+      "task_id": "trial3__claude__knowledge__1000genome",
+      "trial": 3,
+      "agent": "claude",
+      "mode": "knowledge",
+      "workflow": "1000genome",
+      "status": "failed",
+      "started_at": "2026-03-11T17:17:38.853457+00:00",
+      "finished_at": "2026-03-11T17:17:38.853485+00:00",
+      "duration_s": 0.003,
+      "exit_code": 1,
+      "error": "claude-agent-sdk not installed: No module named 'claude_agent_sdk'",
+      "prompt_path": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260311-121738/trial3__claude__knowledge__1000genome.prompt.txt",
+      "stdout_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260311-121738/trial3__claude__knowledge__1000genome.stdout.log",
+      "stderr_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260311-121738/trial3__claude__knowledge__1000genome.stderr.log",
+      "output_path": "/home/mtang11/scripts/workflow-representation-description/workflow_knowledge/1000genome-knowledge-claude-trial3.md",
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "total_tokens": null
+      },
+      "validation": {
+        "valid": false,
+        "score": 0.0,
+        "issues": [
+          "file_missing"
+        ]
+      },
+      "output_metrics": {
+        "exists": false,
+        "bytes": 0,
+        "lines": 0,
+        "words": 0,
+        "chars": 0
+      },
+      "model_control": {
+        "model": "haiku",
+        "temperature": "<SET_TEMP>",
+        "seed": "<SET_SEED>",
+        "max_tokens": "<SET_MAX_TOKENS>",
+        "cmd_template": "claude --model haiku --dangerously-skip-permissions --output-format json -p {prompt}"
+      }
+    },
+    {
+      "task_id": "trial2__claude__wdd__1000genome",
+      "trial": 2,
+      "agent": "claude",
+      "mode": "wdd",
+      "workflow": "1000genome",
+      "status": "failed",
+      "started_at": "2026-03-11T17:17:38.857830+00:00",
+      "finished_at": "2026-03-11T17:17:38.857912+00:00",
+      "duration_s": 0.003,
+      "exit_code": 1,
+      "error": "claude-agent-sdk not installed: No module named 'claude_agent_sdk'",
+      "prompt_path": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260311-121738/trial2__claude__wdd__1000genome.prompt.txt",
+      "stdout_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260311-121738/trial2__claude__wdd__1000genome.stdout.log",
+      "stderr_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260311-121738/trial2__claude__wdd__1000genome.stderr.log",
+      "output_path": "/home/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-claude-trial2.yaml",
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "total_tokens": null
+      },
+      "validation": {
+        "valid": false,
+        "score": 0.0,
+        "issues": [
+          "file_missing"
+        ]
+      },
+      "output_metrics": {
+        "exists": false,
+        "bytes": 0,
+        "lines": 0,
+        "words": 0,
+        "chars": 0
+      },
+      "model_control": {
+        "model": "haiku",
+        "temperature": "<SET_TEMP>",
+        "seed": "<SET_SEED>",
+        "max_tokens": "<SET_MAX_TOKENS>",
+        "cmd_template": "claude --model haiku --dangerously-skip-permissions --output-format json -p {prompt}"
+      }
+    },
+    {
+      "task_id": "trial1__claude__knowledge__1000genome",
+      "trial": 1,
+      "agent": "claude",
+      "mode": "knowledge",
+      "workflow": "1000genome",
+      "status": "failed",
+      "started_at": "2026-03-11T17:17:38.862070+00:00",
+      "finished_at": "2026-03-11T17:17:38.862131+00:00",
+      "duration_s": 0.003,
+      "exit_code": 1,
+      "error": "claude-agent-sdk not installed: No module named 'claude_agent_sdk'",
+      "prompt_path": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260311-121738/trial1__claude__knowledge__1000genome.prompt.txt",
+      "stdout_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260311-121738/trial1__claude__knowledge__1000genome.stdout.log",
+      "stderr_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260311-121738/trial1__claude__knowledge__1000genome.stderr.log",
+      "output_path": "/home/mtang11/scripts/workflow-representation-description/workflow_knowledge/1000genome-knowledge-claude-trial1.md",
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "total_tokens": null
+      },
+      "validation": {
+        "valid": false,
+        "score": 0.0,
+        "issues": [
+          "file_missing"
+        ]
+      },
+      "output_metrics": {
+        "exists": false,
+        "bytes": 0,
+        "lines": 0,
+        "words": 0,
+        "chars": 0
+      },
+      "model_control": {
+        "model": "haiku",
+        "temperature": "<SET_TEMP>",
+        "seed": "<SET_SEED>",
+        "max_tokens": "<SET_MAX_TOKENS>",
+        "cmd_template": "claude --model haiku --dangerously-skip-permissions --output-format json -p {prompt}"
+      }
+    },
+    {
+      "task_id": "trial1__claude__wdd__1000genome",
+      "trial": 1,
+      "agent": "claude",
+      "mode": "wdd",
+      "workflow": "1000genome",
+      "status": "failed",
+      "started_at": "2026-03-11T17:17:38.866911+00:00",
+      "finished_at": "2026-03-11T17:17:38.866990+00:00",
+      "duration_s": 0.004,
+      "exit_code": 1,
+      "error": "claude-agent-sdk not installed: No module named 'claude_agent_sdk'",
+      "prompt_path": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260311-121738/trial1__claude__wdd__1000genome.prompt.txt",
+      "stdout_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260311-121738/trial1__claude__wdd__1000genome.stdout.log",
+      "stderr_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260311-121738/trial1__claude__wdd__1000genome.stderr.log",
+      "output_path": "/home/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-claude-trial1.yaml",
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "total_tokens": null
+      },
+      "validation": {
+        "valid": false,
+        "score": 0.0,
+        "issues": [
+          "file_missing"
+        ]
+      },
+      "output_metrics": {
+        "exists": false,
+        "bytes": 0,
+        "lines": 0,
+        "words": 0,
+        "chars": 0
+      },
+      "model_control": {
+        "model": "haiku",
+        "temperature": "<SET_TEMP>",
+        "seed": "<SET_SEED>",
+        "max_tokens": "<SET_MAX_TOKENS>",
+        "cmd_template": "claude --model haiku --dangerously-skip-permissions --output-format json -p {prompt}"
+      }
+    }
+  ]
+}

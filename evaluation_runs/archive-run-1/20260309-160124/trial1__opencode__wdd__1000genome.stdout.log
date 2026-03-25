@@ -1,0 +1,4 @@
+I'll analyze the workflow repository and create the WDD YAML file following the template. Let me start by reading the template files and exploring the workflow structure.
+Now I have a complete understanding of the workflow. Let me create the WDD YAML file:
+The description strings with colons need to be quoted. Let me fix the YAML file:
+STATUS: success | OUTPUT: /home/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial1.yaml

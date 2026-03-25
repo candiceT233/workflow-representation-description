@@ -1,0 +1,20 @@
+{
+  "wdd_template": {
+    "file": "/home/mtang11/scripts/workflow-representation-description/template_wdd_gen-v7.prompt",
+    "line_count": 63,
+    "word_count": 332,
+    "char_count": 2550,
+    "bullet_count": 20,
+    "numbered_item_count": 5,
+    "avg_line_length": 39.48
+  },
+  "knowledge_template": {
+    "file": "/home/mtang11/scripts/workflow-representation-description/template_workflow_knowledge_gen-v7.prompt",
+    "line_count": 59,
+    "word_count": 310,
+    "char_count": 2287,
+    "bullet_count": 17,
+    "numbered_item_count": 5,
+    "avg_line_length": 37.76
+  }
+}

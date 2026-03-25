@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T16:11:38.861033",
+  "qid": "q021",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 4: INPUT FILES, OUTPUT FILES, AND DATA FORMATS",
+  "question": "What is the primary input file format consumed by the workflow?",
+  "reference_answer": "The primary input format is VCF (Variant Call Format). Phase 3 VCF files are fetched per chromosome from the IGSR (International Genome Sample Resource) FTP server. Each chromosomal VCF file can exceed 250,000 lines and contains variant records for all 2,504 individuals.",
+  "agent": "claude",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "**VCF (Variant Call Format)** files. The workflow consumes two types of VCF inputs: raw VCF files (`ALL.chrX.250000.vcf`) containing SNP variants per chromosome, and VEP-annotated VCF files (`ALL.chrX.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.annotation.vcf`) containing variant effect predictions with SIFT scores.",
+  "duration_s": 7.1,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 4.0,
+  "correctness": 4.0
+}

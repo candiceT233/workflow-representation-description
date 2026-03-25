@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T16:05:20.364140",
+  "qid": "q009",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "What is the specific role of the \"Individuals\" task at the start of the pipeline?",
+  "reference_answer": "The \"Individuals\" task is the first and most intensive step, responsible for fetching and parsing Phase 3 VCF data by chromosome to identify SNPs and determine which individuals possess mutations on both alleles.",
+  "agent": "claude",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "The **Individuals** task (`task:individuals`) processes VCF files per chromosome to extract SNP variants and identify which of the 2,504 individuals carry each mutation. For each chunk of a chromosome file (determined by row range arguments), it reads the VCF variant data and per-individual genotype columns, filters variants based on allele frequency thresholds, and writes per-individual output files containing relevant variant information. It produces tar.gz archives containing all individual output files for a chromosome chunk.\n\nIt runs as embarrassingly parallel work — each job processes a non-overlapping row range of a single chromosome file independently, with no data sharing between instances. Its inputs are the VCF input files and the column headers file, and its outputs (per-chunk tar.gz archives) feed into the downstream `individuals_merge` task.",
+  "duration_s": 10.34,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 5.0,
+  "correctness": 5.0
+}

@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-06T16:57:53.250928",
+  "qid": "q056",
+  "source_file": "1000genome-workflow-knowledge-eval-3.txt",
+  "section": "SECTION 1: SCIENTIFIC PURPOSE AND BIOLOGICAL SEMANTICS",
+  "question": "Why did the project shift away from the multi-platform approach used in Phase 1?",
+  "reference_answer": "The strategic shift to an Illumina-only approach in Phase 3 was driven by the need for higher-quality variant calling and more consistent error profiles.",
+  "agent": "gemini",
+  "context_type": "wdd_yaml",
+  "success": false,
+  "model_answer": "exit 1: An unexpected critical error occurred:Error: EBADF: bad file descriptor, read",
+  "duration_s": 24.96,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": null,
+  "correctness": null
+}

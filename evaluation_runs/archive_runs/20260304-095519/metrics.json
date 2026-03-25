@@ -1,0 +1,768 @@
+{
+  "run_started_at": "2026-03-04T15:55:19.379695+00:00",
+  "run_finished_at": "2026-03-04T16:47:13.908188+00:00",
+  "trials": 3,
+  "random_seed": 20260223,
+  "records": [
+    {
+      "task_id": "trial2__opencode__knowledge__1000genome",
+      "trial": 2,
+      "agent": "opencode",
+      "mode": "knowledge",
+      "workflow": "1000genome",
+      "status": "failed_validation",
+      "started_at": "2026-03-04T15:55:19.410210+00:00",
+      "finished_at": "2026-03-04T15:55:32.403665+00:00",
+      "duration_s": 12.993,
+      "exit_code": 0,
+      "error": "output_invalid",
+      "prompt_path": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260304-095519/trial2__opencode__knowledge__1000genome.prompt.txt",
+      "stdout_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260304-095519/trial2__opencode__knowledge__1000genome.stdout.log",
+      "stderr_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260304-095519/trial2__opencode__knowledge__1000genome.stderr.log",
+      "output_path": "/home/mtang11/scripts/workflow-representation-description/workflow_knowledge/1000genome-knowledge-opencode-trial2.md",
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "total_tokens": null
+      },
+      "validation": {
+        "valid": false,
+        "score": 0.44,
+        "issues": [
+          "missing_core_terms"
+        ]
+      },
+      "output_metrics": {
+        "lines": 1,
+        "words": 19,
+        "chars": 133,
+        "exists": true,
+        "bytes": 133
+      },
+      "model_control": {
+        "model": "opencode/minimax-m2.5-free",
+        "temperature": "<SET_TEMP>",
+        "seed": "<SET_SEED>",
+        "max_tokens": "<SET_MAX_TOKENS>",
+        "cmd_template": "/home/mtang11/.opencode/bin/opencode run -m opencode/minimax-m2.5-free {prompt}"
+      }
+    },
+    {
+      "task_id": "trial3__claude__knowledge__1000genome",
+      "trial": 3,
+      "agent": "claude",
+      "mode": "knowledge",
+      "workflow": "1000genome",
+      "status": "failed",
+      "started_at": "2026-03-04T15:55:32.406164+00:00",
+      "finished_at": "2026-03-04T15:55:35.716342+00:00",
+      "duration_s": 3.31,
+      "exit_code": 1,
+      "error": "non-zero exit 1",
+      "prompt_path": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260304-095519/trial3__claude__knowledge__1000genome.prompt.txt",
+      "stdout_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260304-095519/trial3__claude__knowledge__1000genome.stdout.log",
+      "stderr_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260304-095519/trial3__claude__knowledge__1000genome.stderr.log",
+      "output_path": "/home/mtang11/scripts/workflow-representation-description/workflow_knowledge/1000genome-knowledge-claude-trial3.md",
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "total_tokens": null
+      },
+      "validation": {
+        "valid": false,
+        "score": 0.0,
+        "issues": [
+          "file_missing"
+        ]
+      },
+      "output_metrics": {
+        "exists": false,
+        "bytes": 0,
+        "lines": 0,
+        "words": 0,
+        "chars": 0
+      },
+      "model_control": {
+        "model": "sonnet-4.6-default",
+        "temperature": "<SET_TEMP>",
+        "seed": "<SET_SEED>",
+        "max_tokens": "<SET_MAX_TOKENS>",
+        "cmd_template": "claude --output-format json -p {prompt}"
+      }
+    },
+    {
+      "task_id": "trial2__claude__knowledge__1000genome",
+      "trial": 2,
+      "agent": "claude",
+      "mode": "knowledge",
+      "workflow": "1000genome",
+      "status": "failed",
+      "started_at": "2026-03-04T15:55:35.719251+00:00",
+      "finished_at": "2026-03-04T15:55:38.943064+00:00",
+      "duration_s": 3.224,
+      "exit_code": 1,
+      "error": "non-zero exit 1",
+      "prompt_path": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260304-095519/trial2__claude__knowledge__1000genome.prompt.txt",
+      "stdout_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260304-095519/trial2__claude__knowledge__1000genome.stdout.log",
+      "stderr_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260304-095519/trial2__claude__knowledge__1000genome.stderr.log",
+      "output_path": "/home/mtang11/scripts/workflow-representation-description/workflow_knowledge/1000genome-knowledge-claude-trial2.md",
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "total_tokens": null
+      },
+      "validation": {
+        "valid": false,
+        "score": 0.0,
+        "issues": [
+          "file_missing"
+        ]
+      },
+      "output_metrics": {
+        "exists": false,
+        "bytes": 0,
+        "lines": 0,
+        "words": 0,
+        "chars": 0
+      },
+      "model_control": {
+        "model": "sonnet-4.6-default",
+        "temperature": "<SET_TEMP>",
+        "seed": "<SET_SEED>",
+        "max_tokens": "<SET_MAX_TOKENS>",
+        "cmd_template": "claude --output-format json -p {prompt}"
+      }
+    },
+    {
+      "task_id": "trial3__opencode__knowledge__1000genome",
+      "trial": 3,
+      "agent": "opencode",
+      "mode": "knowledge",
+      "workflow": "1000genome",
+      "status": "failed_validation",
+      "started_at": "2026-03-04T15:55:38.946118+00:00",
+      "finished_at": "2026-03-04T15:55:46.403187+00:00",
+      "duration_s": 7.457,
+      "exit_code": 0,
+      "error": "output_invalid",
+      "prompt_path": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260304-095519/trial3__opencode__knowledge__1000genome.prompt.txt",
+      "stdout_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260304-095519/trial3__opencode__knowledge__1000genome.stdout.log",
+      "stderr_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260304-095519/trial3__opencode__knowledge__1000genome.stderr.log",
+      "output_path": "/home/mtang11/scripts/workflow-representation-description/workflow_knowledge/1000genome-knowledge-opencode-trial3.md",
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "total_tokens": null
+      },
+      "validation": {
+        "valid": false,
+        "score": 0.0,
+        "issues": [
+          "file_missing"
+        ]
+      },
+      "output_metrics": {
+        "exists": false,
+        "bytes": 0,
+        "lines": 0,
+        "words": 0,
+        "chars": 0
+      },
+      "model_control": {
+        "model": "opencode/minimax-m2.5-free",
+        "temperature": "<SET_TEMP>",
+        "seed": "<SET_SEED>",
+        "max_tokens": "<SET_MAX_TOKENS>",
+        "cmd_template": "/home/mtang11/.opencode/bin/opencode run -m opencode/minimax-m2.5-free {prompt}"
+      }
+    },
+    {
+      "task_id": "trial1__opencode__knowledge__1000genome",
+      "trial": 1,
+      "agent": "opencode",
+      "mode": "knowledge",
+      "workflow": "1000genome",
+      "status": "failed_validation",
+      "started_at": "2026-03-04T15:55:46.406236+00:00",
+      "finished_at": "2026-03-04T15:55:57.009712+00:00",
+      "duration_s": 10.603,
+      "exit_code": 0,
+      "error": "output_invalid",
+      "prompt_path": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260304-095519/trial1__opencode__knowledge__1000genome.prompt.txt",
+      "stdout_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260304-095519/trial1__opencode__knowledge__1000genome.stdout.log",
+      "stderr_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260304-095519/trial1__opencode__knowledge__1000genome.stderr.log",
+      "output_path": "/home/mtang11/scripts/workflow-representation-description/workflow_knowledge/1000genome-knowledge-opencode-trial1.md",
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "total_tokens": null
+      },
+      "validation": {
+        "valid": false,
+        "score": 0.44,
+        "issues": [
+          "missing_core_terms"
+        ]
+      },
+      "output_metrics": {
+        "lines": 1,
+        "words": 19,
+        "chars": 135,
+        "exists": true,
+        "bytes": 135
+      },
+      "model_control": {
+        "model": "opencode/minimax-m2.5-free",
+        "temperature": "<SET_TEMP>",
+        "seed": "<SET_SEED>",
+        "max_tokens": "<SET_MAX_TOKENS>",
+        "cmd_template": "/home/mtang11/.opencode/bin/opencode run -m opencode/minimax-m2.5-free {prompt}"
+      }
+    },
+    {
+      "task_id": "trial3__gemini__knowledge__1000genome",
+      "trial": 3,
+      "agent": "gemini",
+      "mode": "knowledge",
+      "workflow": "1000genome",
+      "status": "ok",
+      "started_at": "2026-03-04T15:55:57.013186+00:00",
+      "finished_at": "2026-03-04T15:59:40.810647+00:00",
+      "duration_s": 223.797,
+      "exit_code": 0,
+      "error": null,
+      "prompt_path": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260304-095519/trial3__gemini__knowledge__1000genome.prompt.txt",
+      "stdout_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260304-095519/trial3__gemini__knowledge__1000genome.stdout.log",
+      "stderr_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260304-095519/trial3__gemini__knowledge__1000genome.stderr.log",
+      "output_path": "/home/mtang11/scripts/workflow-representation-description/workflow_knowledge/1000genome-knowledge-gemini-trial3.md",
+      "tokens": {
+        "input_tokens": 87113,
+        "output_tokens": 3708,
+        "total_tokens": 97766
+      },
+      "validation": {
+        "valid": true,
+        "score": 0.86,
+        "issues": []
+      },
+      "output_metrics": {
+        "lines": 101,
+        "words": 652,
+        "chars": 5491,
+        "exists": true,
+        "bytes": 5491
+      },
+      "model_control": {
+        "model": "gemini-2.5-flash",
+        "temperature": "<SET_TEMP>",
+        "seed": "<SET_SEED>",
+        "max_tokens": "<SET_MAX_TOKENS>",
+        "cmd_template": "gemini --model {model} --output-format json -p {prompt}"
+      }
+    },
+    {
+      "task_id": "trial3__opencode__wdd__1000genome",
+      "trial": 3,
+      "agent": "opencode",
+      "mode": "wdd",
+      "workflow": "1000genome",
+      "status": "ok",
+      "started_at": "2026-03-04T15:59:40.814980+00:00",
+      "finished_at": "2026-03-04T16:04:41.511751+00:00",
+      "duration_s": 300.697,
+      "exit_code": 0,
+      "error": null,
+      "prompt_path": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260304-095519/trial3__opencode__wdd__1000genome.prompt.txt",
+      "stdout_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260304-095519/trial3__opencode__wdd__1000genome.stdout.log",
+      "stderr_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260304-095519/trial3__opencode__wdd__1000genome.stderr.log",
+      "output_path": "/home/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial3.yaml",
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "total_tokens": null
+      },
+      "validation": {
+        "valid": true,
+        "score": 1.0,
+        "issues": []
+      },
+      "output_metrics": {
+        "lines": 661,
+        "words": 2455,
+        "chars": 27688,
+        "exists": true,
+        "bytes": 27688
+      },
+      "model_control": {
+        "model": "opencode/minimax-m2.5-free",
+        "temperature": "<SET_TEMP>",
+        "seed": "<SET_SEED>",
+        "max_tokens": "<SET_MAX_TOKENS>",
+        "cmd_template": "/home/mtang11/.opencode/bin/opencode run -m opencode/minimax-m2.5-free {prompt}"
+      }
+    },
+    {
+      "task_id": "trial3__claude__wdd__1000genome",
+      "trial": 3,
+      "agent": "claude",
+      "mode": "wdd",
+      "workflow": "1000genome",
+      "status": "failed",
+      "started_at": "2026-03-04T16:04:41.725173+00:00",
+      "finished_at": "2026-03-04T16:04:44.986451+00:00",
+      "duration_s": 3.261,
+      "exit_code": 1,
+      "error": "non-zero exit 1",
+      "prompt_path": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260304-095519/trial3__claude__wdd__1000genome.prompt.txt",
+      "stdout_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260304-095519/trial3__claude__wdd__1000genome.stdout.log",
+      "stderr_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260304-095519/trial3__claude__wdd__1000genome.stderr.log",
+      "output_path": "/home/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-claude-trial3.yaml",
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "total_tokens": null
+      },
+      "validation": {
+        "valid": false,
+        "score": 0.0,
+        "issues": [
+          "file_missing"
+        ]
+      },
+      "output_metrics": {
+        "exists": false,
+        "bytes": 0,
+        "lines": 0,
+        "words": 0,
+        "chars": 0
+      },
+      "model_control": {
+        "model": "sonnet-4.6-default",
+        "temperature": "<SET_TEMP>",
+        "seed": "<SET_SEED>",
+        "max_tokens": "<SET_MAX_TOKENS>",
+        "cmd_template": "claude --output-format json -p {prompt}"
+      }
+    },
+    {
+      "task_id": "trial1__claude__wdd__1000genome",
+      "trial": 1,
+      "agent": "claude",
+      "mode": "wdd",
+      "workflow": "1000genome",
+      "status": "failed",
+      "started_at": "2026-03-04T16:04:44.989772+00:00",
+      "finished_at": "2026-03-04T16:04:48.165636+00:00",
+      "duration_s": 3.176,
+      "exit_code": 1,
+      "error": "non-zero exit 1",
+      "prompt_path": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260304-095519/trial1__claude__wdd__1000genome.prompt.txt",
+      "stdout_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260304-095519/trial1__claude__wdd__1000genome.stdout.log",
+      "stderr_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260304-095519/trial1__claude__wdd__1000genome.stderr.log",
+      "output_path": "/home/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-claude-trial1.yaml",
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "total_tokens": null
+      },
+      "validation": {
+        "valid": false,
+        "score": 0.0,
+        "issues": [
+          "file_missing"
+        ]
+      },
+      "output_metrics": {
+        "exists": false,
+        "bytes": 0,
+        "lines": 0,
+        "words": 0,
+        "chars": 0
+      },
+      "model_control": {
+        "model": "sonnet-4.6-default",
+        "temperature": "<SET_TEMP>",
+        "seed": "<SET_SEED>",
+        "max_tokens": "<SET_MAX_TOKENS>",
+        "cmd_template": "claude --output-format json -p {prompt}"
+      }
+    },
+    {
+      "task_id": "trial2__gemini__knowledge__1000genome",
+      "trial": 2,
+      "agent": "gemini",
+      "mode": "knowledge",
+      "workflow": "1000genome",
+      "status": "ok",
+      "started_at": "2026-03-04T16:04:48.169091+00:00",
+      "finished_at": "2026-03-04T16:07:16.299658+00:00",
+      "duration_s": 148.131,
+      "exit_code": 0,
+      "error": null,
+      "prompt_path": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260304-095519/trial2__gemini__knowledge__1000genome.prompt.txt",
+      "stdout_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260304-095519/trial2__gemini__knowledge__1000genome.stdout.log",
+      "stderr_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260304-095519/trial2__gemini__knowledge__1000genome.stderr.log",
+      "output_path": "/home/mtang11/scripts/workflow-representation-description/workflow_knowledge/1000genome-knowledge-gemini-trial2.md",
+      "tokens": {
+        "input_tokens": 137895,
+        "output_tokens": 9173,
+        "total_tokens": 153713
+      },
+      "validation": {
+        "valid": true,
+        "score": 0.86,
+        "issues": []
+      },
+      "output_metrics": {
+        "lines": 64,
+        "words": 515,
+        "chars": 4080,
+        "exists": true,
+        "bytes": 4080
+      },
+      "model_control": {
+        "model": "gemini-2.5-flash",
+        "temperature": "<SET_TEMP>",
+        "seed": "<SET_SEED>",
+        "max_tokens": "<SET_MAX_TOKENS>",
+        "cmd_template": "gemini --model {model} --output-format json -p {prompt}"
+      }
+    },
+    {
+      "task_id": "trial1__opencode__wdd__1000genome",
+      "trial": 1,
+      "agent": "opencode",
+      "mode": "wdd",
+      "workflow": "1000genome",
+      "status": "failed_validation",
+      "started_at": "2026-03-04T16:07:16.303859+00:00",
+      "finished_at": "2026-03-04T16:10:07.636295+00:00",
+      "duration_s": 171.332,
+      "exit_code": 0,
+      "error": "output_invalid",
+      "prompt_path": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260304-095519/trial1__opencode__wdd__1000genome.prompt.txt",
+      "stdout_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260304-095519/trial1__opencode__wdd__1000genome.stdout.log",
+      "stderr_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260304-095519/trial1__opencode__wdd__1000genome.stderr.log",
+      "output_path": "/home/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial1.yaml",
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "total_tokens": null
+      },
+      "validation": {
+        "valid": false,
+        "score": 0.0,
+        "issues": [
+          "file_missing"
+        ]
+      },
+      "output_metrics": {
+        "exists": false,
+        "bytes": 0,
+        "lines": 0,
+        "words": 0,
+        "chars": 0
+      },
+      "model_control": {
+        "model": "opencode/minimax-m2.5-free",
+        "temperature": "<SET_TEMP>",
+        "seed": "<SET_SEED>",
+        "max_tokens": "<SET_MAX_TOKENS>",
+        "cmd_template": "/home/mtang11/.opencode/bin/opencode run -m opencode/minimax-m2.5-free {prompt}"
+      }
+    },
+    {
+      "task_id": "trial3__gemini__wdd__1000genome",
+      "trial": 3,
+      "agent": "gemini",
+      "mode": "wdd",
+      "workflow": "1000genome",
+      "status": "ok",
+      "started_at": "2026-03-04T16:10:07.638742+00:00",
+      "finished_at": "2026-03-04T16:25:15.066441+00:00",
+      "duration_s": 907.428,
+      "exit_code": 0,
+      "error": null,
+      "prompt_path": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260304-095519/trial3__gemini__wdd__1000genome.prompt.txt",
+      "stdout_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260304-095519/trial3__gemini__wdd__1000genome.stdout.log",
+      "stderr_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260304-095519/trial3__gemini__wdd__1000genome.stderr.log",
+      "output_path": "/home/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-gemini-trial3.yaml",
+      "tokens": {
+        "input_tokens": 992439,
+        "output_tokens": 52087,
+        "total_tokens": 1086262
+      },
+      "validation": {
+        "valid": true,
+        "score": 1.0,
+        "issues": []
+      },
+      "output_metrics": {
+        "lines": 1211,
+        "words": 4978,
+        "chars": 59346,
+        "exists": true,
+        "bytes": 59346
+      },
+      "model_control": {
+        "model": "gemini-2.5-flash",
+        "temperature": "<SET_TEMP>",
+        "seed": "<SET_SEED>",
+        "max_tokens": "<SET_MAX_TOKENS>",
+        "cmd_template": "gemini --model {model} --output-format json -p {prompt}"
+      }
+    },
+    {
+      "task_id": "trial1__gemini__knowledge__1000genome",
+      "trial": 1,
+      "agent": "gemini",
+      "mode": "knowledge",
+      "workflow": "1000genome",
+      "status": "ok",
+      "started_at": "2026-03-04T16:25:15.493986+00:00",
+      "finished_at": "2026-03-04T16:29:17.698206+00:00",
+      "duration_s": 242.204,
+      "exit_code": 0,
+      "error": null,
+      "prompt_path": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260304-095519/trial1__gemini__knowledge__1000genome.prompt.txt",
+      "stdout_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260304-095519/trial1__gemini__knowledge__1000genome.stdout.log",
+      "stderr_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260304-095519/trial1__gemini__knowledge__1000genome.stderr.log",
+      "output_path": "/home/mtang11/scripts/workflow-representation-description/workflow_knowledge/1000genome-knowledge-gemini-trial1.md",
+      "tokens": {
+        "input_tokens": 148399,
+        "output_tokens": 10758,
+        "total_tokens": 163853
+      },
+      "validation": {
+        "valid": true,
+        "score": 1.0,
+        "issues": []
+      },
+      "output_metrics": {
+        "lines": 195,
+        "words": 1990,
+        "chars": 16327,
+        "exists": true,
+        "bytes": 16327
+      },
+      "model_control": {
+        "model": "gemini-2.5-flash",
+        "temperature": "<SET_TEMP>",
+        "seed": "<SET_SEED>",
+        "max_tokens": "<SET_MAX_TOKENS>",
+        "cmd_template": "gemini --model {model} --output-format json -p {prompt}"
+      }
+    },
+    {
+      "task_id": "trial2__opencode__wdd__1000genome",
+      "trial": 2,
+      "agent": "opencode",
+      "mode": "wdd",
+      "workflow": "1000genome",
+      "status": "failed_validation",
+      "started_at": "2026-03-04T16:29:17.704484+00:00",
+      "finished_at": "2026-03-04T16:32:54.396491+00:00",
+      "duration_s": 216.692,
+      "exit_code": 0,
+      "error": "output_invalid",
+      "prompt_path": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260304-095519/trial2__opencode__wdd__1000genome.prompt.txt",
+      "stdout_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260304-095519/trial2__opencode__wdd__1000genome.stdout.log",
+      "stderr_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260304-095519/trial2__opencode__wdd__1000genome.stderr.log",
+      "output_path": "/home/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial2.yaml",
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "total_tokens": null
+      },
+      "validation": {
+        "valid": false,
+        "score": 0.0,
+        "issues": [
+          "file_missing"
+        ]
+      },
+      "output_metrics": {
+        "exists": false,
+        "bytes": 0,
+        "lines": 0,
+        "words": 0,
+        "chars": 0
+      },
+      "model_control": {
+        "model": "opencode/minimax-m2.5-free",
+        "temperature": "<SET_TEMP>",
+        "seed": "<SET_SEED>",
+        "max_tokens": "<SET_MAX_TOKENS>",
+        "cmd_template": "/home/mtang11/.opencode/bin/opencode run -m opencode/minimax-m2.5-free {prompt}"
+      }
+    },
+    {
+      "task_id": "trial1__gemini__wdd__1000genome",
+      "trial": 1,
+      "agent": "gemini",
+      "mode": "wdd",
+      "workflow": "1000genome",
+      "status": "ok",
+      "started_at": "2026-03-04T16:32:54.398940+00:00",
+      "finished_at": "2026-03-04T16:40:24.747931+00:00",
+      "duration_s": 450.349,
+      "exit_code": 0,
+      "error": null,
+      "prompt_path": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260304-095519/trial1__gemini__wdd__1000genome.prompt.txt",
+      "stdout_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260304-095519/trial1__gemini__wdd__1000genome.stdout.log",
+      "stderr_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260304-095519/trial1__gemini__wdd__1000genome.stderr.log",
+      "output_path": "/home/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-gemini-trial1.yaml",
+      "tokens": {
+        "input_tokens": 478201,
+        "output_tokens": 41036,
+        "total_tokens": 531172
+      },
+      "validation": {
+        "valid": true,
+        "score": 1.0,
+        "issues": []
+      },
+      "output_metrics": {
+        "lines": 851,
+        "words": 3265,
+        "chars": 37152,
+        "exists": true,
+        "bytes": 37154
+      },
+      "model_control": {
+        "model": "gemini-2.5-flash",
+        "temperature": "<SET_TEMP>",
+        "seed": "<SET_SEED>",
+        "max_tokens": "<SET_MAX_TOKENS>",
+        "cmd_template": "gemini --model {model} --output-format json -p {prompt}"
+      }
+    },
+    {
+      "task_id": "trial2__claude__wdd__1000genome",
+      "trial": 2,
+      "agent": "claude",
+      "mode": "wdd",
+      "workflow": "1000genome",
+      "status": "failed",
+      "started_at": "2026-03-04T16:40:25.032458+00:00",
+      "finished_at": "2026-03-04T16:40:28.739210+00:00",
+      "duration_s": 3.707,
+      "exit_code": 1,
+      "error": "non-zero exit 1",
+      "prompt_path": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260304-095519/trial2__claude__wdd__1000genome.prompt.txt",
+      "stdout_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260304-095519/trial2__claude__wdd__1000genome.stdout.log",
+      "stderr_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260304-095519/trial2__claude__wdd__1000genome.stderr.log",
+      "output_path": "/home/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-claude-trial2.yaml",
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "total_tokens": null
+      },
+      "validation": {
+        "valid": false,
+        "score": 0.2,
+        "issues": [
+          "yaml_not_mapping"
+        ]
+      },
+      "output_metrics": {
+        "lines": 1,
+        "words": 6,
+        "chars": 145,
+        "exists": true,
+        "bytes": 145
+      },
+      "model_control": {
+        "model": "sonnet-4.6-default",
+        "temperature": "<SET_TEMP>",
+        "seed": "<SET_SEED>",
+        "max_tokens": "<SET_MAX_TOKENS>",
+        "cmd_template": "claude --output-format json -p {prompt}"
+      }
+    },
+    {
+      "task_id": "trial2__gemini__wdd__1000genome",
+      "trial": 2,
+      "agent": "gemini",
+      "mode": "wdd",
+      "workflow": "1000genome",
+      "status": "ok",
+      "started_at": "2026-03-04T16:40:28.744671+00:00",
+      "finished_at": "2026-03-04T16:47:10.347251+00:00",
+      "duration_s": 401.603,
+      "exit_code": 0,
+      "error": null,
+      "prompt_path": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260304-095519/trial2__gemini__wdd__1000genome.prompt.txt",
+      "stdout_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260304-095519/trial2__gemini__wdd__1000genome.stdout.log",
+      "stderr_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260304-095519/trial2__gemini__wdd__1000genome.stderr.log",
+      "output_path": "/home/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-gemini-trial2.yaml",
+      "tokens": {
+        "input_tokens": 155479,
+        "output_tokens": 8157,
+        "total_tokens": 170681
+      },
+      "validation": {
+        "valid": true,
+        "score": 1.0,
+        "issues": []
+      },
+      "output_metrics": {
+        "lines": 870,
+        "words": 4378,
+        "chars": 50873,
+        "exists": true,
+        "bytes": 50873
+      },
+      "model_control": {
+        "model": "gemini-2.5-flash",
+        "temperature": "<SET_TEMP>",
+        "seed": "<SET_SEED>",
+        "max_tokens": "<SET_MAX_TOKENS>",
+        "cmd_template": "gemini --model {model} --output-format json -p {prompt}"
+      }
+    },
+    {
+      "task_id": "trial1__claude__knowledge__1000genome",
+      "trial": 1,
+      "agent": "claude",
+      "mode": "knowledge",
+      "workflow": "1000genome",
+      "status": "failed",
+      "started_at": "2026-03-04T16:47:10.674843+00:00",
+      "finished_at": "2026-03-04T16:47:13.907490+00:00",
+      "duration_s": 3.233,
+      "exit_code": 1,
+      "error": "non-zero exit 1",
+      "prompt_path": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260304-095519/trial1__claude__knowledge__1000genome.prompt.txt",
+      "stdout_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260304-095519/trial1__claude__knowledge__1000genome.stdout.log",
+      "stderr_log": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260304-095519/trial1__claude__knowledge__1000genome.stderr.log",
+      "output_path": "/home/mtang11/scripts/workflow-representation-description/workflow_knowledge/1000genome-knowledge-claude-trial1.md",
+      "tokens": {
+        "input_tokens": null,
+        "output_tokens": null,
+        "total_tokens": null
+      },
+      "validation": {
+        "valid": false,
+        "score": 0.0,
+        "issues": [
+          "file_missing"
+        ]
+      },
+      "output_metrics": {
+        "exists": false,
+        "bytes": 0,
+        "lines": 0,
+        "words": 0,
+        "chars": 0
+      },
+      "model_control": {
+        "model": "sonnet-4.6-default",
+        "temperature": "<SET_TEMP>",
+        "seed": "<SET_SEED>",
+        "max_tokens": "<SET_MAX_TOKENS>",
+        "cmd_template": "claude --output-format json -p {prompt}"
+      }
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "run_dir": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260310-173034",
+  "precheck": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260310-173034/precheck.json",
+  "task_order": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260310-173034/task_order.json",
+  "metrics_json": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260310-173034/metrics.json",
+  "metrics_csv": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260310-173034/metrics.csv",
+  "aggregates": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260310-173034/aggregates.json",
+  "workflow_wdd_created": [
+    "workflow_wdd/1000genome-wdd-opencode-trial2.yaml",
+    "workflow_wdd/1000genome-wdd-opencode-trial1.yaml"
+  ],
+  "workflow_knowledge_created": []
+}

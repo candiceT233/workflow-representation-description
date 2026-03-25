@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T16:34:48.099457",
+  "qid": "q067",
+  "source_file": "1000genome-workflow-knowledge-eval-3.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "Why must the chromosome VCF files be divided into manageable chunks during the first step?",
+  "reference_answer": "The files must be divided because human chromosomes contain hundreds of thousands of variants, making the VCF files exceptionally large.",
+  "agent": "claude",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "Based on the workflow knowledge document, the chromosome VCF files can be divided into chunks during the `individuals` step for two reasons:\n\n1. **Memory constraints:** The individuals task reads the entire VCF into memory line-by-line. Each VCF file is 6–10 GB (250,000 lines), and the document flags this as a potential bottleneck — \"Memory overhead; potential bottleneck if file larger than available RAM.\"\n\n2. **Performance — it's the critical path:** The individuals task consumes **81.85% of total execution time**. Chunking via the `-i` (individuals-jobs) parameter splits the VCF into smaller pieces processed in parallel, which is the primary way to reduce wall-clock time on this bottleneck stage.\n\nAdditionally, the per-individual output explosion (2,504 separate files created per chromosome) compounds the I/O pressure, so processing smaller chunks helps manage both memory and filesystem overhead before the results are merged in Stage 1b (`individuals_merge`).",
+  "duration_s": 10.19,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 4.0,
+  "correctness": 4.0
+}

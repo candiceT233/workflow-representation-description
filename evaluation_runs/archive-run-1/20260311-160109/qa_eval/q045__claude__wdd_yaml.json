@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T16:24:29.647714",
+  "qid": "q045",
+  "source_file": "1000genome-workflow-knowledge-eval-2.txt",
+  "section": "SECTION 3: REPOSITORY USAGE AND SYSTEM MECHANICS",
+  "question": "What design pattern is used to process the massive genomic releases at scale?",
+  "reference_answer": "The workflow relies on the Scatter/Gather pattern for the \"Individuals\" tasks. This is noted as the most effective strategy for managing the sheer scale of the genomic releases.",
+  "agent": "claude",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "Based on the WDD, the primary pattern is **scatter-gather** with secondary **broadcast** elements:\n\n1. **Scatter**: Each chromosome's VCF data is split into multiple parallel chunks processed by `individuals` tasks (up to 250 chunks per chromosome via the `--individuals-jobs` parameter).\n\n2. **Gather**: The `individuals_merge` task fans-in all chunks for a given chromosome into a single consolidated archive (n_to_1 pattern).\n\n3. **Broadcast**: The merged per-chromosome data is then broadcast (1_to_n) to multiple analysis tasks — `mutation_overlap` and `frequency` — one instance per population (7 populations: ALL, AFR, EUR, EAS, AMR, SAS, GBR).\n\nThis entire scatter-gather-broadcast pipeline runs independently and concurrently for each chromosome (10–22 depending on configuration), enabling embarrassingly parallel processing across both the chromosome and population dimensions. The workflow can scale to 2,500+ total task instances (e.g., 10 chromosomes × 250 chunks for scatter, plus 70 analysis jobs for the broadcast stage).",
+  "duration_s": 13.46,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 5.0,
+  "correctness": 5.0
+}

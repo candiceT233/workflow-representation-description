@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T16:10:53.574913",
+  "qid": "q019",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 3: REPOSITORY USAGE AND SYSTEM MECHANICS",
+  "question": "How does the system locate the specific software executables needed to run the repository's tasks on a remote execution site?",
+  "reference_answer": "The Transformation Catalog (TC) identifies the physical locations of the software executables required for each task, specifying if they are already installed remotely or need to be staged in.",
+  "agent": "claude",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "The WDD YAML does not contain enough information to answer this question. It records the executable paths for each task (e.g., `bin/individuals.py`, `bin/sifting.py`), and notes that the source format is a Pegasus DAX generator (`daxgen.py`), but it does not describe the mechanism by which those executables are located, staged, or resolved on a remote execution site (e.g., Pegasus transformation catalogs, site catalogs, or executable staging configuration).",
+  "duration_s": 15.39,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 2.0,
+  "correctness": 2.0
+}

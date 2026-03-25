@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T16:38:26.004239",
+  "qid": "q073",
+  "source_file": "1000genome-workflow-knowledge-eval-3.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "How does the \"Mutations_Overlap\" task categorize the shared mutation frequencies it calculates?",
+  "reference_answer": "The task calculates the frequency of shared mutations among pairs of individuals, categorizing them by their population and chromosome.",
+  "agent": "claude",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "The WDD does not contain enough detail to answer how the Mutation Overlap task specifically categorizes the shared mutation frequencies it calculates. The YAML describes the task at a high level: it computes **pairwise mutation overlaps among individuals** for a specific **population and chromosome combination**, accounting for **SIFT scores**, and produces overlap matrices and visualization plots. However, it does not specify the categories, bins, or classification scheme used to group or label the resulting frequency values.",
+  "duration_s": 11.96,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 3.0,
+  "correctness": 3.0
+}

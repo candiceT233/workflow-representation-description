@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T16:08:47.393747",
+  "qid": "q015",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "What specific data fields does the \"Sifting\" task record when filtering variants?",
+  "reference_answer": "The \"Sifting\" task specifically filters for variants with SIFT scores and records their rs numbers, ENSEMBL GEN IDs, and HGNC IDs.",
+  "agent": "claude",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "Based on the WDD YAML, the Sifting task extracts the following fields from VEP annotation files:\n\n- **Variant line number**\n- **rs identifier** (rs number)\n- **ENSEMBL gene ID**\n- **SIFT score**\n- **Phenotype prediction**\n\nThese are output as a **pipe-delimited text file** with one variant per line (from `data:sifted_variants`), and the output is described as a **space-delimited text** file in the data object definition. The task filters for lines containing SIFT predictions and extracts these structured fields along with HGNC IDs (mentioned in the task description but not in the data object's per-line format).",
+  "duration_s": 9.94,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 4.0,
+  "correctness": 4.0
+}

@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-09T15:15:01.488104",
+  "qid": "q041",
+  "source_file": "1000genome-workflow-knowledge-eval-2.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "Which two prior tasks must complete before the \"Mutations_Overlap\" task can calculate shared mutation frequencies?",
+  "reference_answer": "The \"Mutations_Overlap\" task requires the successful completion of both the \"Individuals_Merge\" task and the \"Populations\" task.",
+  "agent": "opencode",
+  "context_type": "workflow_knowledge",
+  "success": false,
+  "model_answer": "stdin and input arguments may not both be used.",
+  "duration_s": 0.0,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": null,
+  "correctness": null
+}

@@ -1,0 +1,23 @@
+{
+  "timestamp": "2026-03-06T16:03:44.208500",
+  "qid": "q007",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 1: SCIENTIFIC PURPOSE AND BIOLOGICAL SEMANTICS",
+  "question": "What is the biological function of the \"SIFT\" scores computed during the workflow?",
+  "reference_answer": "SIFT stands for \"Sorts Intolerant From Tolerant,\" and it is a sequence homology-based tool that predicts whether an amino acid substitution will impact protein function.",
+  "agent": "gemini",
+  "context_type": "workflow_knowledge",
+  "success": true,
+  "model_answer": "The `sifting` task computes SIFT (Sorting Intolerant From Tolerant) scores for Single Nucleotide Polymorphisms (SNPs). These scores predict the potential phenotypic effect of amino acid substitutions.",
+  "duration_s": 28.2,
+  "total_tokens": 15017,
+  "input_tokens": 324,
+  "output_tokens": 0,
+  "tokens": {
+    "total": 15017,
+    "input": 324,
+    "output": 0
+  },
+  "judge_score": 4.0,
+  "correctness": 4.0
+}

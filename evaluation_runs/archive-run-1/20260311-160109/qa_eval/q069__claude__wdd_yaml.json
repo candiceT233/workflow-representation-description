@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-11T16:36:08.913903",
+  "qid": "q069",
+  "source_file": "1000genome-workflow-knowledge-eval-3.txt",
+  "section": "SECTION 2: WORKFLOW DATAFLOW AND TASK DEPENDENCIES",
+  "question": "What is the specific function of the \"Individuals_Merge\" task within the pipeline's logic?",
+  "reference_answer": "The \"Individuals_Merge\" task acts as a synchronization point, gathering the outputs of the parallel chunks and merging them into a single mutations file per chromosome.",
+  "agent": "claude",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "The **Individuals Merge** task consolidates all per-chunk output archives from the Data Extraction stage into a single merged archive per chromosome. Specifically, it takes the multiple tar.gz files produced by parallel `individuals` tasks (each processing a different row-range chunk of one chromosome's VCF data) and combines them into one consolidated tar.gz archive containing the complete set of per-individual variant files for that chromosome.\n\nIt operates as a **gather/fan-in** step (n-to-1 pattern): multiple chunk archives flow in, one merged archive comes out per chromosome. It runs one serial merge job per chromosome, reading the input tar.gz files sequentially, extracting their contents, and recompressing everything into a single output archive. This merged output then serves as the input broadcast to the downstream analysis tasks (mutation_overlap and frequency) across all populations.",
+  "duration_s": 12.92,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": 5.0,
+  "correctness": 5.0
+}

@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-06T16:50:00.982995",
+  "qid": "q047",
+  "source_file": "1000genome-workflow-knowledge-eval-2.txt",
+  "section": "SECTION 3: REPOSITORY USAGE AND SYSTEM MECHANICS",
+  "question": "What tools were used in the multi-caller approach during the Phase 3 analysis pipeline?",
+  "reference_answer": "The analysis pipeline integrated variant calling results from GATK, FreeBayes, and BCFtools.",
+  "agent": "gemini",
+  "context_type": "workflow_knowledge",
+  "success": false,
+  "model_answer": "exit 1: An unexpected critical error occurred:Error: EBADF: bad file descriptor, read",
+  "duration_s": 25.14,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": null,
+  "correctness": null
+}

@@ -1,0 +1,23 @@
+{
+  "timestamp": "2026-03-06T15:56:12.482551",
+  "qid": "q003",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 1: SCIENTIFIC PURPOSE AND BIOLOGICAL SEMANTICS",
+  "question": "What types of genetic variants are included in the Phase 3 multi-allelic variant calling?",
+  "reference_answer": "Phase 3 introduced multi-allelic variant calling that encompasses single nucleotide polymorphisms (SNPs), insertions/deletions (INDELs), and complex structural variants (SVs).",
+  "agent": "gemini",
+  "context_type": "wdd_yaml",
+  "success": true,
+  "model_answer": "Based on the provided WDD YAML, the `task:individuals` description states it \"processes VCF files, extracting SNP variants\". The `task:sifting` also mentions \"SNP variants.\" The context does not explicitly mention \"multi-allelic variant calling\" or other types of genetic variants beyond SNP variants.",
+  "duration_s": 29.36,
+  "total_tokens": 20649,
+  "input_tokens": 640,
+  "output_tokens": 0,
+  "tokens": {
+    "total": 20649,
+    "input": 640,
+    "output": 0
+  },
+  "judge_score": 3.0,
+  "correctness": 3.0
+}

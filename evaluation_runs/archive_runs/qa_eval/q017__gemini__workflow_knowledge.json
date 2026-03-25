@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-03-06T16:25:28.368979",
+  "qid": "q017",
+  "source_file": "1000genome-workflow-knowledge-eval-1.txt",
+  "section": "SECTION 3: REPOSITORY USAGE AND SYSTEM MECHANICS",
+  "question": "Which script within the implementation is responsible for the dynamic generation of workflow dependencies?",
+  "reference_answer": "The `daxgen.py` script governs the dynamic generation of dependencies, particularly handling the transition between parallelized VCF chunks and the synchronized merge task.",
+  "agent": "gemini",
+  "context_type": "workflow_knowledge",
+  "success": false,
+  "model_answer": "exit 1: An unexpected critical error occurred:Error: EBADF: bad file descriptor, read",
+  "duration_s": 24.88,
+  "total_tokens": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "tokens": null,
+  "judge_score": null,
+  "correctness": null
+}

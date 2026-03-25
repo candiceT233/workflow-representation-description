@@ -1,0 +1,40 @@
+{
+  "run_start": "2026-03-06T16:12:23.738907",
+  "trial_used": 1,
+  "knowledge_file": "1000genome-knowledge-gemini-trial1.md",
+  "wdd_file": "1000genome-wdd-gemini-trial1.yaml",
+  "agents": [
+    "gemini"
+  ],
+  "context_types": [
+    "workflow_knowledge",
+    "wdd_yaml"
+  ],
+  "n_questions": 74,
+  "summary": {
+    "gemini__workflow_knowledge": {
+      "n": 74,
+      "success": 0,
+      "correctness_mean": null,
+      "correctness_std": null,
+      "judge_mean": null,
+      "judge_std": null,
+      "duration_mean_s": 24.6,
+      "duration_total_s": 1820.09,
+      "total_tokens_sum": null,
+      "total_tokens_mean": null
+    },
+    "gemini__wdd_yaml": {
+      "n": 74,
+      "success": 0,
+      "correctness_mean": null,
+      "correctness_std": null,
+      "judge_mean": null,
+      "judge_std": null,
+      "duration_mean_s": 24.56,
+      "duration_total_s": 1817.71,
+      "total_tokens_sum": null,
+      "total_tokens_mean": null
+    }
+  }
+}

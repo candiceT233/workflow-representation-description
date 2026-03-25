@@ -1,0 +1,6 @@
+Now let me check the data files to understand the inputs better:
+Now I'll write the WDD YAML file:
+Let me fix the YAML syntax errors:
+The issue is the long line 562. Let me fix it:
+Now I need to add the integrity_hash to the workflow_graph. Let me compute it:
+STATUS: success | OUTPUT: /home/mtang11/scripts/workflow-representation-description/workflow_wdd/1000genome-wdd-opencode-trial3.yaml

@@ -1,0 +1,10 @@
+{
+  "run_dir": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260311-122808",
+  "precheck": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260311-122808/precheck.json",
+  "task_order": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260311-122808/task_order.json",
+  "metrics_json": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260311-122808/metrics.json",
+  "metrics_csv": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260311-122808/metrics.csv",
+  "aggregates": "/home/mtang11/scripts/workflow-representation-description/evaluation_runs/20260311-122808/aggregates.json",
+  "workflow_wdd_created": [],
+  "workflow_knowledge_created": []
+}
