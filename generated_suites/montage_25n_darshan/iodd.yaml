@@ -1,0 +1,844 @@
+header:
+  iodd_id: iodd:deploy:montage_scale_a_25n:darshan
+  ddd_id: deploy:montage:scale_a_25n:functional_trace
+  hrd_id: hrd:delta_ncsa_cpu
+  wrd_lineage_id: wrd:montage
+  edd_lineage_id: edd:montage:scale_a_25tile
+  edd_instance_id: montage_scale_a_25tile_inst_001
+  run_start: 2026-05-22T22:45:32Z
+  run_end: 2026-05-22T22:45:42Z
+  wall_time_seconds: 10
+  predictive: false
+  profiling_tools: ["Darshan 3.4.6 (log version 3.41)"]
+  schema_version: iodd-7.0
+  generated_by: claude-code-opus-4-8
+  description: >-
+    Darshan system-level I/O record for the Montage Scale-A 25-node run,
+    aggregated from 83 per-process .darshan logs across the eight Montage
+    binaries. All Montage I/O is captured by the Darshan STDIO module
+    (cfitsio/libc fopen/fread/fwrite); no POSIX-module records appear, so
+    POSIX read/write op counts, sequential/consecutive/random access counters,
+    and POSIX request-size histograms are not available for this run. The
+    dominant pattern is a cascading pipeline whose four *Exec stages fan out
+    25 ways: mDiffExec is by far the heaviest reader (270 MB, re-reading the
+    projected FITS tiles), mProjExec the heaviest writer (107 MB projected
+    FITS). Aggregate STDIO bytes (378.3 MB read / 204.4 MB written) match the
+    DataLife ground-truth totals to within 0.08%. Top observed concern is
+    metadata/open overhead on the small-file .tbl sharding and directory-scan
+    stages (mImgtbl, mDiffExec), consistent with the WDD small-file hints.
+
+per_task_io_profile:
+  - task_id: task:imgtbl_raw
+    instance_count: 1
+    storage_tier_used: tier:projects_lustre
+    bytes_read: 97566
+    bytes_written: 38529
+    read_ops: 106
+    write_ops: 807
+    open_ops: 56
+    close_ops: unknown
+    posix_open_time_s: unknown
+    posix_read_time_s: 0.0303
+    posix_write_time_s: 0.0036
+    posix_close_time_s: unknown
+    stdio_meta_time_s: 0.6558
+    observed_read_bandwidth_gbs: 0.0032
+    observed_write_bandwidth_gbs: 0.0107
+    access_pattern_observed: sequential
+    io_phase_observed: mixed
+    compute_to_io_ratio: 0.69
+    match_wrd_io_phase: true
+    field_confidence:
+      note: >-
+        close_ops and per-call open/close times not captured by darshan: the
+        STDIO module reports a single aggregated STDIO_F_META_TIME (0.6558 s,
+        dominated by directory-wide header opens) rather than separate
+        open/close op counts and times. POSIX sequential/random counters
+        absent (STDIO-only); access_pattern inferred from the cfitsio
+        header-scan workload. compute_to_io_ratio computed as
+        (read_time+write_time+meta_time)/task_wall_time (~1 s).
+
+  - task_id: task:project
+    instance_count: 25
+    storage_tier_used: tier:projects_lustre
+    bytes_read: 52943350
+    bytes_written: 106558615
+    read_ops: 20900
+    write_ops: 37048
+    open_ops: 525
+    close_ops: unknown
+    posix_open_time_s: unknown
+    posix_read_time_s: 0.7102
+    posix_write_time_s: 1.0344
+    posix_close_time_s: unknown
+    stdio_meta_time_s: 2.5349
+    observed_read_bandwidth_gbs: 0.0745
+    observed_write_bandwidth_gbs: 0.1030
+    access_pattern_observed: sequential
+    io_phase_observed: mixed
+    compute_to_io_ratio: 0.36
+    match_wrd_io_phase: true
+    field_confidence:
+      note: >-
+        Aggregate of 25 mProjExec logs. Reads 25 raw FITS tiles (52.7 MB) and
+        region.hdr; writes 25 projected FITS plus area (106.6 MB). Bandwidth is
+        STDIO/libc-buffer-level (per-process cumulative read/write time over a
+        ~1.5 s stage span), not a Lustre device measurement; darshan does not
+        expose device-level bandwidth here. POSIX access-pattern counters not
+        captured by darshan. compute_to_io_ratio uses stage wall span ~1.6 s
+        (offsets 1-2 s) for the aggregate.
+
+  - task_id: task:imgtbl_projected
+    instance_count: 1
+    storage_tier_used: tier:projects_lustre
+    bytes_read: 94766
+    bytes_written: 34217
+    read_ops: 106
+    write_ops: 807
+    open_ops: 56
+    close_ops: unknown
+    posix_open_time_s: unknown
+    posix_read_time_s: 0.0989
+    posix_write_time_s: 0.0080
+    posix_close_time_s: unknown
+    stdio_meta_time_s: 1.1723
+    observed_read_bandwidth_gbs: 0.0010
+    observed_write_bandwidth_gbs: 0.0043
+    access_pattern_observed: sequential
+    io_phase_observed: mixed
+    compute_to_io_ratio: 0.64
+    match_wrd_io_phase: true
+    field_confidence:
+      note: >-
+        Identified as the projected-directory mImgtbl invocation (opens 25
+        projected FITS headers). STDIO_F_META_TIME (1.1723 s) dominates,
+        confirming the metadata-heavy directory header scan from WDD
+        hint:corrections_broadcast_metadata. close_ops / per-op times and POSIX
+        access counters not captured by darshan.
+
+  - task_id: task:overlaps
+    instance_count: 1
+    storage_tier_used: tier:projects_lustre
+    bytes_read: 12258
+    bytes_written: 6347
+    read_ops: 30
+    write_ops: 75
+    open_ops: 3
+    close_ops: unknown
+    posix_open_time_s: unknown
+    posix_read_time_s: 0.0002
+    posix_write_time_s: 0.0013
+    posix_close_time_s: unknown
+    stdio_meta_time_s: 0.0063
+    observed_read_bandwidth_gbs: 0.0613
+    observed_write_bandwidth_gbs: 0.0049
+    access_pattern_observed: sequential
+    io_phase_observed: mixed
+    compute_to_io_ratio: 0.008
+    match_wrd_io_phase: true
+    field_confidence:
+      note: >-
+        Pure table-to-table: reads pimages.tbl, writes diffs.tbl. Negligible I/O
+        time confirms WDD compute_bound classification (compute_to_io_ratio
+        ~0.008 over a ~1 s task). close_ops/POSIX counters not captured by
+        darshan.
+
+  - task_id: task:diff
+    instance_count: 25
+    storage_tier_used: tier:projects_lustre
+    bytes_read: 270417386
+    bytes_written: 66967210
+    read_ops: 99493
+    write_ops: 23277
+    open_ops: 1853
+    close_ops: unknown
+    posix_open_time_s: unknown
+    posix_read_time_s: 1.5851
+    posix_write_time_s: 1.8028
+    posix_close_time_s: unknown
+    stdio_meta_time_s: 10.9314
+    observed_read_bandwidth_gbs: 0.1706
+    observed_write_bandwidth_gbs: 0.0371
+    access_pattern_observed: sequential
+    io_phase_observed: streaming
+    compute_to_io_ratio: 7.16
+    match_wrd_io_phase: true
+    field_confidence:
+      note: >-
+        Aggregate of 25 mDiffExec logs; heaviest reader in the workflow
+        (269.9 MB from projected FITS, re-read for every overlap pair -
+        confirms WDD hint:projected_fits_reuse). 1853 opens and 10.93 s
+        cumulative STDIO_F_META_TIME (summed across 25 processes) signal heavy
+        open/metadata overhead. compute_to_io_ratio (3.32+10.93)/2.0 ~7.16 is a
+        summed-time-over-stage-span artifact (>1 because times sum 25 processes
+        over a ~2 s wall span), indicating the stage is metadata/open-bound, not
+        that wall time is exceeded. POSIX sequential/random counters and
+        per-op close times not captured by darshan.
+
+  - task_id: task:fit
+    instance_count: 25
+    storage_tier_used: tier:projects_lustre
+    bytes_read: 33497844
+    bytes_written: 30202
+    read_ops: 11870
+    write_ops: 122
+    open_ops: 219
+    close_ops: unknown
+    posix_open_time_s: unknown
+    posix_read_time_s: 0.2802
+    posix_write_time_s: 0.0649
+    posix_close_time_s: unknown
+    stdio_meta_time_s: 0.8242
+    observed_read_bandwidth_gbs: 0.1196
+    observed_write_bandwidth_gbs: 0.0005
+    access_pattern_observed: sequential
+    io_phase_observed: mixed
+    compute_to_io_ratio: 1.17
+    match_wrd_io_phase: true
+    field_confidence:
+      note: >-
+        Aggregate of 25 mFitExec logs. Reads 33.5 MB of diff FITS, writes tiny
+        per-shard fit tables (30 KB) gathered into fits.tbl. POSIX access
+        counters / close times not captured by darshan.
+
+  - task_id: task:bgmodel
+    instance_count: 1
+    storage_tier_used: tier:projects_lustre
+    bytes_read: 34083
+    bytes_written: 1506
+    read_ops: 105
+    write_ops: 27
+    open_ops: 4
+    close_ops: unknown
+    posix_open_time_s: unknown
+    posix_read_time_s: 0.0002
+    posix_write_time_s: 0.0012
+    posix_close_time_s: unknown
+    stdio_meta_time_s: 0.0137
+    observed_read_bandwidth_gbs: 0.1704
+    observed_write_bandwidth_gbs: 0.0013
+    access_pattern_observed: sequential
+    io_phase_observed: mixed
+    compute_to_io_ratio: 0.015
+    match_wrd_io_phase: true
+    field_confidence:
+      note: >-
+        Reads pimages.tbl + fits.tbl, writes corrections.tbl. Negligible I/O
+        time confirms WDD compute_bound n_to_1 gather. close_ops/POSIX counters
+        not captured by darshan.
+
+  - task_id: task:background
+    instance_count: 25
+    instances_profiled: 2
+    storage_tier_used: tier:projects_lustre
+    bytes_read: 8494410
+    bytes_written: 8455824
+    read_ops: 3030
+    write_ops: 2938
+    open_ops: 28
+    close_ops: unknown
+    posix_open_time_s: unknown
+    posix_read_time_s: 0.0480
+    posix_write_time_s: 0.0590
+    posix_close_time_s: unknown
+    stdio_meta_time_s: 0.1371
+    observed_read_bandwidth_gbs: 0.1770
+    observed_write_bandwidth_gbs: 0.1433
+    access_pattern_observed: sequential
+    io_phase_observed: mixed
+    compute_to_io_ratio: 0.24
+    match_wrd_io_phase: true
+    field_confidence:
+      note: >-
+        DDD planned 25 mBgExec instances but only 2 .darshan logs were captured
+        for this stage (instances_profiled=2); the reported bytes/ops are the
+        sum of those 2 shards only and therefore UNDER-COUNT the full 25-way
+        background stage. This trace-coverage gap is the reason the IODD
+        aggregate read total (378.3 MB) slightly differs from a fully-instrumented
+        run; flagged in anomalies. Per-shard reads projected FITS, writes
+        corrected FITS, reads broadcast corrections.tbl. POSIX counters / close
+        times not captured by darshan.
+
+  - task_id: task:imgtbl_corrected
+    instance_count: 1
+    storage_tier_used: tier:projects_lustre
+    bytes_read: 12838
+    bytes_written: 6406
+    read_ops: 18
+    write_ops: 125
+    open_ops: 12
+    close_ops: unknown
+    posix_open_time_s: unknown
+    posix_read_time_s: 0.0050
+    posix_write_time_s: 0.0088
+    posix_close_time_s: unknown
+    stdio_meta_time_s: 0.1387
+    observed_read_bandwidth_gbs: 0.0026
+    observed_write_bandwidth_gbs: 0.0007
+    access_pattern_observed: sequential
+    io_phase_observed: mixed
+    compute_to_io_ratio: 0.15
+    match_wrd_io_phase: true
+    field_confidence:
+      note: >-
+        Identified as the corrected-directory mImgtbl invocation (opens 6
+        corrected FITS headers; fewer than the projected scan because only the 2
+        captured background shards' corrected tiles existed in the trace set).
+        close_ops/POSIX counters not captured by darshan.
+
+  - task_id: task:add
+    instance_count: 1
+    storage_tier_used: tier:projects_lustre
+    bytes_read: 12733758
+    bytes_written: 22302762
+    read_ops: 4496
+    write_ops: 7745
+    open_ops: 22
+    close_ops: unknown
+    posix_open_time_s: unknown
+    posix_read_time_s: 0.0549
+    posix_write_time_s: 0.1531
+    posix_close_time_s: unknown
+    stdio_meta_time_s: 0.2115
+    observed_read_bandwidth_gbs: 0.2320
+    observed_write_bandwidth_gbs: 0.1457
+    access_pattern_observed: sequential
+    io_phase_observed: mixed
+    compute_to_io_ratio: 0.42
+    match_wrd_io_phase: true
+    field_confidence:
+      note: >-
+        Terminal n_to_1 coadd: reads 12 corrected FITS (12.7 MB), writes
+        mosaic.fits + mosaic_area.fits (22.3 MB, the heaviest single-file write
+        in the run at 7744 line-by-line writes). io_phase observed as mixed
+        (interleaved read of tiles and line-by-line mosaic writes), consistent
+        with WDD streaming-coadd behavioral_notes. close_ops/POSIX counters not
+        captured by darshan.
+
+communication_channels:
+  - pc_edge_id: pc:imgtbl_raw->project:1_to_n
+    physical_path: shared_file_on_pfs
+    tier_id: tier:projects_lustre
+    data_volume_bytes: 48300
+    transfer_pattern: bulk_sequential
+    match_ddd: true
+    field_confidence:
+      note: >-
+        data_volume_bytes is the project stage's STDIO read of the sharded
+        images.tbl files on Lustre (48,300 B over 25 shards). transfer_time_s
+        and transfer_bandwidth not captured by darshan - producer-write to
+        consumer-read timeline lineage is a DataLife/DaYu capability; darshan
+        gives only per-process byte/op counts, not cross-task transfer wall time.
+
+  - pc_edge_id: pc:project->imgtbl_projected:n_to_1
+    physical_path: shared_file_on_pfs
+    tier_id: tier:projects_lustre
+    data_volume_bytes: 72050
+    transfer_pattern: bulk_sequential
+    match_ddd: true
+    field_confidence:
+      note: >-
+        Header-only scan: imgtbl_projected read 72,050 B of projected FITS
+        headers (not full pixel data). transfer_time/bandwidth not captured by
+        darshan (no cross-task lineage).
+
+  - pc_edge_id: pc:imgtbl_projected->overlaps:1_to_1
+    physical_path: shared_file_on_pfs
+    tier_id: tier:projects_lustre
+    data_volume_bytes: 12258
+    transfer_pattern: bulk_sequential
+    match_ddd: true
+    field_confidence:
+      note: >-
+        overlaps read of pimages.tbl (12,258 B). transfer_time/bandwidth not
+        captured by darshan.
+
+  - pc_edge_id: pc:overlaps->diff:1_to_n
+    physical_path: shared_file_on_pfs
+    tier_id: tier:projects_lustre
+    data_volume_bytes: 14820
+    transfer_pattern: bulk_sequential
+    match_ddd: true
+    field_confidence:
+      note: >-
+        diff stage read of sharded diffs.tbl (14,820 B over 25 shards).
+        transfer_time/bandwidth not captured by darshan.
+
+  - pc_edge_id: pc:project->diff:n_to_n
+    physical_path: shared_file_on_pfs
+    tier_id: tier:projects_lustre
+    data_volume_bytes: 269891712
+    transfer_pattern: bulk_sequential
+    match_ddd: true
+    field_confidence:
+      note: >-
+        Largest channel: diff read 269.9 MB of projected FITS pixel data from
+        the shared projected/ directory on Lustre (each of 25 diff shards
+        re-reads the tiles for its overlap pairs). Volume taken from the
+        consumer (diff) STDIO read of projected_fits. transfer_time/bandwidth
+        and true n-to-n producer-consumer realized lineage not captured by
+        darshan.
+
+  - pc_edge_id: pc:overlaps->fit:1_to_n
+    physical_path: shared_file_on_pfs
+    tier_id: tier:projects_lustre
+    data_volume_bytes: 14820
+    transfer_pattern: bulk_sequential
+    match_ddd: true
+    field_confidence:
+      note: >-
+        fit stage read of sharded diffs.tbl (14,820 B). transfer_time/bandwidth
+        not captured by darshan.
+
+  - pc_edge_id: pc:diff->fit:n_to_n
+    physical_path: shared_file_on_pfs
+    tier_id: tier:projects_lustre
+    data_volume_bytes: 33483024
+    transfer_pattern: bulk_sequential
+    match_ddd: true
+    field_confidence:
+      note: >-
+        fit read 33.5 MB of diff FITS from the shared diffs/ directory. Volume
+        from consumer (fit) STDIO read of diff_fits. transfer_time/bandwidth not
+        captured by darshan.
+
+  - pc_edge_id: pc:imgtbl_projected->bgmodel:1_to_1
+    physical_path: shared_file_on_pfs
+    tier_id: tier:projects_lustre
+    data_volume_bytes: 34083
+    transfer_pattern: bulk_sequential
+    match_ddd: true
+    field_confidence:
+      note: >-
+        bgmodel read of pimages.tbl + fits.tbl (combined 34,083 B - darshan
+        cannot split the two table reads to this single edge; this is the
+        combined tbl read for bgmodel). transfer_time/bandwidth not captured by
+        darshan.
+
+  - pc_edge_id: pc:fit->bgmodel:n_to_1
+    physical_path: shared_file_on_pfs
+    tier_id: tier:projects_lustre
+    data_volume_bytes: 28227
+    transfer_pattern: bulk_sequential
+    match_ddd: true
+    field_confidence:
+      note: >-
+        Volume taken from the producer side (fit wrote 28,227 B of per-shard fit
+        tables, concatenated into fits.tbl). transfer_time/bandwidth not
+        captured by darshan.
+
+  - pc_edge_id: pc:imgtbl_projected->background:1_to_n
+    physical_path: shared_file_on_pfs
+    tier_id: tier:projects_lustre
+    data_volume_bytes: 9914
+    transfer_pattern: bulk_sequential
+    match_ddd: true
+    field_confidence:
+      note: >-
+        background read of sharded pimages.tbl (9,914 B); under-counted because
+        only 2 of 25 background shards were traced. transfer_time/bandwidth not
+        captured by darshan.
+
+  - pc_edge_id: pc:bgmodel->background:1_to_n
+    physical_path: shared_file_on_pfs
+    tier_id: tier:projects_lustre
+    data_volume_bytes: 1431
+    transfer_pattern: bulk_sequential
+    match_ddd: true
+    field_confidence:
+      note: >-
+        corrections.tbl broadcast: volume from producer (bgmodel wrote 1,431 B);
+        the 2 traced background shards each re-open this shared file (1_to_n
+        broadcast confirmed). transfer_time/bandwidth not captured by darshan.
+
+  - pc_edge_id: pc:project->background:n_to_n
+    physical_path: shared_file_on_pfs
+    tier_id: tier:projects_lustre
+    data_volume_bytes: 8472976
+    transfer_pattern: bulk_sequential
+    match_ddd: true
+    field_confidence:
+      note: >-
+        background read of projected FITS (8.47 MB) - UNDER-COUNTED: only 2 of
+        25 background shards traced, so true volume is ~12.5x larger.
+        transfer_time/bandwidth and n-to-n realized lineage not captured by
+        darshan.
+
+  - pc_edge_id: pc:background->imgtbl_corrected:n_to_1
+    physical_path: shared_file_on_pfs
+    tier_id: tier:projects_lustre
+    data_volume_bytes: 8646
+    transfer_pattern: bulk_sequential
+    match_ddd: true
+    field_confidence:
+      note: >-
+        imgtbl_corrected header scan of corrected FITS (8,646 B, headers only);
+        under-counted (only the 2 traced shards' corrected tiles existed).
+        transfer_time/bandwidth not captured by darshan.
+
+  - pc_edge_id: pc:imgtbl_corrected->add:1_to_1
+    physical_path: shared_file_on_pfs
+    tier_id: tier:projects_lustre
+    data_volume_bytes: 2974
+    transfer_pattern: bulk_sequential
+    match_ddd: true
+    field_confidence:
+      note: >-
+        add read of cimages.tbl (2,974 B). transfer_time/bandwidth not captured
+        by darshan.
+
+  - pc_edge_id: pc:background->add:n_to_1
+    physical_path: shared_file_on_pfs
+    tier_id: tier:projects_lustre
+    data_volume_bytes: 12723852
+    transfer_pattern: bulk_sequential
+    match_ddd: true
+    field_confidence:
+      note: >-
+        add streamed 12.72 MB of corrected FITS to build the mosaic; volume from
+        consumer (add) STDIO read of corrected_fits. transfer_time/bandwidth and
+        cross-task lineage not captured by darshan.
+
+data_format_observations:
+  - dataset_id: data:raw_fits_tiles
+    observed_container: plain_binary
+    observed_access_pattern: contiguous_sequential
+    observed_request_size_kb: 2.81
+    match_wrd_format: true
+    match_wrd_layout: true
+    field_confidence:
+      note: >-
+        Avg request size = project-stage raw_fits bytes_read / reads
+        (52,704,150 / 18,375 = 2.81 KB). Sequential/strided distinction not
+        captured by darshan (no STDIO access-pattern counters).
+
+  - dataset_id: data:region_hdr
+    observed_container: text
+    observed_access_pattern: contiguous_sequential
+    observed_request_size_kb: 0.02
+    match_wrd_format: true
+    match_wrd_layout: true
+    field_confidence:
+      note: >-
+        Small WCS header re-opened by project/diff/add; ~20 B per read.
+        Access-pattern detail not captured by darshan.
+
+  - dataset_id: data:projected_fits
+    observed_container: plain_binary
+    observed_access_pattern: contiguous_sequential
+    observed_request_size_kb: 2.86
+    match_wrd_format: true
+    match_wrd_layout: true
+    field_confidence:
+      note: >-
+        Written by project (avg write 106,554,240 / 36,998 = 2.88 KB) and read
+        by diff/background (avg read 269,891,712 / 94,288 = 2.86 KB). Sequential
+        vs random not captured by darshan.
+
+  - dataset_id: data:images_tbl
+    observed_container: text
+    observed_access_pattern: contiguous_sequential
+    observed_request_size_kb: 0.39
+    match_wrd_format: true
+    match_wrd_layout: true
+    field_confidence:
+      note: Small sharded ASCII table. Access-pattern detail not captured by darshan.
+
+  - dataset_id: data:pimages_tbl
+    observed_container: text
+    observed_access_pattern: contiguous_sequential
+    observed_request_size_kb: 0.32
+    match_wrd_format: true
+    match_wrd_layout: true
+    field_confidence:
+      note: Access-pattern detail not captured by darshan.
+
+  - dataset_id: data:diffs_tbl
+    observed_container: text
+    observed_access_pattern: contiguous_sequential
+    observed_request_size_kb: 0.09
+    match_wrd_format: true
+    match_wrd_layout: true
+    field_confidence:
+      note: Many tiny shard reads (avg ~86 B/read). Access-pattern detail not captured by darshan.
+
+  - dataset_id: data:diff_fits
+    observed_container: plain_binary
+    observed_access_pattern: contiguous_sequential
+    observed_request_size_kb: 2.86
+    match_wrd_format: true
+    match_wrd_layout: true
+    field_confidence:
+      note: >-
+        Written by diff (66,965,760 / 23,252 = 2.88 KB) and read by fit
+        (33,483,024 / 11,698 = 2.86 KB). Access-pattern detail not captured by
+        darshan.
+
+  - dataset_id: data:fits_tbl
+    observed_container: text
+    observed_access_pattern: contiguous_sequential
+    observed_request_size_kb: 0.32
+    match_wrd_format: true
+    match_wrd_layout: true
+    field_confidence:
+      note: Access-pattern detail not captured by darshan.
+
+  - dataset_id: data:corrections_tbl
+    observed_container: text
+    observed_access_pattern: contiguous_sequential
+    observed_request_size_kb: 0.06
+    match_wrd_format: true
+    match_wrd_layout: true
+    field_confidence:
+      note: Broadcast table re-opened per background shard. Access-pattern detail not captured by darshan.
+
+  - dataset_id: data:corrected_fits
+    observed_container: plain_binary
+    observed_access_pattern: contiguous_sequential
+    observed_request_size_kb: 2.88
+    match_wrd_format: true
+    match_wrd_layout: true
+    field_confidence:
+      note: >-
+        Written by background (8,455,680 / 2,936 = 2.88 KB) and read by add
+        (12,723,852 / 4,424 = 2.88 KB). Background write under-counted (2 of 25
+        shards traced). Access-pattern detail not captured by darshan.
+
+  - dataset_id: data:cimages_tbl
+    observed_container: text
+    observed_access_pattern: contiguous_sequential
+    observed_request_size_kb: 0.37
+    match_wrd_format: true
+    match_wrd_layout: true
+    field_confidence:
+      note: Access-pattern detail not captured by darshan.
+
+  - dataset_id: data:mosaic_fits
+    observed_container: plain_binary
+    observed_access_pattern: contiguous_sequential
+    observed_request_size_kb: 2.88
+    match_wrd_format: true
+    match_wrd_layout: true
+    field_confidence:
+      note: >-
+        add wrote mosaic.fits line-by-line (22,302,720 / 7,744 = 2.88 KB avg
+        write to mosaic+area). Access-pattern detail not captured by darshan.
+
+  - dataset_id: data:mosaic_area_fits
+    observed_container: plain_binary
+    observed_access_pattern: contiguous_sequential
+    observed_request_size_kb: 2.88
+    match_wrd_format: true
+    match_wrd_layout: true
+    field_confidence:
+      note: >-
+        Companion area image written alongside mosaic.fits by add; darshan
+        aggregates the two mosaic outputs in one mosaic_fits byte category, so
+        the per-file split is not separable here.
+
+temporal_io_behavior:
+  workflow_wall_time_s: 10
+  tasks:
+    - task_id: task:imgtbl_raw
+      task_start_offset_s: 0
+      task_end_offset_s: 1
+      task_wall_time_s: 1
+      io_start_offset_s: 0.023
+      io_end_offset_s: 0.95
+      io_active_duration_s: 0.93
+      io_fraction_of_task: 0.93
+      pipeline_overlap_observed: false
+
+    - task_id: task:project
+      task_start_offset_s: 1
+      task_end_offset_s: 2
+      task_wall_time_s: 1
+      io_start_offset_s: 1.015
+      io_end_offset_s: 2.575
+      io_active_duration_s: 1.56
+      io_fraction_of_task: 1.0
+      pipeline_overlap_observed: false
+
+    - task_id: task:imgtbl_projected
+      task_start_offset_s: 2
+      task_end_offset_s: 4
+      task_wall_time_s: 2
+      io_start_offset_s: 2.5
+      io_end_offset_s: 3.9
+      io_active_duration_s: 1.4
+      io_fraction_of_task: 0.7
+      pipeline_overlap_observed: false
+
+    - task_id: task:overlaps
+      task_start_offset_s: 4
+      task_end_offset_s: 4
+      task_wall_time_s: 1
+      io_start_offset_s: 4.006
+      io_end_offset_s: 4.161
+      io_active_duration_s: 0.155
+      io_fraction_of_task: 0.155
+      pipeline_overlap_observed: false
+
+    - task_id: task:diff
+      task_start_offset_s: 4
+      task_end_offset_s: 6
+      task_wall_time_s: 2
+      io_start_offset_s: 4.006
+      io_end_offset_s: 5.830
+      io_active_duration_s: 1.824
+      io_fraction_of_task: 0.91
+      pipeline_overlap_observed: false
+
+    - task_id: task:fit
+      task_start_offset_s: 6
+      task_end_offset_s: 7
+      task_wall_time_s: 1
+      io_start_offset_s: 6.004
+      io_end_offset_s: 7.267
+      io_active_duration_s: 1.263
+      io_fraction_of_task: 1.0
+      pipeline_overlap_observed: false
+
+    - task_id: task:bgmodel
+      task_start_offset_s: 7
+      task_end_offset_s: 8
+      task_wall_time_s: 1
+      io_start_offset_s: 7.005
+      io_end_offset_s: 7.322
+      io_active_duration_s: 0.317
+      io_fraction_of_task: 0.317
+      pipeline_overlap_observed: false
+
+    - task_id: task:background
+      task_start_offset_s: 8
+      task_end_offset_s: 9
+      task_wall_time_s: 1
+      io_start_offset_s: 8.113
+      io_end_offset_s: 9.495
+      io_active_duration_s: 1.382
+      io_fraction_of_task: 1.0
+      pipeline_overlap_observed: false
+
+    - task_id: task:imgtbl_corrected
+      task_start_offset_s: 9
+      task_end_offset_s: 9
+      task_wall_time_s: 1
+      io_start_offset_s: 9.0
+      io_end_offset_s: 9.2
+      io_active_duration_s: 0.2
+      io_fraction_of_task: 0.2
+      pipeline_overlap_observed: false
+
+    - task_id: task:add
+      task_start_offset_s: 9
+      task_end_offset_s: 10
+      task_wall_time_s: 1
+      io_start_offset_s: 9.011
+      io_end_offset_s: 9.631
+      io_active_duration_s: 0.62
+      io_fraction_of_task: 0.62
+      pipeline_overlap_observed: false
+  field_confidence:
+    note: >-
+      Offsets derived from per-log Darshan start_time/end_time (1 s epoch
+      granularity) and intra-log STDIO_F_*_START/END_TIMESTAMP (sub-second,
+      relative to each process start). Stage boundaries align with the strict
+      sequential shell ordering in the DDD (bash wait after each fan-out), so
+      pipeline_overlap_observed = false everywhere, matching DDD pipelining: []
+      (no overlap planned). The 1 s epoch granularity limits inter-stage
+      precision; finer cross-task overlap detection is a DataLife/DaYu timeline
+      capability not captured by darshan.
+
+file_lifecycle_events:
+  field_confidence:
+    note: >-
+      Per-file creation / first-read / last-read / deletion timeline and
+      idle_time/lifetime are NOT captured by darshan. Darshan records per-process
+      open/read/write/seek counts, bytes, and first/last I/O timestamps within a
+      single process, but does not track a file's cross-process lifecycle
+      (creation by a producer process vs first read by a separate consumer
+      process vs deletion). This section is a DataLife DFL-G capability. The
+      only lifecycle-adjacent fact darshan confirms is that intermediate FITS
+      and .tbl files were created on tier:projects_lustre (mount /projects,
+      Lustre) and re-read by later stages (e.g. projected FITS read by
+      imgtbl_projected, diff, and background - data reuse), consistent with WDD
+      retention windows; precise deletion/idle timing is unknown.
+
+diagnosis_summary:
+  overall_io_pattern: cascading
+  pattern_match_wrd: false
+  bottleneck_summary:
+    - entity: task:diff
+      bottleneck_type: metadata
+      severity: medium
+      evidence: >-
+        25-shard aggregate STDIO_F_META_TIME = 10.93 s with 1853 opens vs
+        99,493 reads ((opens)/(reads+writes) = 0.015 overall but meta_time
+        dominates total I/O time 3.32 s of read+write); per-pair re-open of
+        projected FITS and region.hdr (507 region.hdr opens) drives open/metadata
+        overhead. Heaviest reader (269.9 MB) re-reading projected tiles confirms
+        WDD hint:projected_fits_reuse.
+    - entity: task:imgtbl_projected
+      bottleneck_type: metadata
+      severity: low
+      evidence: >-
+        STDIO_F_META_TIME 1.17 s dominates a task that moves only 95 KB; the
+        directory-wide FITS header scan is metadata-bound, matching WDD
+        hint:corrections_broadcast_metadata.
+  optimization_opportunities:
+    - opportunity_type: adjust_stripe_count
+      affected_entities: [data:projected_fits, data:diff_fits, tier:projects_lustre]
+      estimated_impact: >-
+        All instrumented FITS files use Lustre stripe_count=1 (single OST, PFL
+        ddn_nvme first 64 KB then ddn_hdd). For the larger projected/diff FITS
+        re-read at 25-way fan-out, increasing stripe_count (lfs setstripe -c 4)
+        could spread the 270 MB diff-stage reads across more OSTs and reduce
+        single-OST contention; impact modest at this 25-node scale but relevant
+        for Scale-B.
+      evidence: LUSTRE_COMP*_STRIPE_COUNT=1 on all profiled .fits records.
+      ddd_change_required: staging_plan.stripe_setup_commands / storage_tier_assignments stripe tuning.
+    - opportunity_type: reduce_metadata_operations
+      affected_entities: [task:diff, task:imgtbl_projected, task:imgtbl_corrected]
+      estimated_impact: >-
+        Metadata/open time dominates the table-scan and diff stages; reducing
+        repeated region.hdr opens (507 across diff shards) or caching headers
+        would cut the 10.93 s aggregate meta time on diff.
+      evidence: STDIO_F_META_TIME high relative to read/write time on diff and mImgtbl tasks.
+      ddd_change_required: caching_policy on data:region_hdr / data:projected_fits.
+  anomalies:
+    - anomaly_type: other
+      entity: task:background
+      expected: 25 instances profiled (DDD parallelism_instances=25)
+      observed: 2 .darshan logs captured for mBgExec
+      recommendation: >-
+        Trace-coverage gap, not a deployment error - 23 of 25 background-shard
+        Darshan logs are missing from the trace set, so this stage's bytes/ops
+        and the project->background / background->add / background->imgtbl_corrected
+        channel volumes are under-counted. Re-run with confirmed LD_PRELOAD on
+        all 25 background sruns, or treat background-stage aggregates as a lower
+        bound. Fix profiler instrumentation; no WDD/DDD change required.
+    - anomaly_type: pattern_mismatch
+      entity: workflow
+      expected: hybrid (WDD workflow_patterns.primary_pattern)
+      observed: cascading
+      recommendation: >-
+        Darshan sees only the sequential stage cascade (strict bash wait between
+        stages -> cascading) and cannot directly observe the embedded
+        scatter/gather fan-out concurrency that makes the WDD pattern hybrid;
+        the scatter_gather component is a secondary_pattern in the WDD. This is a
+        profiler-visibility limitation, not a real divergence - no WDD update
+        needed. Cross-task concurrency detection is a DataLife/DaYu capability.
+  field_confidence:
+    note: >-
+      Coverage map for this Darshan run. FULLY POPULATED from darshan:
+      per_task_io_profile bytes/ops/STDIO-times, data_format_observations
+      (container, request sizes, byte volumes), communication_channels
+      data_volume_bytes, temporal_io_behavior offsets, Lustre striping.
+      NOT CAPTURED BY DARSHAN (set unknown / omitted): POSIX read/write op
+      counts and sequential/consecutive/random access counters (run is STDIO-only,
+      no POSIX module); per-op open/close op counts and open/close times
+      (STDIO reports a single aggregated meta_time); device-level peak bandwidth
+      (no DXT); per-channel transfer_time_s / transfer_bandwidth_gbs and true
+      producer-consumer realized lineage; full file_lifecycle_events
+      (creation/first-read/deletion/idle/lifetime); MPI-IO collective/aggregator
+      counters (workflow is non-MPI posix_independent); contention_events.

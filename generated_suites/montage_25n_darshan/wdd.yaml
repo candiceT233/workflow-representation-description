@@ -1,0 +1,1300 @@
+metadata:
+  workflow_lineage_id: wrd:montage
+  version: "1.0.0"
+  version_notes: "Initial WDD compiled from run_montage_prof.sh (shell-orchestrated Montage image-mosaic pipeline on NCSA Delta)."
+  deprecated: false
+  workflow_name: montage
+  workflow_description: >-
+    Montage is an astronomical image-mosaic engine that assembles a set of
+    overlapping input FITS sky tiles into a single seamless mosaic image. It
+    reads raw FITS tiles plus a target WCS header (region.hdr), reprojects each
+    tile onto the common mosaic projection, computes pairwise overlap difference
+    images, fits planes to those differences, solves a global background-
+    correction model, applies the corrections, and coadds the corrected tiles
+    into a final mosaic FITS image with an accompanying area-weight image. This
+    Delta deployment runs the C/cfitsio Montage binaries orchestrated by a SLURM
+    shell script with srun fan-out across nodes (not Pegasus).
+  source_repository: /u/mtang9/widget_eval/hpc_workflows/repos/Montage
+  source_commit: ac0a15334f670ed83e328b6c5768f94b4b847359
+  source_format: native
+  source_file: /u/mtang9/widget_eval/hpc_workflows/runs/Montage/run_montage_prof.sh
+  schema_version: wrd-7.0
+  generated_by: claude-code-opus-4-8
+  generated_at: 2026-06-01T14:26:02Z
+  last_modified_at: 2026-06-01T14:26:02Z
+
+stages:
+  - stage_id: stage:build_image_table
+    name: Build Input Image Table
+    order: 1
+    description: >-
+      Scan the raw FITS tile directory and build the images.tbl metadata table
+      describing each input tile's WCS geometry. Single-task exception stage.
+    tasks: [task:imgtbl_raw]
+
+  - stage_id: stage:reproject
+    name: Reproject Tiles
+    order: 2
+    description: >-
+      Reproject each input FITS tile onto the common mosaic WCS defined by
+      region.hdr. Scatter fan-out: one image-table shard per node via mProjExec.
+    tasks: [task:project]
+
+  - stage_id: stage:table_projected
+    name: Build Projected Image Table
+    order: 3
+    description: >-
+      Build pimages.tbl, the metadata table over the reprojected FITS tiles.
+      Single-task exception stage.
+    tasks: [task:imgtbl_projected]
+
+  - stage_id: stage:overlaps
+    name: Enumerate Overlaps
+    order: 4
+    description: >-
+      Analyze pimages.tbl to enumerate every pair of spatially overlapping
+      reprojected tiles, producing diffs.tbl. Single-task exception stage.
+    tasks: [task:overlaps]
+
+  - stage_id: stage:difference
+    name: Pairwise Difference Images
+    order: 5
+    description: >-
+      Compute a difference image for each overlapping tile pair listed in
+      diffs.tbl. Scatter fan-out: one diff-table shard per node via mDiffExec.
+    tasks: [task:diff]
+
+  - stage_id: stage:fit_planes
+    name: Fit Difference Planes
+    order: 6
+    description: >-
+      Fit a plane to each overlap difference image and emit per-shard fit
+      tables, gathered into fits.tbl. Scatter fan-out via mFitExec then concat.
+    tasks: [task:fit]
+
+  - stage_id: stage:background_model
+    name: Global Background Model
+    order: 7
+    description: >-
+      Solve a global background-correction model from the plane fits and image
+      metadata, producing corrections.tbl. Gather (n_to_1) exception stage.
+    tasks: [task:bgmodel]
+
+  - stage_id: stage:background_apply
+    name: Apply Background Correction
+    order: 8
+    description: >-
+      Apply the per-tile background corrections to the reprojected tiles.
+      Scatter fan-out: one image-table shard per node via mBgExec.
+    tasks: [task:background]
+
+  - stage_id: stage:table_corrected
+    name: Build Corrected Image Table
+    order: 9
+    description: >-
+      Build cimages.tbl, the metadata table over the background-corrected FITS
+      tiles. Single-task exception stage.
+    tasks: [task:imgtbl_corrected]
+
+  - stage_id: stage:coadd
+    name: Coadd Final Mosaic
+    order: 10
+    description: >-
+      Coadd all background-corrected tiles into the final mosaic.fits and
+      mosaic_area.fits using cimages.tbl and region.hdr. Gather (n_to_1) stage.
+    tasks: [task:add]
+
+tasks:
+  - task_id: task:imgtbl_raw
+    name: Raw Image Table
+    stage: stage:build_image_table
+    executable: mImgtbl
+    description: >-
+      Scans the raw_images directory of input FITS sky tiles and extracts each
+      tile's WCS and geometry metadata into an ASCII images.tbl table. This
+      table drives all downstream reprojection sharding. Reads every input FITS
+      header once and writes a single POSIX text table.
+    behavioral_notes: >-
+      Reads FITS headers for all input tiles sequentially at startup via cfitsio
+      STDIO; writes the complete images.tbl text table at completion. Directory
+      scan plus header reads; no large pixel-data reads.
+    parallelism_model:
+      type: serial
+      description: Single process over the whole raw image directory; not sharded.
+    io_dominance: io_bound
+    io_access_type: posix_independent
+    restart_model: idempotent
+    hardware_path:
+      has_conditional_execution: false
+      execution_alternatives: []
+      minimum_resource_assertions: []
+    output_class: intermediate
+    inputs: [data:raw_fits_tiles]
+    outputs: [data:images_tbl]
+
+  - task_id: task:project
+    name: Reproject Tile
+    stage: stage:reproject
+    executable: mProjExec (mProject)
+    description: >-
+      Reprojects each raw FITS tile onto the common mosaic WCS from region.hdr,
+      producing one projected FITS image per input tile. Driven by mProjExec
+      over an images.tbl shard so each node handles a subset of tiles. Reads
+      input tile pixel data and writes reprojected pixel data plus area weights.
+    behavioral_notes: >-
+      Each mProjExec instance reads its images.tbl shard, then for each row
+      reads that input FITS tile (cfitsio STDIO full-image read) and writes a
+      projected FITS file plus area file into projected/. Sequential per-tile
+      read/transform/write; one shard per node.
+    parallelism_model:
+      type: embarrassingly_parallel
+      description: >-
+        Each node processes an independent round-robin shard of the image table;
+        tiles are reprojected independently with no inter-node communication.
+    io_dominance: balanced
+    io_access_type: posix_independent
+    restart_model: idempotent
+    hardware_path:
+      has_conditional_execution: false
+      execution_alternatives: []
+      minimum_resource_assertions: []
+    output_class: intermediate
+    inputs: [data:raw_fits_tiles, data:images_tbl, data:region_hdr]
+    outputs: [data:projected_fits]
+
+  - task_id: task:imgtbl_projected
+    name: Projected Image Table
+    stage: stage:table_projected
+    executable: mImgtbl
+    description: >-
+      Scans the projected FITS tiles and builds pimages.tbl describing their WCS
+      geometry. Consumed by overlap enumeration, background modeling, and
+      background application. Reads projected FITS headers and writes one table.
+    behavioral_notes: >-
+      Reads projected FITS headers sequentially via cfitsio STDIO; writes
+      pimages.tbl text table at completion. Metadata-oriented; no pixel reads.
+    parallelism_model:
+      type: serial
+      description: Single process over the projected directory.
+    io_dominance: io_bound
+    io_access_type: posix_independent
+    restart_model: idempotent
+    hardware_path:
+      has_conditional_execution: false
+      execution_alternatives: []
+      minimum_resource_assertions: []
+    output_class: intermediate
+    inputs: [data:projected_fits]
+    outputs: [data:pimages_tbl]
+
+  - task_id: task:overlaps
+    name: Enumerate Overlaps
+    stage: stage:overlaps
+    executable: mOverlaps
+    description: >-
+      Reads pimages.tbl and computes which pairs of reprojected tiles overlap on
+      the sky, writing the diffs.tbl table of overlapping pairs. This pair list
+      drives the pairwise difference and plane-fit stages. Pure table-to-table
+      computation with no pixel I/O.
+    behavioral_notes: >-
+      Reads the pimages.tbl text table once, computes pairwise geometric
+      overlaps in memory, writes diffs.tbl at completion. Text I/O only.
+    parallelism_model:
+      type: serial
+      description: Single process computing all overlap pairs.
+    io_dominance: compute_bound
+    io_access_type: posix_independent
+    restart_model: idempotent
+    hardware_path:
+      has_conditional_execution: false
+      execution_alternatives: []
+      minimum_resource_assertions: []
+    output_class: intermediate
+    inputs: [data:pimages_tbl]
+    outputs: [data:diffs_tbl]
+
+  - task_id: task:diff
+    name: Pairwise Difference
+    stage: stage:difference
+    executable: mDiffExec (mDiff)
+    description: >-
+      Computes a pixel-wise difference image for each overlapping tile pair in a
+      diffs.tbl shard, reading the two reprojected FITS tiles and writing a diff
+      FITS image into diffs/. Driven by mDiffExec, one shard per node. Quantifies
+      background mismatch between neighboring tiles.
+    behavioral_notes: >-
+      Each mDiffExec instance reads its diffs.tbl shard, then for each pair reads
+      two projected FITS tiles (cfitsio STDIO) and writes one diff FITS file.
+      Sequential per-pair read/subtract/write; one shard per node.
+    parallelism_model:
+      type: embarrassingly_parallel
+      description: >-
+        Each node processes an independent round-robin shard of the overlap
+        pair table; difference images are computed independently.
+    io_dominance: balanced
+    io_access_type: posix_independent
+    restart_model: idempotent
+    hardware_path:
+      has_conditional_execution: false
+      execution_alternatives: []
+      minimum_resource_assertions: []
+    output_class: intermediate
+    inputs: [data:diffs_tbl, data:projected_fits, data:region_hdr]
+    outputs: [data:diff_fits]
+
+  - task_id: task:fit
+    name: Fit Difference Planes
+    stage: stage:fit_planes
+    executable: mFitExec (mFitplane)
+    description: >-
+      Fits a plane (a + bx + cy) to each overlap difference image listed in a
+      fit-table shard and records the fit coefficients per pair. Per-shard fit
+      tables are concatenated into fits.tbl, the input to background modeling.
+      Reads diff FITS images and writes plane-fit coefficient rows.
+    behavioral_notes: >-
+      Each mFitExec instance reads its shard of the diff pair table, opens each
+      diff FITS image (cfitsio STDIO), computes a least-squares plane fit, and
+      appends coefficient rows to a per-shard fits table; shards are gathered by
+      tbl_tool concat into fits.tbl.
+    parallelism_model:
+      type: embarrassingly_parallel
+      description: >-
+        Each node fits planes for an independent shard of difference images;
+        results are gathered by table concatenation afterward.
+    io_dominance: balanced
+    io_access_type: posix_independent
+    restart_model: idempotent
+    hardware_path:
+      has_conditional_execution: false
+      execution_alternatives: []
+      minimum_resource_assertions: []
+    output_class: intermediate
+    inputs: [data:diffs_tbl, data:diff_fits]
+    outputs: [data:fits_tbl]
+
+  - task_id: task:bgmodel
+    name: Background Model
+    stage: stage:background_model
+    executable: mBgModel
+    description: >-
+      Solves a global background-correction model by combining the per-pair
+      plane fits (fits.tbl) with the projected image metadata (pimages.tbl),
+      producing corrections.tbl with one correction per tile. This is the global
+      gather step that makes the mosaic seamless. Table-to-table computation.
+    behavioral_notes: >-
+      Reads pimages.tbl and the gathered fits.tbl once, solves the global
+      least-squares background system in memory, writes corrections.tbl at
+      completion. Text I/O only; single global process (n_to_1 gather).
+    parallelism_model:
+      type: serial
+      description: >-
+        Single global solve; must see all plane fits at once, so it gathers the
+        outputs of every fit shard.
+    io_dominance: compute_bound
+    io_access_type: posix_independent
+    restart_model: idempotent
+    hardware_path:
+      has_conditional_execution: false
+      execution_alternatives: []
+      minimum_resource_assertions: []
+    output_class: intermediate
+    inputs: [data:pimages_tbl, data:fits_tbl]
+    outputs: [data:corrections_tbl]
+
+  - task_id: task:background
+    name: Apply Background Correction
+    stage: stage:background_apply
+    executable: mBgExec (mBackground)
+    description: >-
+      Applies the per-tile background correction from corrections.tbl to each
+      reprojected FITS tile, writing a corrected FITS image into corrected/.
+      Driven by mBgExec over a pimages.tbl shard, one shard per node. Removes the
+      modeled background offsets so tiles match at their seams.
+    behavioral_notes: >-
+      Each mBgExec instance reads its pimages.tbl shard plus the shared
+      corrections.tbl, then for each tile reads the projected FITS (cfitsio
+      STDIO), subtracts the modeled background plane, and writes a corrected FITS
+      file. Sequential per-tile read/modify/write; one shard per node.
+    parallelism_model:
+      type: embarrassingly_parallel
+      description: >-
+        Each node corrects an independent round-robin shard of tiles using the
+        shared global corrections table; no inter-node communication.
+    io_dominance: balanced
+    io_access_type: posix_independent
+    restart_model: idempotent
+    hardware_path:
+      has_conditional_execution: false
+      execution_alternatives: []
+      minimum_resource_assertions: []
+    output_class: intermediate
+    inputs: [data:pimages_tbl, data:corrections_tbl, data:projected_fits]
+    outputs: [data:corrected_fits]
+
+  - task_id: task:imgtbl_corrected
+    name: Corrected Image Table
+    stage: stage:table_corrected
+    executable: mImgtbl
+    description: >-
+      Scans the background-corrected FITS tiles and builds cimages.tbl
+      describing their WCS geometry, which the final coadd uses to place each
+      tile. Reads corrected FITS headers and writes one metadata table.
+    behavioral_notes: >-
+      Reads corrected FITS headers sequentially via cfitsio STDIO; writes
+      cimages.tbl text table at completion. Metadata-oriented; no pixel reads.
+    parallelism_model:
+      type: serial
+      description: Single process over the corrected directory.
+    io_dominance: io_bound
+    io_access_type: posix_independent
+    restart_model: idempotent
+    hardware_path:
+      has_conditional_execution: false
+      execution_alternatives: []
+      minimum_resource_assertions: []
+    output_class: intermediate
+    inputs: [data:corrected_fits]
+    outputs: [data:cimages_tbl]
+
+  - task_id: task:add
+    name: Coadd Mosaic
+    stage: stage:coadd
+    executable: mAdd
+    description: >-
+      Coadds all background-corrected FITS tiles into the final science mosaic,
+      using cimages.tbl for tile placement and region.hdr for the output WCS. It
+      writes mosaic.fits (the coadded image) and mosaic_area.fits (per-pixel
+      coverage weights). This is the terminal gather producing the deliverable.
+    behavioral_notes: >-
+      Reads cimages.tbl and region.hdr, then streams every corrected FITS tile
+      (cfitsio STDIO) accumulating flux and area into the output mosaic, which it
+      writes line-by-line. Single global process consuming all corrected tiles
+      (n_to_1 gather); writes two output FITS files.
+    parallelism_model:
+      type: serial
+      description: >-
+        Single coadd process; must read all corrected tiles to produce the one
+        mosaic, so it gathers every background-apply shard's outputs.
+    io_dominance: io_bound
+    io_access_type: posix_independent
+    restart_model: idempotent
+    hardware_path:
+      has_conditional_execution: false
+      execution_alternatives: []
+      minimum_resource_assertions: []
+    output_class: checkpoint
+    inputs: [data:corrected_fits, data:cimages_tbl, data:region_hdr]
+    outputs: [data:mosaic_fits, data:mosaic_area_fits]
+
+data_objects:
+  - data_id: data:raw_fits_tiles
+    name: Raw FITS Sky Tiles
+    description: >-
+      The set of input astronomical FITS image tiles covering the target sky
+      region, each carrying pixel data and a WCS header. These are the external
+      inputs Montage reprojects and coadds into a mosaic; in this deployment they
+      are synthetically generated WCS tiles for scaling runs.
+    category: input
+    persistence: persistent
+    format_hint:
+      container: plain_binary
+      compression: none
+      layout_hint: contiguous
+      typical_request_size_kb: null
+    cardinality: "config-determined (one per input sky tile; see cardinality_source)"
+    cardinality_source:
+      type: config_determined
+      controlling_parameter: tile_grid_rows_cols
+      config_file: scripts/montage_gen_fits.py
+      possible_values: "rows x cols tiles (e.g., 5x5=25 for scale A, 12x11=132 for scale B); must be >= node count"
+    estimated_size_hint: "unknown (depends on tile pixel dimensions chosen at generation)"
+    producer_task: null
+    consumer_tasks: [task:imgtbl_raw, task:project]
+    lifecycle:
+      creation_phase: null
+      last_consumer_phase: task:project
+      retention_window: "external input, available from workflow start to task:project completion"
+      access_frequency_class: few_times
+      consumer_count: 2
+
+  - data_id: data:region_hdr
+    name: Mosaic Region Header
+    description: >-
+      The FITS WCS header (region.hdr) defining the target mosaic projection,
+      pixel scale, and footprint. It is a configuration object that fixes the
+      common coordinate system onto which all tiles are reprojected and into
+      which the final mosaic is coadded.
+    category: config
+    persistence: persistent
+    format_hint:
+      container: text
+      compression: none
+      layout_hint: contiguous
+      typical_request_size_kb: 1
+    cardinality: "single global file"
+    cardinality_source:
+      type: fixed
+      controlling_parameter: null
+      config_file: null
+      possible_values: "n/a"
+    estimated_size_hint: "small text header, <1 KB"
+    producer_task: null
+    consumer_tasks: [task:project, task:diff, task:add]
+    lifecycle:
+      creation_phase: null
+      last_consumer_phase: task:add
+      retention_window: "external config, available from workflow start to task:add completion"
+      access_frequency_class: few_times
+      consumer_count: 3
+
+  - data_id: data:images_tbl
+    name: Input Image Metadata Table
+    description: >-
+      The images.tbl ASCII metadata table listing each raw FITS tile and its WCS
+      geometry. It is the intermediate index that mProjExec shards across nodes
+      to drive reprojection of the input tiles.
+    category: intermediate
+    persistence: workflow_scoped
+    format_hint:
+      container: text
+      compression: none
+      layout_hint: contiguous
+      typical_request_size_kb: null
+    cardinality: "single global table (sharded N ways at runtime by tbl_tool)"
+    cardinality_source:
+      type: fixed
+      controlling_parameter: null
+      config_file: null
+      possible_values: "n/a"
+    estimated_size_hint: "small text table, order KB to MB depending on tile count"
+    producer_task: task:imgtbl_raw
+    consumer_tasks: [task:project]
+    lifecycle:
+      creation_phase: task:imgtbl_raw
+      last_consumer_phase: task:project
+      retention_window: "from task:imgtbl_raw completion to task:project completion"
+      access_frequency_class: once
+      consumer_count: 1
+
+  - data_id: data:projected_fits
+    name: Reprojected FITS Tiles
+    description: >-
+      The set of FITS tiles reprojected onto the common mosaic WCS, plus their
+      area-weight images, written into projected/. These intermediate images are
+      the geometrically aligned tiles consumed by differencing, background
+      modeling, and background application.
+    category: intermediate
+    persistence: workflow_scoped
+    format_hint:
+      container: plain_binary
+      compression: none
+      layout_hint: contiguous
+      typical_request_size_kb: null
+    cardinality: "runtime-determined (one projected FITS plus area per input tile)"
+    cardinality_source:
+      type: config_determined
+      controlling_parameter: tile_grid_rows_cols
+      config_file: scripts/montage_gen_fits.py
+      possible_values: "one per input tile that projects into the region"
+    estimated_size_hint: "unknown (comparable to input tile pixel footprint)"
+    producer_task: task:project
+    consumer_tasks: [task:imgtbl_projected, task:diff, task:background]
+    lifecycle:
+      creation_phase: task:project
+      last_consumer_phase: task:background
+      retention_window: "from task:project completion to task:background completion"
+      access_frequency_class: repeatedly
+      consumer_count: 3
+
+  - data_id: data:pimages_tbl
+    name: Projected Image Metadata Table
+    description: >-
+      The pimages.tbl ASCII metadata table over the reprojected tiles, listing
+      their WCS geometry. It is the intermediate index used to enumerate
+      overlaps, to seed the background model, and (sharded) to drive background
+      application.
+    category: intermediate
+    persistence: workflow_scoped
+    format_hint:
+      container: text
+      compression: none
+      layout_hint: contiguous
+      typical_request_size_kb: null
+    cardinality: "single global table (sharded N ways for background apply)"
+    cardinality_source:
+      type: fixed
+      controlling_parameter: null
+      config_file: null
+      possible_values: "n/a"
+    estimated_size_hint: "small text table, order KB to MB"
+    producer_task: task:imgtbl_projected
+    consumer_tasks: [task:overlaps, task:bgmodel, task:background]
+    lifecycle:
+      creation_phase: task:imgtbl_projected
+      last_consumer_phase: task:background
+      retention_window: "from task:imgtbl_projected completion to task:background completion"
+      access_frequency_class: few_times
+      consumer_count: 3
+
+  - data_id: data:diffs_tbl
+    name: Overlap Pair Table
+    description: >-
+      The diffs.tbl ASCII table enumerating every pair of overlapping reprojected
+      tiles. It is the intermediate work list that mDiffExec and mFitExec shard
+      across nodes to compute and fit pairwise difference images.
+    category: intermediate
+    persistence: workflow_scoped
+    format_hint:
+      container: text
+      compression: none
+      layout_hint: contiguous
+      typical_request_size_kb: null
+    cardinality: "single global table (sharded N ways for diff and fit)"
+    cardinality_source:
+      type: fixed
+      controlling_parameter: null
+      config_file: null
+      possible_values: "n/a"
+    estimated_size_hint: "small text table; rows scale with number of overlapping pairs"
+    producer_task: task:overlaps
+    consumer_tasks: [task:diff, task:fit]
+    lifecycle:
+      creation_phase: task:overlaps
+      last_consumer_phase: task:fit
+      retention_window: "from task:overlaps completion to task:fit completion"
+      access_frequency_class: few_times
+      consumer_count: 2
+
+  - data_id: data:diff_fits
+    name: Pairwise Difference Images
+    description: >-
+      The set of FITS difference images, one per overlapping tile pair, written
+      into diffs/. Each captures the background mismatch between two neighboring
+      reprojected tiles and is the intermediate input to plane fitting.
+    category: intermediate
+    persistence: workflow_scoped
+    format_hint:
+      container: plain_binary
+      compression: none
+      layout_hint: contiguous
+      typical_request_size_kb: null
+    cardinality: "runtime-determined (one diff FITS per overlapping pair)"
+    cardinality_source:
+      type: runtime_determined
+      controlling_parameter: null
+      config_file: null
+      possible_values: "runtime-determined (number of overlapping pairs from mOverlaps)"
+    estimated_size_hint: "unknown (overlap-region pixel footprint per pair)"
+    producer_task: task:diff
+    consumer_tasks: [task:fit]
+    lifecycle:
+      creation_phase: task:diff
+      last_consumer_phase: task:fit
+      retention_window: "from task:diff completion to task:fit completion"
+      access_frequency_class: once
+      consumer_count: 1
+
+  - data_id: data:fits_tbl
+    name: Plane Fit Table
+    description: >-
+      The fits.tbl ASCII table of per-pair plane-fit coefficients describing the
+      background gradient across each overlap. Gathered from per-shard fit tables,
+      it is the intermediate input that feeds the global background model.
+    category: intermediate
+    persistence: workflow_scoped
+    format_hint:
+      container: text
+      compression: none
+      layout_hint: contiguous
+      typical_request_size_kb: null
+    cardinality: "single global table (gathered from N fit shards via tbl_tool concat)"
+    cardinality_source:
+      type: fixed
+      controlling_parameter: null
+      config_file: null
+      possible_values: "n/a"
+    estimated_size_hint: "small text table; one row per overlapping pair"
+    producer_task: task:fit
+    consumer_tasks: [task:bgmodel]
+    lifecycle:
+      creation_phase: task:fit
+      last_consumer_phase: task:bgmodel
+      retention_window: "from task:fit completion to task:bgmodel completion"
+      access_frequency_class: once
+      consumer_count: 1
+
+  - data_id: data:corrections_tbl
+    name: Background Corrections Table
+    description: >-
+      The corrections.tbl ASCII table giving the per-tile background-correction
+      coefficients produced by the global background model. It is the
+      intermediate that mBgExec applies to each reprojected tile to make the
+      mosaic photometrically seamless.
+    category: intermediate
+    persistence: workflow_scoped
+    format_hint:
+      container: text
+      compression: none
+      layout_hint: contiguous
+      typical_request_size_kb: null
+    cardinality: "single global table (broadcast to all background-apply shards)"
+    cardinality_source:
+      type: fixed
+      controlling_parameter: null
+      config_file: null
+      possible_values: "n/a"
+    estimated_size_hint: "small text table; one row per tile"
+    producer_task: task:bgmodel
+    consumer_tasks: [task:background]
+    lifecycle:
+      creation_phase: task:bgmodel
+      last_consumer_phase: task:background
+      retention_window: "from task:bgmodel completion to task:background completion"
+      access_frequency_class: repeatedly
+      consumer_count: 1
+
+  - data_id: data:corrected_fits
+    name: Background-Corrected FITS Tiles
+    description: >-
+      The set of reprojected FITS tiles with their modeled background offsets
+      removed, written into corrected/. These intermediate images are the
+      photometrically matched tiles that the final mAdd step coadds into the
+      mosaic.
+    category: intermediate
+    persistence: workflow_scoped
+    format_hint:
+      container: plain_binary
+      compression: none
+      layout_hint: contiguous
+      typical_request_size_kb: null
+    cardinality: "runtime-determined (one corrected FITS per reprojected tile)"
+    cardinality_source:
+      type: config_determined
+      controlling_parameter: tile_grid_rows_cols
+      config_file: scripts/montage_gen_fits.py
+      possible_values: "one per reprojected tile"
+    estimated_size_hint: "unknown (comparable to projected tile footprint)"
+    producer_task: task:background
+    consumer_tasks: [task:imgtbl_corrected, task:add]
+    lifecycle:
+      creation_phase: task:background
+      last_consumer_phase: task:add
+      retention_window: "from task:background completion to task:add completion"
+      access_frequency_class: few_times
+      consumer_count: 2
+
+  - data_id: data:cimages_tbl
+    name: Corrected Image Metadata Table
+    description: >-
+      The cimages.tbl ASCII metadata table over the background-corrected tiles,
+      listing their WCS geometry. It is the intermediate index mAdd uses to place
+      each corrected tile when coadding the final mosaic.
+    category: intermediate
+    persistence: workflow_scoped
+    format_hint:
+      container: text
+      compression: none
+      layout_hint: contiguous
+      typical_request_size_kb: null
+    cardinality: "single global table"
+    cardinality_source:
+      type: fixed
+      controlling_parameter: null
+      config_file: null
+      possible_values: "n/a"
+    estimated_size_hint: "small text table, order KB to MB"
+    producer_task: task:imgtbl_corrected
+    consumer_tasks: [task:add]
+    lifecycle:
+      creation_phase: task:imgtbl_corrected
+      last_consumer_phase: task:add
+      retention_window: "from task:imgtbl_corrected completion to task:add completion"
+      access_frequency_class: once
+      consumer_count: 1
+
+  - data_id: data:mosaic_fits
+    name: Final Mosaic Image
+    description: >-
+      The mosaic.fits coadded science image: the final seamless astronomical
+      mosaic assembled from all background-corrected tiles on the target WCS. It
+      is the primary deliverable of the workflow, consumed outside the pipeline.
+    category: output
+    persistence: persistent
+    format_hint:
+      container: plain_binary
+      compression: none
+      layout_hint: contiguous
+      typical_request_size_kb: null
+    cardinality: "single global output file"
+    cardinality_source:
+      type: fixed
+      controlling_parameter: null
+      config_file: null
+      possible_values: "n/a"
+    estimated_size_hint: "unknown (full mosaic footprint defined by region.hdr)"
+    producer_task: task:add
+    consumer_tasks: []
+    lifecycle:
+      creation_phase: task:add
+      last_consumer_phase: null
+      retention_window: "from task:add completion; terminal output retained after workflow"
+      access_frequency_class: once
+      consumer_count: 0
+
+  - data_id: data:mosaic_area_fits
+    name: Mosaic Area Weight Image
+    description: >-
+      The mosaic_area.fits image giving per-pixel coverage/area weights for the
+      final mosaic, recording how many tiles contributed to each pixel. It is a
+      companion output to the mosaic used for downstream photometric weighting.
+    category: output
+    persistence: persistent
+    format_hint:
+      container: plain_binary
+      compression: none
+      layout_hint: contiguous
+      typical_request_size_kb: null
+    cardinality: "single global output file"
+    cardinality_source:
+      type: fixed
+      controlling_parameter: null
+      config_file: null
+      possible_values: "n/a"
+    estimated_size_hint: "unknown (same footprint as mosaic.fits)"
+    producer_task: task:add
+    consumer_tasks: []
+    lifecycle:
+      creation_phase: task:add
+      last_consumer_phase: null
+      retention_window: "from task:add completion; terminal output retained after workflow"
+      access_frequency_class: once
+      consumer_count: 0
+
+pc_edges:
+  - edge_id: pc:imgtbl_raw->project:1_to_n
+    producer: task:imgtbl_raw
+    consumer: task:project
+    data_objects: [data:images_tbl]
+    pc_pattern: 1_to_n
+    pc_pattern_rationale: >-
+      One mImgtbl process produces a single images.tbl, which tbl_tool splits
+      round-robin into N shards each consumed by one of N parallel mProjExec
+      instances -> 1_to_n.
+    data_flow_description: >-
+      The single images.tbl is sharded into N node-local tables; each project
+      instance reads its full shard text table once at startup.
+    coupling: tight
+    coupling_rationale: >-
+      Sharding and reprojection cannot begin until mImgtbl has fully written
+      images.tbl; the file is read after producer completion.
+    communication_pattern: shared_file
+    data_volume_class: small
+  - edge_id: pc:project->imgtbl_projected:n_to_1
+    producer: task:project
+    consumer: task:imgtbl_projected
+    data_objects: [data:projected_fits]
+    pc_pattern: n_to_1
+    pc_pattern_rationale: >-
+      N parallel project shards write projected FITS tiles into a shared
+      projected/ directory; one mImgtbl process scans them all -> n_to_1.
+    data_flow_description: >-
+      mImgtbl reads the header of every projected FITS file in projected/ to
+      build pimages.tbl; reads headers only, not full pixel data.
+    coupling: tight
+    coupling_rationale: >-
+      mImgtbl runs only after the project fan-out wait completes, scanning the
+      finished directory of projected files.
+    communication_pattern: file_per_producer
+    data_volume_class: medium
+  - edge_id: pc:imgtbl_projected->overlaps:1_to_1
+    producer: task:imgtbl_projected
+    consumer: task:overlaps
+    data_objects: [data:pimages_tbl]
+    pc_pattern: 1_to_1
+    pc_pattern_rationale: >-
+      One mImgtbl produces pimages.tbl, read by one mOverlaps process -> 1_to_1.
+    data_flow_description: >-
+      mOverlaps reads the entire pimages.tbl text table once to compute overlap
+      pairs.
+    coupling: tight
+    coupling_rationale: >-
+      mOverlaps opens pimages.tbl only after mImgtbl has written it; sequential
+      shell ordering.
+    communication_pattern: shared_file
+    data_volume_class: small
+  - edge_id: pc:overlaps->diff:1_to_n
+    producer: task:overlaps
+    consumer: task:diff
+    data_objects: [data:diffs_tbl]
+    pc_pattern: 1_to_n
+    pc_pattern_rationale: >-
+      One mOverlaps produces diffs.tbl, which is split into N shards each
+      consumed by one of N parallel mDiffExec instances -> 1_to_n.
+    data_flow_description: >-
+      diffs.tbl is sharded round-robin; each diff instance reads its shard text
+      table to learn which pairs to difference.
+    coupling: tight
+    coupling_rationale: >-
+      Sharding and differencing follow mOverlaps completion in shell order;
+      shard files read after the producer finishes.
+    communication_pattern: shared_file
+    data_volume_class: small
+  - edge_id: pc:project->diff:n_to_n
+    producer: task:project
+    consumer: task:diff
+    data_objects: [data:projected_fits]
+    pc_pattern: n_to_n
+    pc_pattern_rationale: >-
+      N project shards write the projected tiles; N diff shards each read the two
+      projected tiles of every pair in their shard, so any diff node may read any
+      project node's output -> n_to_n.
+    data_flow_description: >-
+      Each diff instance opens the two projected FITS files for each overlap pair
+      it owns (full-image cfitsio reads) from the shared projected/ directory.
+    coupling: tight
+    coupling_rationale: >-
+      All projected files must exist before differencing; the diff stage runs
+      after the project fan-out wait.
+    communication_pattern: file_per_producer
+    data_volume_class: medium
+  - edge_id: pc:overlaps->fit:1_to_n
+    producer: task:overlaps
+    consumer: task:fit
+    data_objects: [data:diffs_tbl]
+    pc_pattern: 1_to_n
+    pc_pattern_rationale: >-
+      diffs.tbl is split a second time into N fit shards, each consumed by one of
+      N parallel mFitExec instances -> 1_to_n.
+    data_flow_description: >-
+      Each fit instance reads its diffs.tbl shard to learn which difference images
+      to fit.
+    coupling: tight
+    coupling_rationale: >-
+      Fit sharding occurs after mOverlaps and after differencing in shell order;
+      shard files read post-producer.
+    communication_pattern: shared_file
+    data_volume_class: small
+  - edge_id: pc:diff->fit:n_to_n
+    producer: task:diff
+    consumer: task:fit
+    data_objects: [data:diff_fits]
+    pc_pattern: n_to_n
+    pc_pattern_rationale: >-
+      N diff shards write diff FITS images into shared diffs/; N fit shards each
+      read the diff images for their pair shard, so any fit node may read any
+      diff node's output -> n_to_n.
+    data_flow_description: >-
+      Each fit instance opens the diff FITS image for each pair it owns
+      (cfitsio read) and fits a plane.
+    coupling: tight
+    coupling_rationale: >-
+      The diff fan-out wait completes before the fit stage starts; all diff files
+      present before fitting.
+    communication_pattern: file_per_producer
+    data_volume_class: medium
+  - edge_id: pc:imgtbl_projected->bgmodel:1_to_1
+    producer: task:imgtbl_projected
+    consumer: task:bgmodel
+    data_objects: [data:pimages_tbl]
+    pc_pattern: 1_to_1
+    pc_pattern_rationale: >-
+      One pimages.tbl is read by the single mBgModel process -> 1_to_1.
+    data_flow_description: >-
+      mBgModel reads pimages.tbl once to know the tile set for the global
+      background solve.
+    coupling: tight
+    coupling_rationale: >-
+      mBgModel reads pimages.tbl which was fully written by the earlier mImgtbl;
+      sequential ordering.
+    communication_pattern: shared_file
+    data_volume_class: small
+  - edge_id: pc:fit->bgmodel:n_to_1
+    producer: task:fit
+    consumer: task:bgmodel
+    data_objects: [data:fits_tbl]
+    pc_pattern: n_to_1
+    pc_pattern_rationale: >-
+      N fit shards each emit a per-shard fits table; tbl_tool concat gathers them
+      into one fits.tbl that the single mBgModel reads -> n_to_1.
+    data_flow_description: >-
+      Per-shard fit tables are concatenated into fits.tbl, read once in full by
+      mBgModel for the global background least-squares solve.
+    coupling: tight
+    coupling_rationale: >-
+      The fit fan-out wait and concat complete before mBgModel runs; it needs the
+      complete fit table before solving.
+    communication_pattern: file_per_producer
+    data_volume_class: small
+  - edge_id: pc:imgtbl_projected->background:1_to_n
+    producer: task:imgtbl_projected
+    consumer: task:background
+    data_objects: [data:pimages_tbl]
+    pc_pattern: 1_to_n
+    pc_pattern_rationale: >-
+      pimages.tbl is split into N shards each consumed by one of N parallel
+      mBgExec instances -> 1_to_n.
+    data_flow_description: >-
+      Each background instance reads its pimages.tbl shard to learn which tiles to
+      correct.
+    coupling: tight
+    coupling_rationale: >-
+      Background sharding occurs after pimages.tbl exists; shard files read after
+      producer completion.
+    communication_pattern: shared_file
+    data_volume_class: small
+  - edge_id: pc:bgmodel->background:1_to_n
+    producer: task:bgmodel
+    consumer: task:background
+    data_objects: [data:corrections_tbl]
+    pc_pattern: 1_to_n
+    pc_pattern_rationale: >-
+      One mBgModel produces corrections.tbl, which is read (broadcast) by all N
+      parallel mBgExec instances -> 1_to_n.
+    data_flow_description: >-
+      Every background instance opens the same shared corrections.tbl to obtain
+      its tiles' correction coefficients.
+    coupling: tight
+    coupling_rationale: >-
+      mBgExec runs only after mBgModel has written corrections.tbl; the file is
+      read after producer completion.
+    communication_pattern: shared_file
+    data_volume_class: small
+  - edge_id: pc:project->background:n_to_n
+    producer: task:project
+    consumer: task:background
+    data_objects: [data:projected_fits]
+    pc_pattern: n_to_n
+    pc_pattern_rationale: >-
+      N project shards write projected tiles; N background shards each read the
+      projected tiles in their own shard, so any background node may read any
+      project node's output -> n_to_n.
+    data_flow_description: >-
+      Each background instance reads the projected FITS file for each tile it
+      owns (cfitsio read), subtracts the modeled background, writes a corrected
+      FITS file.
+    coupling: tight
+    coupling_rationale: >-
+      All projected files exist before background application; the stage runs
+      after the project fan-out.
+    communication_pattern: file_per_producer
+    data_volume_class: medium
+  - edge_id: pc:background->imgtbl_corrected:n_to_1
+    producer: task:background
+    consumer: task:imgtbl_corrected
+    data_objects: [data:corrected_fits]
+    pc_pattern: n_to_1
+    pc_pattern_rationale: >-
+      N background shards write corrected FITS tiles into shared corrected/; one
+      mImgtbl scans them all -> n_to_1.
+    data_flow_description: >-
+      mImgtbl reads the header of every corrected FITS file to build cimages.tbl;
+      headers only, not pixel data.
+    coupling: tight
+    coupling_rationale: >-
+      mImgtbl runs only after the background fan-out wait completes, scanning the
+      finished corrected directory.
+    communication_pattern: file_per_producer
+    data_volume_class: medium
+  - edge_id: pc:imgtbl_corrected->add:1_to_1
+    producer: task:imgtbl_corrected
+    consumer: task:add
+    data_objects: [data:cimages_tbl]
+    pc_pattern: 1_to_1
+    pc_pattern_rationale: >-
+      One mImgtbl produces cimages.tbl, read by the single mAdd process -> 1_to_1.
+    data_flow_description: >-
+      mAdd reads cimages.tbl once for tile placement metadata before coadding.
+    coupling: tight
+    coupling_rationale: >-
+      mAdd opens cimages.tbl only after mImgtbl has written it; sequential
+      ordering.
+    communication_pattern: shared_file
+    data_volume_class: small
+  - edge_id: pc:background->add:n_to_1
+    producer: task:background
+    consumer: task:add
+    data_objects: [data:corrected_fits]
+    pc_pattern: n_to_1
+    pc_pattern_rationale: >-
+      N background shards write corrected FITS tiles into shared corrected/; one
+      mAdd reads all of them to build the single mosaic -> n_to_1.
+    data_flow_description: >-
+      mAdd streams every corrected FITS file (cfitsio reads), accumulating flux
+      and area into the output mosaic written line-by-line.
+    coupling: tight
+    coupling_rationale: >-
+      mAdd runs only after the background fan-out wait completes; it must read
+      all corrected tiles to produce the mosaic.
+    communication_pattern: file_per_producer
+    data_volume_class: medium
+
+workflow_graph:
+  integrity_hash: d2c59faf2afeda38417dee2a7efc240cdc4a6586349915bb9007910a7e9bf8e4
+  last_generated: 2026-06-01T14:26:02Z
+  dag_edges:
+    - { from: task:imgtbl_raw, to: task:project, via: pc:imgtbl_raw->project:1_to_n }
+    - { from: task:project, to: task:imgtbl_projected, via: pc:project->imgtbl_projected:n_to_1 }
+    - { from: task:imgtbl_projected, to: task:overlaps, via: pc:imgtbl_projected->overlaps:1_to_1 }
+    - { from: task:overlaps, to: task:diff, via: pc:overlaps->diff:1_to_n }
+    - { from: task:project, to: task:diff, via: pc:project->diff:n_to_n }
+    - { from: task:overlaps, to: task:fit, via: pc:overlaps->fit:1_to_n }
+    - { from: task:diff, to: task:fit, via: pc:diff->fit:n_to_n }
+    - { from: task:imgtbl_projected, to: task:bgmodel, via: pc:imgtbl_projected->bgmodel:1_to_1 }
+    - { from: task:fit, to: task:bgmodel, via: pc:fit->bgmodel:n_to_1 }
+    - { from: task:imgtbl_projected, to: task:background, via: pc:imgtbl_projected->background:1_to_n }
+    - { from: task:bgmodel, to: task:background, via: pc:bgmodel->background:1_to_n }
+    - { from: task:project, to: task:background, via: pc:project->background:n_to_n }
+    - { from: task:background, to: task:imgtbl_corrected, via: pc:background->imgtbl_corrected:n_to_1 }
+    - { from: task:imgtbl_corrected, to: task:add, via: pc:imgtbl_corrected->add:1_to_1 }
+    - { from: task:background, to: task:add, via: pc:background->add:n_to_1 }
+  loop_groups: []
+  critical_path_hint: >-
+    task:imgtbl_raw -> task:project -> task:imgtbl_projected -> task:overlaps ->
+    task:diff -> task:fit -> task:bgmodel -> task:background ->
+    task:imgtbl_corrected -> task:add (linear stage cascade; the four *Exec
+    stages fan out internally but the stage chain itself is sequential).
+  control_flow:
+    has_iteration: false
+    iteration_description: null
+    has_conditional_branches: false
+    conditional_description: null
+  stage_execution_order:
+    - stage:build_image_table
+    - stage:reproject
+    - stage:table_projected
+    - stage:overlaps
+    - stage:difference
+    - stage:fit_planes
+    - stage:background_model
+    - stage:background_apply
+    - stage:table_corrected
+    - stage:coadd
+  cross_reference:
+    task_to_stage:
+      task:imgtbl_raw: stage:build_image_table
+      task:project: stage:reproject
+      task:imgtbl_projected: stage:table_projected
+      task:overlaps: stage:overlaps
+      task:diff: stage:difference
+      task:fit: stage:fit_planes
+      task:bgmodel: stage:background_model
+      task:background: stage:background_apply
+      task:imgtbl_corrected: stage:table_corrected
+      task:add: stage:coadd
+    data_to_producer:
+      data:raw_fits_tiles: null
+      data:region_hdr: null
+      data:images_tbl: task:imgtbl_raw
+      data:projected_fits: task:project
+      data:pimages_tbl: task:imgtbl_projected
+      data:diffs_tbl: task:overlaps
+      data:diff_fits: task:diff
+      data:fits_tbl: task:fit
+      data:corrections_tbl: task:bgmodel
+      data:corrected_fits: task:background
+      data:cimages_tbl: task:imgtbl_corrected
+      data:mosaic_fits: task:add
+      data:mosaic_area_fits: task:add
+    data_to_consumers:
+      data:raw_fits_tiles: [task:imgtbl_raw, task:project]
+      data:region_hdr: [task:project, task:diff, task:add]
+      data:images_tbl: [task:project]
+      data:projected_fits: [task:imgtbl_projected, task:diff, task:background]
+      data:pimages_tbl: [task:overlaps, task:bgmodel, task:background]
+      data:diffs_tbl: [task:diff, task:fit]
+      data:diff_fits: [task:fit]
+      data:fits_tbl: [task:bgmodel]
+      data:corrections_tbl: [task:background]
+      data:corrected_fits: [task:imgtbl_corrected, task:add]
+      data:cimages_tbl: [task:add]
+      data:mosaic_fits: []
+      data:mosaic_area_fits: []
+
+workflow_patterns:
+  primary_pattern: hybrid
+  secondary_patterns: [scatter_gather, cascading]
+  classification_rationale: >-
+    The workflow is a linear cascade of ten stages (each stage's output feeds the
+    next), but four of the compute stages (reproject, difference, fit, background
+    apply) are scatter fan-outs driven by table sharding (tbl_tool split) and
+    srun across N nodes, while mBgModel and mAdd are explicit n_to_1 gathers.
+    Several edges are n_to_n (project->diff, diff->fit, project->background)
+    because sharded producers and sharded consumers both touch the shared FITS
+    directories. The combination of an overall cascading stage chain with
+    embedded scatter_gather fan-out/fan-in makes the primary pattern hybrid.
+  pattern_table_row: >-
+    montage | 10 stages | 4 single-task exception stages (mImgtbl x3, mOverlaps,
+    mBgModel, mAdd) + 4 N-way scatter fan-out stages (project, diff, fit,
+    background) | 1_to_1, 1_to_n, n_to_1, n_to_n | scatter_gather fan-out/gather
+    within an overall cascading pipeline (hybrid)
+
+io_behavioral_hints:
+  - hint_id: hint:small_file_table_sharding
+    description: >-
+      tbl_tool.py splits images.tbl, diffs.tbl (twice), and pimages.tbl into N
+      small per-node shard files and concatenates N small per-shard fit tables.
+      At higher node counts this produces many tiny .tbl files read/written
+      around each fan-out, a small-file/metadata-heavy pattern on the shared
+      filesystem.
+    affected_tasks: [task:project, task:diff, task:fit, task:background]
+    affected_data: [data:images_tbl, data:diffs_tbl, data:pimages_tbl, data:fits_tbl]
+    potential_concern: small_file_overhead
+  - hint_id: hint:projected_fits_reuse
+    description: >-
+      The projected FITS tiles are read three times across the workflow (by
+      mImgtbl for pimages.tbl, by mDiffExec for differencing, and by mBgExec for
+      background application) from the shared projected/ directory, a data-reuse
+      pattern where the same intermediate is re-opened by multiple later stages.
+    affected_tasks: [task:imgtbl_projected, task:diff, task:background]
+    affected_data: [data:projected_fits]
+    potential_concern: data_reuse
+  - hint_id: hint:corrections_broadcast_metadata
+    description: >-
+      The single corrections.tbl is opened independently by all N mBgExec
+      instances on different nodes (a 1_to_n broadcast over a shared file), and
+      each mImgtbl rebuild scans every FITS header in a directory. With many
+      tiles these directory-wide header scans and shared-file opens are
+      metadata-intensive on the parallel filesystem.
+    affected_tasks: [task:background, task:imgtbl_projected, task:imgtbl_corrected]
+    affected_data: [data:corrections_tbl, data:projected_fits, data:corrected_fits]
+    potential_concern: metadata_overhead
+
+execution_profiles:
+  - profile_name: full_mosaic
+    terminal_task_id: task:add
+    description: >-
+      Runs the complete Montage pipeline end to end, producing the final
+      mosaic.fits and mosaic_area.fits. This is the standard scientific stopping
+      point: a finished, background-matched astronomical image mosaic.
+    required_task_set:
+      - task:imgtbl_raw
+      - task:project
+      - task:imgtbl_projected
+      - task:overlaps
+      - task:diff
+      - task:fit
+      - task:bgmodel
+      - task:background
+      - task:imgtbl_corrected
+      - task:add
+    conditional_inclusions: []
+    output_dataset_ids: [data:mosaic_fits, data:mosaic_area_fits]
+
+translation_metadata:
+  source_format: native
+  source_file: /u/mtang9/widget_eval/hpc_workflows/runs/Montage/run_montage_prof.sh
+  translation_tool: claude-code-opus-4-8
+  translation_timestamp: 2026-06-01T14:26:02Z
+  unmapped_fields:
+    - field_path: data_objects[*].format_hint.datasets
+      reason: >-
+        FITS and .tbl are not HDF5/netCDF4 containers, so dataset-level
+        substructure is not modeled; FITS pixel arrays and tables are opaque at
+        this layer.
+    - field_path: data_objects[*].estimated_size_hint
+      reason: >-
+        Per-instance sizes depend on tile pixel dimensions chosen at synthetic
+        generation time; not fixed in the orchestration source.
+  round_trip_gaps:
+    - field_path: stages
+      note: >-
+        Stage groupings, descriptions, and execution profiles have no native
+        representation in the shell script; they are reconstructed and would be
+        lost on round-trip back to run_montage_prof.sh.
+    - field_path: pc_edges[*].pc_pattern
+      note: >-
+        Producer-consumer patterns are implicit in the shell fan-out and tbl
+        sharding; they are not declared in the source and would not round-trip.
+  quality_warnings: []
+  field_confidence_records:
+    - field_path: metadata.workflow_description
+      confidence_level: high
+      confidence_reason: >-
+        Montage is a well-known image-mosaic engine and the README plus the
+        ordered binary invocations confirm the reprojection/difference/fit/
+        background/coadd pipeline.
+      requires_human_review: false
+    - field_path: stages[*].description
+      confidence_level: high
+      confidence_reason: Derived directly from the ordered binary calls in run_montage_prof.sh.
+      requires_human_review: false
+    - field_path: tasks[*].description
+      confidence_level: high
+      confidence_reason: >-
+        Each task maps one-to-one to a named Montage binary with well-documented
+        function; inputs/outputs read from the script arguments.
+      requires_human_review: false
+    - field_path: data_objects[*].description
+      confidence_level: high
+      confidence_reason: >-
+        Data objects are the explicit file/table arguments passed between
+        Montage binaries in the script.
+      requires_human_review: false
+    - field_path: pc_edges[*].pc_pattern
+      confidence_level: high
+      confidence_reason: >-
+        Patterns derived from tbl_tool split/concat behavior and the fanout()
+        srun loop: single-task stages are 1_to_1/1_to_n/n_to_1, sharded FITS
+        producer/consumer pairs are n_to_n.
+      requires_human_review: false
+    - field_path: pc_edges[*].coupling
+      confidence_level: high
+      confidence_reason: >-
+        The script is strictly sequential between stages (bash wait after each
+        fanout, ex calls run inline), so every consumer starts only after its
+        producer fully completes -> tight.
+      requires_human_review: false
+    - field_path: workflow_patterns.primary_pattern
+      confidence_level: high
+      confidence_reason: >-
+        Explicit scatter fan-out (split + srun) and gather (concat, mBgModel,
+        mAdd) embedded in a linear stage chain -> hybrid (scatter_gather +
+        cascading).
+      requires_human_review: false
+    - field_path: tasks[*].io_dominance
+      confidence_level: medium
+      confidence_reason: >-
+        Inferred from each tool's role (table-only solvers compute_bound, FITS
+        read/transform/write balanced, header-scan/coadd io_bound); not measured.
+      requires_human_review: false
+    - field_path: tasks[*].io_access_type
+      confidence_level: high
+      confidence_reason: >-
+        All Montage tools are C/cfitsio binaries using STDIO fopen/fread/fwrite
+        with no MPI (verified absence of MPI_/mpi.h in Project source); .tbl are
+        POSIX text -> posix_independent.
+      requires_human_review: false
+    - field_path: tasks[*].restart_model
+      confidence_level: medium
+      confidence_reason: >-
+        Montage stages are deterministic transforms over their inputs and the run
+        script rm -rf's outputs and reruns from scratch, so each stage is
+        idempotent on re-run; no checkpoint-resume logic exists.
+      requires_human_review: false
+    - field_path: tasks[*].behavioral_notes
+      confidence_level: high
+      confidence_reason: >-
+        Behaviors derived from the documented Montage tool semantics (per-row
+        table processing, per-tile FITS read/write, global solves) and cfitsio
+        STDIO usage.
+      requires_human_review: false
+    - field_path: io_behavioral_hints
+      confidence_level: medium
+      confidence_reason: >-
+        Hints inferred statically from the tbl sharding (many small files),
+        repeated reads of projected FITS, and broadcast/directory-scan metadata
+        patterns; not confirmed by profiling.
+      requires_human_review: false
+    - field_path: execution_profiles
+      confidence_level: high
+      confidence_reason: >-
+        The script has a single linear pipeline whose only meaningful terminal is
+        mAdd producing the mosaic; one full profile proposed.
+      requires_human_review: true
+    - field_path: tasks[*].output_class
+      confidence_level: medium
+      confidence_reason: >-
+        Only mAdd's mosaic.fits/mosaic_area.fits have standalone scientific value
+        (checkpoint); all other outputs are intermediates feeding the next stage.
+        Should be confirmed with the scientist.
+      requires_human_review: true

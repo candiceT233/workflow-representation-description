@@ -1,0 +1,391 @@
+header:
+  ddd_id: deploy:montage:scale_a_25n:functional_trace
+  strategy_name: functional_trace
+  wrd_lineage_id: wrd:montage
+  wrd_version: "1.0.0"
+  edd_lineage_id: edd:montage:scale_a_25tile
+  edd_instance_id: montage_scale_a_25tile_inst_001
+  hrd_id: hrd:delta_ncsa_cpu
+  hrd_version: "1.0.0"
+  gd_id: gd:montage:scale_a_profiling
+  schema_version: ddd-7.0
+  execution_profile: full_mosaic
+  generated_by: claude-code-opus-4-8
+  generated_at: 2026-06-01T14:30:43Z
+  description: >-
+    Deployment for the Montage Scale-A 25-node functional profiling run on the
+    NCSA Delta CPU partition. The strategy is driven by the GD hard goals
+    (25/25 distinct-node spread, non-empty profiler traces, the final mosaic.fits
+    artifact, all I/O on /projects Lustre, and a 50-minute wall budget on
+    partition cpu / account bekn-delta-cpu), with the only soft objective being
+    efficient node-hours. The four *Exec stages fan out one .tbl shard per node
+    across 25 distinct nodes via pinned single-task srun; the six single-task
+    Montage stages (mImgtbl x3, mOverlaps, mBgModel, mAdd) run on the batch node.
+    All run I/O and traces live on tier:projects_lustre, the only cross-node
+    shared filesystem with adequate quota, since Delta home is tightly capped.
+
+per_task_parallelism:
+  - task_id: task:imgtbl_raw
+    parallelism_instances: 1
+    ranks_per_instance: 1
+    threads_per_rank: 1
+    compute_resource: compute:cpu_node
+    total_nodes_required: 1
+    goal_ref: goal:produce_mosaic_fits
+    rationale: >-
+      mImgtbl is a serial exception stage (WDD parallelism_model.type=serial); it
+      runs single-task on the batch node, scanning all raw FITS headers to build
+      images.tbl before the reproject fan-out can shard it.
+
+  - task_id: task:project
+    parallelism_instances: 25
+    ranks_per_instance: 1
+    threads_per_rank: 1
+    compute_resource: compute:cpu_node
+    total_nodes_required: 25
+    goal_ref: goal:multinode_25_distinct
+    rationale: >-
+      mProjExec is embarrassingly_parallel over an images.tbl shard; EDD
+      resolved_cardinalities[data:projected_fits]=25 and shard_count=25 give a
+      25-way fan-out, one pinned srun per distinct node (placement policy spread).
+
+  - task_id: task:imgtbl_projected
+    parallelism_instances: 1
+    ranks_per_instance: 1
+    threads_per_rank: 1
+    compute_resource: compute:cpu_node
+    total_nodes_required: 1
+    goal_ref: goal:produce_mosaic_fits
+    rationale: >-
+      Serial exception stage (WDD type=serial); a single mImgtbl scans the
+      projected/ directory headers on the batch node to build pimages.tbl.
+
+  - task_id: task:overlaps
+    parallelism_instances: 1
+    ranks_per_instance: 1
+    threads_per_rank: 1
+    compute_resource: compute:cpu_node
+    total_nodes_required: 1
+    goal_ref: goal:produce_mosaic_fits
+    rationale: >-
+      mOverlaps is a serial, compute_bound table-to-table computation; it runs
+      single-task on the batch node to enumerate all overlap pairs into diffs.tbl.
+
+  - task_id: task:diff
+    parallelism_instances: 25
+    ranks_per_instance: 1
+    threads_per_rank: 1
+    compute_resource: compute:cpu_node
+    total_nodes_required: 25
+    goal_ref: goal:multinode_25_distinct
+    rationale: >-
+      mDiffExec is embarrassingly_parallel over a diffs.tbl shard; shard_count=25
+      gives a 25-way fan-out, one pinned srun per distinct node (spread).
+
+  - task_id: task:fit
+    parallelism_instances: 25
+    ranks_per_instance: 1
+    threads_per_rank: 1
+    compute_resource: compute:cpu_node
+    total_nodes_required: 25
+    goal_ref: goal:multinode_25_distinct
+    rationale: >-
+      mFitExec is embarrassingly_parallel over a fit-table shard; shard_count=25
+      gives a 25-way fan-out, one pinned srun per distinct node (spread), gathered
+      by tbl_tool concat into fits.tbl.
+
+  - task_id: task:bgmodel
+    parallelism_instances: 1
+    ranks_per_instance: 1
+    threads_per_rank: 1
+    compute_resource: compute:cpu_node
+    total_nodes_required: 1
+    goal_ref: goal:produce_mosaic_fits
+    rationale: >-
+      mBgModel is a serial n_to_1 gather (WDD type=serial, compute_bound) that
+      must see all plane fits at once; it runs single-task on the batch node.
+
+  - task_id: task:background
+    parallelism_instances: 25
+    ranks_per_instance: 1
+    threads_per_rank: 1
+    compute_resource: compute:cpu_node
+    total_nodes_required: 25
+    goal_ref: goal:multinode_25_distinct
+    rationale: >-
+      mBgExec is embarrassingly_parallel over a pimages.tbl shard; shard_count=25
+      gives a 25-way fan-out, one pinned srun per distinct node (spread), each
+      reading the broadcast corrections.tbl.
+
+  - task_id: task:imgtbl_corrected
+    parallelism_instances: 1
+    ranks_per_instance: 1
+    threads_per_rank: 1
+    compute_resource: compute:cpu_node
+    total_nodes_required: 1
+    goal_ref: goal:produce_mosaic_fits
+    rationale: >-
+      Serial exception stage (WDD type=serial); a single mImgtbl scans the
+      corrected/ directory headers on the batch node to build cimages.tbl.
+
+  - task_id: task:add
+    parallelism_instances: 1
+    ranks_per_instance: 1
+    threads_per_rank: 1
+    compute_resource: compute:cpu_node
+    total_nodes_required: 1
+    goal_ref: goal:produce_mosaic_fits
+    rationale: >-
+      mAdd is the terminal serial n_to_1 gather; it streams all corrected tiles
+      on the batch node to write mosaic.fits and mosaic_area.fits, satisfying the
+      mosaic-production hard goal.
+
+storage_tier_assignments:
+  - dataset_id: data:raw_fits_tiles
+    assigned_tier: tier:projects_lustre
+    cleanup_policy: retain_indefinitely
+    replication: false
+    caching_policy: none
+    goal_ref: goal:outputs_on_projects_lustre
+    rationale: >-
+      Persistent external input read from the shared scale_a input root on
+      /projects Lustre; the only cross-node shared FS with quota headroom.
+
+  - dataset_id: data:region_hdr
+    assigned_tier: tier:projects_lustre
+    cleanup_policy: retain_indefinitely
+    replication: false
+    caching_policy: none
+    goal_ref: goal:outputs_on_projects_lustre
+    rationale: >-
+      Small persistent config header read by project/diff/add from the shared
+      Lustre input root; never staged to volatile tiers.
+
+  - dataset_id: data:images_tbl
+    assigned_tier: tier:projects_lustre
+    cleanup_policy: end_of_job
+    replication: false
+    caching_policy: none
+    goal_ref: goal:outputs_on_projects_lustre
+    rationale: >-
+      Small intermediate table written into the shared Lustre RUNDIR/tbls so all
+      25 fan-out nodes can read their shards.
+
+  - dataset_id: data:projected_fits
+    assigned_tier: tier:projects_lustre
+    cleanup_policy: after_last_consumer
+    replication: false
+    caching_policy: cache_on_first_read
+    goal_ref: goal:outputs_on_projects_lustre
+    rationale: >-
+      Intermediate FITS reused by imgtbl_projected, diff, and background across
+      nodes (access_frequency repeatedly); must sit on the shared Lustre RUNDIR.
+
+  - dataset_id: data:pimages_tbl
+    assigned_tier: tier:projects_lustre
+    cleanup_policy: after_last_consumer
+    replication: false
+    caching_policy: none
+    goal_ref: goal:outputs_on_projects_lustre
+    rationale: >-
+      Small intermediate table on the shared Lustre RUNDIR, sharded for the
+      background fan-out and read by overlaps and bgmodel.
+
+  - dataset_id: data:diffs_tbl
+    assigned_tier: tier:projects_lustre
+    cleanup_policy: after_last_consumer
+    replication: false
+    caching_policy: none
+    goal_ref: goal:outputs_on_projects_lustre
+    rationale: >-
+      Small intermediate table on the shared Lustre RUNDIR, sharded twice for the
+      diff and fit fan-outs.
+
+  - dataset_id: data:diff_fits
+    assigned_tier: tier:projects_lustre
+    cleanup_policy: after_last_consumer
+    replication: false
+    caching_policy: none
+    goal_ref: goal:outputs_on_projects_lustre
+    rationale: >-
+      Intermediate diff FITS written by 25 diff nodes into the shared diffs/ on
+      Lustre and read by the fit fan-out (n_to_n cross-node access).
+
+  - dataset_id: data:fits_tbl
+    assigned_tier: tier:projects_lustre
+    cleanup_policy: after_last_consumer
+    replication: false
+    caching_policy: none
+    goal_ref: goal:outputs_on_projects_lustre
+    rationale: >-
+      Small gathered table on the shared Lustre RUNDIR, concatenated from 25 fit
+      shards and read once by bgmodel.
+
+  - dataset_id: data:corrections_tbl
+    assigned_tier: tier:projects_lustre
+    cleanup_policy: after_last_consumer
+    replication: false
+    caching_policy: cache_on_first_read
+    goal_ref: goal:outputs_on_projects_lustre
+    rationale: >-
+      Small intermediate table broadcast (1_to_n) to all 25 background nodes;
+      kept on shared Lustre so every node can open the same file.
+
+  - dataset_id: data:corrected_fits
+    assigned_tier: tier:projects_lustre
+    cleanup_policy: after_last_consumer
+    replication: false
+    caching_policy: none
+    goal_ref: goal:outputs_on_projects_lustre
+    rationale: >-
+      Intermediate corrected FITS written by 25 background nodes into shared
+      corrected/ on Lustre and gathered by imgtbl_corrected and add.
+
+  - dataset_id: data:mosaic_fits
+    assigned_tier: tier:projects_lustre
+    cleanup_policy: retain_indefinitely
+    replication: false
+    caching_policy: none
+    goal_ref: goal:produce_mosaic_fits
+    rationale: >-
+      Terminal mosaic deliverable written to the shared Lustre RUNDIR/mosaic;
+      retained as the ground-truth completion signal for the run.
+
+  - dataset_id: data:cimages_tbl
+    assigned_tier: tier:projects_lustre
+    cleanup_policy: after_last_consumer
+    replication: false
+    caching_policy: none
+    goal_ref: goal:outputs_on_projects_lustre
+    rationale: >-
+      Small intermediate table on the shared Lustre RUNDIR read once by mAdd for
+      tile placement.
+
+  - dataset_id: data:mosaic_area_fits
+    assigned_tier: tier:projects_lustre
+    cleanup_policy: retain_indefinitely
+    replication: false
+    caching_policy: none
+    goal_ref: goal:produce_mosaic_fits
+    rationale: >-
+      Companion area-weight output written alongside mosaic.fits to the shared
+      Lustre RUNDIR/mosaic and retained with the deliverable.
+
+staging_plan:
+  stage_in_steps: []
+  stage_out_steps: []
+  stripe_setup_commands: []
+
+task_placement:
+  - group_id: pg:montage_exec_fanout_spread
+    tasks: [task:project, task:diff, task:fit, task:background]
+    placement_policy: spread
+    co_schedule: false
+    goal_ref: goal:multinode_25_distinct
+    rationale: >-
+      Each *Exec stage scatters exactly one .tbl shard per node via
+      "srun --exclusive --nodes=1 --ntasks=1 --cpus-per-task=128 --nodelist=NODE[i]"
+      across 25 distinct nodes; spread placement is mandatory to reach 25/25
+      distinct-node coverage required by the hard node-spread goal.
+
+  - group_id: pg:montage_exception_batchnode
+    tasks: [task:imgtbl_raw, task:imgtbl_projected, task:overlaps, task:bgmodel, task:imgtbl_corrected, task:add]
+    placement_policy: no_constraint
+    co_schedule: false
+    goal_ref: goal:produce_mosaic_fits
+    rationale: >-
+      The single-task exception stages (mImgtbl x3, mOverlaps, mBgModel, mAdd)
+      run inline on the batch node and are the only permitted single-node
+      exceptions to the spread requirement.
+
+pipelining: []
+
+replication_and_caching:
+  global_replication_factor: 1
+  restart_strategy:
+    model: full_restart
+    operator_action_required: true
+    rationale: >-
+      All WDD tasks are idempotent with no checkpoint-resume logic; the run
+      script rm -rf's outputs and reruns from scratch, so any failure is handled
+      by operator re-submission of the whole job.
+  cache_warm_strategy: no
+  goal_ref: goal:efficient_node_hours
+
+job_script:
+  scheduler_type: slurm
+  target_partition: cpu
+  account: bekn-delta-cpu
+  estimated_walltime_hours: 0.83
+  exclusive_nodes: true
+  directives:
+    - directive: "--account=bekn-delta-cpu"
+      purpose: "Allocation charging on the CPU account with available capacity"
+    - directive: "--partition=cpu"
+      purpose: "Queue selection per the partition_cpu_account_bekn hard constraint"
+    - directive: "--nodes=25"
+      purpose: "Node allocation for the 25-way fan-out and 25/25 spread goal"
+    - directive: "--ntasks-per-node=1"
+      purpose: "One task per node (Rule 1) to drive per-node srun fan-out"
+    - directive: "--cpus-per-task=128"
+      purpose: "Whole-node CPU allocation per fan-out task"
+    - directive: "--mem=0"
+      purpose: "Whole-node memory allocation"
+    - directive: "--time=00:50:00"
+      purpose: "Wall time cap within the 50-minute Scale-A budget"
+  environment_setup:
+    module_load_commands: []
+    container_command: null
+    ld_preload: "export LD_PRELOAD=<profiler libmonitor.so or libdarshan.so> applied per Montage command (MWRAP), not on bash/python"
+    environment_variable_exports:
+      - "export WORKFLOW_ROOT=/u/mtang9/widget_eval/hpc_workflows"
+      - "export PATH=$WORKFLOW_ROOT/repos/Montage/bin:$PATH"
+      - "export MONTAGE_DATA=/projects/bekn/mtang9/widget/data/Montage/scale_a"
+      - "export RUNDIR=/projects/bekn/mtang9/widget/runs/Montage/scale_a_25n"
+      - "export DATALIFE_FILE_PATTERNS=*.fits,*.tbl,*.hdr,*.area"
+    stripe_setup_commands: []
+  rationale: >-
+    Partition cpu and account bekn-delta-cpu are mandated by the
+    partition_cpu_account_bekn hard constraint; --nodes=25 with
+    --ntasks-per-node=1 enables the per-node srun fan-out and the 25/25
+    distinct-node spread goal. The 00:50:00 wall cap matches the GD wall-time
+    hard goal (a verified run completes in ~20s, so the budget is ample).
+    Exclusive whole-node access (--cpus-per-task=128 --mem=0 plus per-srun
+    --exclusive) avoids co-tenant contention on the shared Lustre tier during
+    profiling.
+
+validation_summary:
+  validation_status: valid
+  hard_constraint_checks:
+    - constraint_id: goal:must_produce_mosaic_fits
+      status: pass
+      evidence: "task:add runs single-task on the batch node writing data:mosaic_fits to tier:projects_lustre RUNDIR/mosaic."
+    - constraint_id: goal:must_reach_25_distinct_nodes
+      status: pass
+      evidence: "Four *Exec fan-out tasks each scatter 25 shards across 25 distinct --nodelist nodes; exception stages are the only permitted single-node steps."
+    - constraint_id: goal:outputs_on_projects_lustre
+      status: pass
+      evidence: "Every dataset (inputs, intermediates, mosaic, traces RUNDIR) is assigned to tier:projects_lustre; no dataset on tier:home."
+    - constraint_id: goal:partition_cpu_account_bekn
+      status: pass
+      evidence: "job_script directives set --partition=cpu and --account=bekn-delta-cpu."
+  capacity_checks:
+    - tier_id: tier:projects_lustre
+      total_assigned_gb: 0.1
+      tier_capacity_gb: 1024
+      status: pass
+      note: "All run data (~25 MB input plus comparable projected/diff/corrected intermediates and mosaic) is far below the 1 TB per-job Lustre capacity."
+  bandwidth_checks: []
+  scheduler_feasibility_checks:
+    - partition_id: cpu
+      total_nodes_required: 25
+      max_nodes_in_partition: 136
+      walltime_hours: 0.83
+      max_walltime_in_partition: 48
+      status: pass
+      note: "25 nodes <= 136 and 0.83 h <= 48 h on partition cpu."
+  validation_notes: >-
+    All hard constraints pass and the single capacity check passes. Operator
+    should confirm 25/25 distinct nodes via logs/nodes_*.txt and verify non-empty
+    profiler traces in RUNDIR/traces at runtime, since trace non-emptiness cannot
+    be statically validated.

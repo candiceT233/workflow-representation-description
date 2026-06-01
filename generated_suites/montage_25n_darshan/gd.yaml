@@ -1,0 +1,94 @@
+header:
+  gd_id: "gd:montage:scale_a_profiling"
+  wrd_lineage_id: "wrd:montage"
+  wrd_version: "1.0.0"
+  operator: "mtang9, HPC profiling campaign operator, IIT / NCSA Delta"
+  created_at: "2026-06-01T14:29:33Z"
+  last_modified_at: "2026-06-01T14:29:33Z"
+  schema_version: "gd-7.0"
+  description: "Montage image-mosaic pipeline, Scale A profiling run on NCSA Delta (25 nodes, partition cpu, account bekn-delta-cpu). This is a benchmarking/validation run, not production. Primary concerns are (1) correct multi-node execution with full node spread across all 25 allocated nodes and (2) capture of meaningful, non-empty I/O traces from the profilers (DataLife / Darshan). Throughput and latency are explicitly NOT primary objectives for this run."
+
+goals:
+  - goal_id: "goal:multinode_25_distinct"
+    goal_type: "other"
+    description: "Validate correct multi-node execution at 25 nodes with full node spread: all 25 allocated nodes must run work (25/25 distinct nodes), per the campaign's Rule 1/2 (--nodes=25 --ntasks-per-node=1, every allocated node executes a unit of work)."
+    metric: "distinct_nodes_running_work"
+    target_value: 25
+    target_unit: "nodes"
+    target_direction: "exact"
+    constraint_type: "hard"
+
+  - goal_id: "goal:nonempty_io_traces"
+    goal_type: "other"
+    description: "Capture meaningful, non-empty I/O traces from both profilers (DataLife and Darshan). The run is a failure for profiling purposes if either profiler emits empty or zero-record trace output."
+    metric: "nonempty_trace_outputs_per_profiler"
+    target_value: 1
+    target_unit: "count"
+    target_direction: "minimize"
+    constraint_type: "hard"
+
+  - goal_id: "goal:max_25_nodes"
+    goal_type: "resource_budget"
+    description: "Bounded resource budget: the run must not exceed 25 nodes on partition cpu under account bekn-delta-cpu."
+    metric: "node_count"
+    target_value: 25
+    target_unit: "nodes"
+    target_direction: "minimize"
+    constraint_type: "hard"
+
+  - goal_id: "goal:wall_time_50min"
+    goal_type: "latency"
+    description: "End-to-end wall time must stay within the 50-minute allocation window for the Scale A run. Latency is a budget cap here, not a primary optimization target."
+    metric: "end_to_end_wall_time_minutes"
+    target_value: 50
+    target_unit: "minutes"
+    target_direction: "minimize"
+    constraint_type: "hard"
+
+  - goal_id: "goal:produce_mosaic_fits"
+    goal_type: "other"
+    description: "The pipeline must produce the final mosaic.fits output; absence of the final mosaic indicates the multi-node run did not complete correctly."
+    metric: "mosaic_fits_produced"
+    target_value: 1
+    target_unit: "count"
+    target_direction: "exact"
+    constraint_type: "hard"
+
+  - goal_id: "goal:efficient_node_hours"
+    goal_type: "cost"
+    description: "Secondary soft objective: minimize consumed node-hours within the bounded budget once correctness and trace-capture hard goals are met. Throughput/latency are not optimization targets for this run."
+    metric: "node_hours"
+    target_value: 21
+    target_unit: "node-hours"
+    target_direction: "minimize"
+    constraint_type: "soft"
+    priority: 1
+
+conflict_resolution:
+  priority_ordering:
+    - "goal:efficient_node_hours"
+
+hard_constraints:
+  - constraint_id: "goal:must_produce_mosaic_fits"
+    description: "The run must produce the final mosaic.fits artifact. A run that completes without mosaic.fits is invalid regardless of node spread or trace capture."
+    applies_to: "data:mosaic_fits (final Montage mosaic output)"
+    rationale: "The mosaic is the workflow's terminal data product; its presence is the ground-truth signal that the multi-node Montage pipeline executed end-to-end correctly."
+    enforced_by: "scientific_requirement"
+
+  - constraint_id: "goal:must_reach_25_distinct_nodes"
+    description: "Work must be distributed across 25 distinct compute nodes (25/25). No node in the allocation may sit idle; single-task aggregation stages are the only permitted single-node exceptions."
+    applies_to: "all tasks (fan-out srun stages, Class A)"
+    rationale: "The campaign's purpose is to validate true multi-node spread; partial spread (fewer than 25 distinct nodes doing work) would invalidate the scale-validation goal."
+    enforced_by: "team_policy"
+
+  - constraint_id: "goal:outputs_on_projects_lustre"
+    description: "All workflow inputs, intermediate data, run directories, and profiler trace outputs must reside on /projects Lustre (/projects/bekn/mtang9/widget/), not on home."
+    applies_to: "all data objects, run directories, and profiler trace outputs"
+    rationale: "Home quota on Delta is tight; placing data and traces on /projects Lustre prevents quota exhaustion mid-run and is required for the trace-capture goal to succeed."
+    enforced_by: "facility_policy"
+
+  - constraint_id: "goal:partition_cpu_account_bekn"
+    description: "The run must execute on partition cpu under SLURM account bekn-delta-cpu."
+    applies_to: "all tasks / the SLURM allocation"
+    rationale: "bekn-delta-cpu is the allocation with available cpu capacity; the gpu account is nearly exhausted and the workflow is CPU-only."
+    enforced_by: "facility_policy"

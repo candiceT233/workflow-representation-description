@@ -1,0 +1,180 @@
+metadata:
+  experiment_lineage_id: edd:montage:scale_a_25tile
+  version: "1.0.0"
+  version_notes: "First EDD instance for Montage Scale-A: 5x5=25 synthetic-FITS tiles on 25 Delta CPU nodes, one tile per node, 25-way table sharding per fan-out stage. Resolves the WDD's instance-dependent tile-grid cardinality and execution context."
+  instance_id: montage_scale_a_25tile_inst_001
+  wrd_lineage_id: wrd:montage
+  wrd_version: "1.0.0"
+  schema_version: edd-2.0
+  experiment_name: montage_scale_a_25tile
+  experiment_description: >-
+    Montage Scale-A scaling experiment: assemble a 5x5 = 25 tile synthetic FITS
+    mosaic on 25 Delta CPU nodes (one tile per node), exercising the full
+    reproject -> difference -> fit -> background -> coadd pipeline with 25-way
+    table sharding at each scatter fan-out. Inputs are synthetically generated
+    WCS FITS tiles (~25 MB total) and a region.hdr defining the mosaic geometry;
+    the run characterizes I/O behavior at the smallest scale point of the
+    Montage Delta scaling campaign.
+  submitted_by: "mtang (mtang11@hawk.iit.edu), Illinois Institute of Technology / NCSA Delta campaign"
+  submitted_at: 2026-06-01T14:29:34Z
+  generated_by: claude-code-opus-4-8
+
+experiment_parameters:
+  - parameter_id: param:tile_grid_rows_cols
+    display_name: Tile Grid (rows x cols)
+    source_file: scripts/montage_gen_fits.py
+    source_location: "montage_gen_fits.py: positional argv[2]=rows, argv[3]=cols"
+    parameter_type: string
+    possible_values: "rows x cols tiles (e.g., 5x5=25 for scale A, 12x11=132 for scale B); rows*cols must be >= node count"
+    default_value: null
+    affects:
+      cardinalities:
+        - data:raw_fits_tiles
+        - data:projected_fits
+        - data:corrected_fits
+      hardware_paths: []
+      data_objects_in_scope: []
+    resolved_value: "5x5"
+    validation_check: pass
+
+  - parameter_id: param:n_nodes
+    display_name: Number of Compute Nodes
+    source_file: runs/Montage/run_montage_prof.sh
+    source_location: "run_montage_prof.sh: NODES from SLURM_NNODES; --nodes set at submit time"
+    parameter_type: integer
+    possible_values: "any positive integer <= number of input tiles"
+    default_value: null
+    affects:
+      cardinalities: []
+      hardware_paths: []
+      data_objects_in_scope: []
+    resolved_value: 25
+    validation_check: pass
+
+  - parameter_id: param:shard_count
+    display_name: Fan-out Shard Count
+    source_file: scripts/tbl_tool.py
+    source_location: "tbl_tool.py split N; N = node count in fanout() loop of run_montage_prof.sh"
+    parameter_type: integer
+    possible_values: "equal to n_nodes (one shard per node per fan-out stage)"
+    default_value: null
+    affects:
+      cardinalities: []
+      hardware_paths: []
+      data_objects_in_scope: []
+    resolved_value: 25
+    validation_check: pass
+
+  - parameter_id: param:montage_data
+    display_name: Input Data Root (MONTAGE_DATA)
+    source_file: runs/Montage/run_montage_prof.sh
+    source_location: "run_montage_prof.sh: MONTAGE_DATA env (--export); contains raw_images/ + region.hdr"
+    parameter_type: path
+    possible_values: "any directory containing raw_images/ and region.hdr with >= n_nodes tiles"
+    default_value: null
+    affects:
+      cardinalities: []
+      hardware_paths: []
+      data_objects_in_scope:
+        - data:raw_fits_tiles
+        - data:region_hdr
+    resolved_value: /projects/bekn/mtang9/widget/data/Montage/scale_a
+    validation_check: pass
+
+resolved_cardinalities:
+  - data_id: data:raw_fits_tiles
+    wrd_cardinality_source_type: config_determined
+    resolved_count: 25
+    resolved_count_basis: "param:tile_grid_rows_cols resolved_value = 5x5 -> 25 input FITS tiles, one per grid cell."
+    estimated_total_size: "25 tiles, ~25 MB total (synthetic numpy FITS)."
+
+  - data_id: data:projected_fits
+    wrd_cardinality_source_type: config_determined
+    resolved_count: 25
+    resolved_count_basis: "One projected FITS (plus area file) per input tile; 5x5 grid -> 25 projected tiles."
+    estimated_total_size: "~25 projected FITS plus area weight images (comparable to input footprint)."
+
+  - data_id: data:corrected_fits
+    wrd_cardinality_source_type: config_determined
+    resolved_count: 25
+    resolved_count_basis: "One background-corrected FITS per reprojected tile; 25 reprojected -> 25 corrected tiles."
+    estimated_total_size: "~25 corrected FITS (comparable to projected tile footprint)."
+
+hardware_resolution:
+  path_selections: []
+  hardware_floor:
+    - task_id: task:project
+      resource: n_nodes
+      wrd_assertion_condition: "fan-out shard count == node count (one image-table shard per node)"
+      minimum_value: 25
+      derivation_basis: "param:n_nodes resolved to 25; reproject fan-out splits images.tbl into 25 shards, one per node -> floor 25 nodes."
+      satisfied_by_hrd: null
+      satisfied: null
+
+    - task_id: task:diff
+      resource: n_nodes
+      wrd_assertion_condition: "fan-out shard count == node count (one diff-table shard per node)"
+      minimum_value: 25
+      derivation_basis: "param:shard_count resolved to 25; difference fan-out splits diffs.tbl into 25 shards, one per node -> floor 25 nodes."
+      satisfied_by_hrd: null
+      satisfied: null
+
+    - task_id: task:fit
+      resource: n_nodes
+      wrd_assertion_condition: "fan-out shard count == node count (one fit-table shard per node)"
+      minimum_value: 25
+      derivation_basis: "param:shard_count resolved to 25; fit fan-out splits diffs.tbl into 25 shards, one per node -> floor 25 nodes."
+      satisfied_by_hrd: null
+      satisfied: null
+
+    - task_id: task:background
+      resource: n_nodes
+      wrd_assertion_condition: "fan-out shard count == node count (one pimages-table shard per node)"
+      minimum_value: 25
+      derivation_basis: "param:shard_count resolved to 25; background-apply fan-out splits pimages.tbl into 25 shards, one per node -> floor 25 nodes."
+      satisfied_by_hrd: null
+      satisfied: null
+
+execution_context:
+  target_system: hrd:delta_ncsa
+  execution_profile: full_mosaic
+  input_data_root: /projects/bekn/mtang9/widget/data/Montage/scale_a
+  output_data_root: /projects/bekn/mtang9/widget/runs/Montage/scale_a_25n
+  notes: >-
+    Scale-A is the 25-node smallest scale point of the Montage Delta scaling
+    campaign. SLURM directives: --ntasks-per-node=1, --cpus-per-task=128,
+    --mem=0 (whole-node), partition cpu, account bekn-delta-cpu, wall 00:50:00.
+    Inputs are synthetic numpy FITS tiles generated by montage_gen_fits.py;
+    region.hdr fixes the 5x5 mosaic geometry. #tiles (25) == #nodes (25), so
+    each fan-out stage shards its .tbl 25 ways (one tile/pair per node) via
+    tbl_tool.py split and gather stages concat. Verified run: COMPLETED exit 0,
+    25/25 distinct nodes, mosaic.fits produced, ~20s wall.
+
+environment:
+  required_modules: []
+  container:
+    image: null
+    runtime: null
+    bind_mounts: []
+  critical_libraries:
+    hdf5:
+      build_type: unknown
+    darshan:
+      preloaded: false
+      library_path: /u/mtang9/widget_eval/hpc_workflows/tools/darshan/lib/libdarshan.so
+  environment_variables:
+    - name: WORKFLOW_ROOT
+      value: /u/mtang9/widget_eval/hpc_workflows
+      purpose: "Root of the hpc_workflows tree; used to locate Montage binaries and profiler libraries."
+    - name: PATH
+      value: "$WORKFLOW_ROOT/repos/Montage/bin:$PATH"
+      purpose: "Puts the native C/cfitsio Montage binaries (mProjExec, mDiffExec, mAdd, etc.) on PATH."
+    - name: MONTAGE_DATA
+      value: /projects/bekn/mtang9/widget/data/Montage/scale_a
+      purpose: "Input directory containing raw_images/ and region.hdr for the Scale-A 25-tile mosaic."
+    - name: PROFILER
+      value: datalife
+      purpose: "Selects the DataLife profiler for this trace suite (one profiler per run, Rule 7)."
+    - name: DATALIFE_FILE_PATTERNS
+      value: "*.fits,*.tbl,*.hdr,*.area"
+      purpose: "Restricts DataLife instrumentation to Montage data files (Rule 4)."

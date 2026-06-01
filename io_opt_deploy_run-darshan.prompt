@@ -1,0 +1,175 @@
+TASK: I/O-Optimized Deployment Planning + Execution from a WIDGET Document Suite (Darshan IODD)
+
+ROLE
+You are an autonomous deployment + execution agent. Your ONLY knowledge of the target
+workflow comes from a WIDGET v7 six-document YAML suite. From it you must (1) produce an
+I/O-optimized deployment plan and (2) actually run the workflow on the cluster and record
+its runtime. You must also record the cost (tokens / context / time / tool calls) you spend
+in each phase.
+
+=========================================================================================
+EXPERIMENTAL CONTROL — KNOWLEDGE BOUNDARY (read carefully)
+=========================================================================================
+- The six YAML files in
+    /u/mtang9/widget_eval/widget-v1/workflow-representation-description/generated_suites/montage_25n_darshan/
+  are your SOLE source of truth about what the workflow is, how it currently deploys, the
+  hardware, the goals, and its observed I/O behavior.
+- Do NOT read the workflow's source code, the raw profiler traces, README files, design
+  docs, or any campaign/notes files to UNDERSTAND the workflow. Deriving workflow knowledge
+  from anything other than the six YAMLs invalidates the experiment.
+- You MAY use the EXECUTION ENVIRONMENT paths below purely to LAUNCH the run (binaries,
+  input data, scheduler). Treat them as opaque execution substrate, not as a knowledge
+  source. Do not open the Montage source to learn behavior.
+- The observed-I/O document (iodd.yaml) in this suite was produced by the **Darshan**
+  profiler. Base every I/O optimization on what THIS IODD records. Where the IODD marks a
+  field "not captured by darshan", you do NOT have that information — do not substitute
+  outside knowledge to fill the gap. If a gap blocks an optimization, report it as a gap.
+
+=========================================================================================
+INPUT — the document suite (read all six)
+=========================================================================================
+Directory: /u/mtang9/widget_eval/widget-v1/workflow-representation-description/generated_suites/montage_25n_darshan/
+- wdd.yaml  — logical structure (stages, tasks, data_objects, pc_edges, patterns, io_behavioral_hints)
+- edd.yaml  — experiment instance (scale, input data path, resolved parameters)
+- gd.yaml   — goals / SLOs / hard constraints
+- hrd.yaml  — hardware (compute classes, storage tiers, interconnect)
+- ddd.yaml  — current deployment strategy + scheduler directives
+- iodd.yaml — observed I/O profile from Darshan (per-task bytes/ops, bottlenecks, optimization_opportunities)
+
+=========================================================================================
+EXECUTION ENVIRONMENT (substrate only — for launching, not for learning the workflow)
+=========================================================================================
+- Cluster: NCSA Delta (as described in hrd.yaml). Account / partition / node-count: take
+  from ddd.yaml scheduler directives (do not invent your own).
+- Montage binaries: /u/mtang9/widget_eval/hpc_workflows/repos/Montage/bin   (prepend to PATH)
+- Workflow input data: the path resolved in edd.yaml (Scale-A synthetic FITS + region.hdr).
+- Run dir root: /projects/bekn/mtang9/widget/runs/Montage/  — create a NEW subdir for your
+  run (e.g. opt_darshan_<timestamp>). NEVER overwrite mn25_datalife / mn25_darshan or any
+  data dir.
+- Results dir (you create): .../generated_suites/montage_25n_darshan/agent_run_results/
+- Optional table sharder: /u/mtang9/widget_eval/hpc_workflows/scripts/tbl_tool.py (split/concat .tbl only).
+- SLURM cluster; --account is REQUIRED on every job. Submit via sbatch.
+- If Jarvis-MCP tools (jm_*, create_pipeline, append_pkg, build_pipeline_env, run_pipeline)
+  are available in your session, you may deploy via Jarvis instead of a raw SLURM script.
+
+=========================================================================================
+PHASE 0 — METRICS BOOTSTRAP (do this first, before reading the YAMLs in full)
+=========================================================================================
+- Run: for f in <suite_dir>/*.yaml; do wc -c "$f"; done  → record bytes per file.
+- Compute est_tokens = ceil(bytes / 4) per file and the suite total. This is the
+  deterministic "ingestion cost" of the widget suite.
+- Print, alone on a line, the sentinel:  @@WIDGET_METRIC planning_start@@
+- Record planning_start = `date -u +%s` (and ISO time).
+
+=========================================================================================
+PHASE 1 — I/O-OPTIMIZED DEPLOYMENT PLAN  (the "planning" phase)
+=========================================================================================
+Using ONLY the six YAMLs:
+1. Summarize the workflow from wdd.yaml: stages, tasks, DAG/topological order, P-C patterns,
+   primary workflow pattern, and any io_behavioral_hints.
+2. From ddd.yaml, restate the CURRENT deployment: per-task parallelism, storage-tier
+   assignments, and scheduler directives.
+3. From iodd.yaml (DataLife), extract the observed I/O facts you will optimize against:
+   per-task bytes read/written and op counts, request-size / data-flow detail where present,
+   bottleneck_summary, anomalies, and optimization_opportunities. QUOTE the specific IODD
+   fields you rely on (so the basis of each decision is auditable).
+4. From hrd.yaml, identify which storage tiers / hardware features are actually available to
+   exploit (faster tier, node-local, stripe tuning, etc.). Use only what the HRD lists.
+5. From gd.yaml, list the goals and HARD constraints your plan must respect (node budget,
+   must-produce outputs, output-location constraints, priority ranking).
+6. PRODUCE the I/O-optimized deployment plan: concrete, justified changes relative to the
+   current DDD (e.g. storage-tier reassignment, node-local staging, parallelism changes,
+   stripe tuning, request-size/aggregation changes, stage overlap). For EACH proposed change
+   state: (a) the IODD evidence motivating it, (b) the GD goal it serves, (c) confirmation it
+   honors every hard constraint. If an optimization you would normally make is blocked
+   because Darshan did not capture the needed evidence, SAY SO explicitly — that gap is a
+   result, not a failure.
+7. Write the plan to <suite_dir>/agent_run_results/deployment_plan.md.
+8. Record planning_end = `date -u +%s`; then print, alone on a line:  @@WIDGET_METRIC planning_end@@
+
+=========================================================================================
+PHASE 2 — RUN THE WORKFLOW + RECORD RUNTIME  (the "running" phase)
+=========================================================================================
+Print, alone on a line, the sentinel:  @@WIDGET_METRIC running_start@@   then:
+1. Translate your plan into an executable deployment. The ddd.yaml scheduler_directives +
+   per-task placement, plus the WDD executables and pc_edges, give you everything needed to
+   construct the run; apply your optimizations on top. (The DDD encodes a Class-A srun
+   fan-out: one task per node for the scatter/*Exec stages, single-task for the
+   mImgtbl/mOverlaps/mBgModel/mAdd stages.) Prefer Jarvis-MCP if available; else build and
+   sbatch a SLURM script.
+2. Create a fresh run dir under the run-dir root. Apply any tier/stripe/staging optimization
+   to that dir BEFORE launching (e.g. `lfs setstripe ...` if your plan calls for it).
+3. Submit, then wait for completion. Record SEPARATELY:
+   - queue_wait_seconds (submit → start), and
+   - workflow_runtime_seconds (actual pipeline elapsed — from the run's own timing output,
+     cross-checked with `sacct -j <jobid> --format=JobID,Elapsed,NNodes,State`).
+   Verify the run produced the workflow's terminal output and used the intended node count.
+4. Write <suite_dir>/agent_run_results/run_report.md: what you ran, which optimizations were
+   applied, success/failure, workflow_runtime_seconds, node count, and any deviation from plan.
+5. Record running metrics (see METRICS PROTOCOL); then print, alone on a line:  @@WIDGET_METRIC running_end@@
+
+=========================================================================================
+METRICS PROTOCOL (mandatory) — authoritative tokens WITHOUT API access
+=========================================================================================
+Token spend is measured authoritatively by parsing THIS session's local Claude Code
+transcript (~/.claude/projects/<project-slug>/<session-uuid>.jsonl), which records the real
+input/output/cache token counts per turn. You do NOT estimate tokens. Your job is to make
+the run parseable and to record the metrics only you know (wall time, tool counts, file
+sizes, workflow runtime).
+
+1. PHASE SENTINELS — you already print these four lines EXACTLY, alone on a line, at the
+   phase boundaries; they delimit the transcript so tokens attribute per phase:
+     @@WIDGET_METRIC planning_start@@   (first action, before reading anything)
+     @@WIDGET_METRIC planning_end@@     (right after writing deployment_plan.md)
+     @@WIDGET_METRIC running_start@@    (right before constructing/launching the run)
+     @@WIDGET_METRIC running_end@@      (right after the run completes + run_report.md)
+
+2. Write <suite_dir>/agent_run_results/metrics.json with the NON-token metrics you measure:
+{
+  "agent": "<your agent/model name and version>",
+  "profiler_suite": "darshan",
+  "session_transcript_hint": "<your session uuid, or 'newest jsonl under the project'>",
+  "context_ingestion": {
+    "yaml_files": [{"file":"wdd.yaml","bytes":N,"est_tokens":N}, ... all six ...],
+    "total_bytes": N, "total_est_tokens": N
+  },
+  "planning": { "wall_seconds": N, "tool_calls": N, "files_read": [{"path":"...","bytes":N}] },
+  "running":  { "wall_seconds": N, "queue_wait_seconds": N, "workflow_runtime_seconds": N, "tool_calls": N }
+}
+  (est_tokens = ceil(bytes/4): the deterministic "cost of reading the yaml files", which
+  complements the authoritative transcript token counts.)
+
+3. AUTHORITATIVE TOKENS — after the run, the real per-phase token + tool-call counts come from:
+     python3 .../workflow-representation-description/measure_agent_cost.py --latest \
+       --out <suite_dir>/agent_run_results/metrics_tokens.json
+   It segments the transcript by your sentinels and reports real input/output/cache tokens
+   per phase (tokens_are_estimate=false). Run it yourself at the very end if you can; either
+   way LEAVE THE SENTINELS so it can be run post-hoc. Do not fabricate token numbers.
+
+4. Use `date -u +%s` for wall timing. Count every tool call per phase.
+
+5. At the very end of your final message, print the planning and running summaries inline in
+   two fenced blocks labeled `METRICS:PLANNING` and `METRICS:RUNNING` (wall time, tool calls,
+   workflow_runtime_seconds, and — if you ran the parser — the authoritative token counts).
+
+=========================================================================================
+HARD SCOPE RULES
+=========================================================================================
+- The six YAMLs are the ONLY workflow-knowledge source. No source code, raw traces, or
+  notes/campaign files for understanding the workflow.
+- Respect every gd.yaml hard constraint; stay within the node budget.
+- Never overwrite the existing trace run dirs (mn25_datalife, mn25_darshan) or any data dir.
+- Before any destructive action, print exactly what will change.
+- If a required value is absent from the suite, use an explicit placeholder and report it as
+  missing — do not fetch it from outside.
+
+=========================================================================================
+OUTPUT
+=========================================================================================
+1. <suite_dir>/agent_run_results/deployment_plan.md
+2. <suite_dir>/agent_run_results/run_report.md
+3. <suite_dir>/agent_run_results/metrics.json
+4. A final message summarizing: the optimization(s) chosen, the achieved
+   workflow_runtime_seconds, and the two inline METRICS blocks.
+
+(<suite_dir> = /u/mtang9/widget_eval/widget-v1/workflow-representation-description/generated_suites/montage_25n_darshan)

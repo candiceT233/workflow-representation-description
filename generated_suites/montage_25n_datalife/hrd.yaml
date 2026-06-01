@@ -1,0 +1,128 @@
+header:
+  hrd_id: hrd:delta_ncsa_cpu
+  system_name: Delta @ NCSA
+  version: 1.0.0
+  version_notes: Initial HRD for the Delta CPU partition. Hardware facts verified 2026-05-22 via sinfo/scontrol/accounts; bandwidth ceilings are vendor/facility estimates pending IOR/mdtest/STREAM measurement.
+  facility: National Center for Supercomputing Applications (NCSA), University of Illinois
+  schema_version: hrd-7.0
+  created_at: 2026-06-01T14:29:34Z
+  last_modified_at: 2026-06-01T14:29:34Z
+  description: |
+    NCSA Delta CPU partition: a SLURM-scheduled cluster of dual-socket 128-core
+    AMD CPU nodes (~257 GB RAM each) connected by an HPE Cray Slingshot fabric.
+    Storage is hierarchical: a tight per-user home, a Lustre parallel filesystem
+    on project space, a fast NVMe work tier, and node-local /tmp scratch.
+    An account is required on every job and accounting is enabled.
+
+compute_topology:
+  - compute_id: compute:cpu_node
+    node_type_description: Dual-socket AMD CPU node, 128 cores, ~257 GB RAM, no accelerators
+    node_count: 136
+    cores_per_node: 128
+    hardware_threads_per_core: 1
+    memory_per_node_gb: 257
+    interconnect_id: net:slingshot
+    node_local_storage:
+      type: nvme_ssd
+      notes: Node-local scratch accessible at /tmp. Cleared at job end.
+
+network_fabric:
+  - interconnect_id: net:slingshot
+    technology: Slingshot-11
+    topology: dragonfly
+    notes: HPE Cray Slingshot fabric. Generation assumed Slingshot-11 but not certain (confidence medium). Bisection bandwidth unknown. Per-node injection bandwidth and latency not yet measured (no OSU micro-benchmark run).
+
+storage_hierarchy:
+  - tier_id: tier:home
+    tier_type: parallel_filesystem
+    mount_point: /u/mtang9
+    total_capacity_tb: 0.102
+    per_job_capacity_tb: 0.102
+    persistence: persistent
+    shared_across_jobs: true
+    contention_model:
+      contention_type: unknown
+      qos_guarantees: false
+    notes: Per-user home directory with a tight quota (~102 GB). Role - source code, scripts, small config (WORKFLOW_ROOT). Bandwidth class - low; do not place large run outputs or trace dirs here. Bandwidth ceilings unknown (no IOR measurement).
+    benchmark_source: No empirical measurement; capacity from facility quota policy verified 2026-05-22.
+  - tier_id: tier:projects_lustre
+    tier_type: parallel_filesystem
+    filesystem_type: Lustre
+    mount_point: /projects/bekn
+    total_capacity_tb: 1.0
+    per_job_capacity_tb: 1.0
+    persistence: persistent
+    shared_across_jobs: true
+    stripe_tuning:
+      notes: Lustre PFS. Tune stripe count/size for large sequential writes (commonly lfs setstripe -c 4..16) for best sustained bandwidth on large checkpoint/output files. Specific defaults not yet characterized.
+    contention_model:
+      contention_type: unknown
+      qos_guarantees: false
+    notes: Lustre parallel filesystem on project space (~1 TB). Role - persistent large run outputs, trace dirs, conda envs. Bandwidth class - high (parallel, shared). Bandwidth ceilings unknown (no IOR/mdtest measurement).
+    benchmark_source: No empirical measurement; capacity and filesystem type from facility docs verified 2026-05-22.
+  - tier_id: tier:work_nvme
+    tier_type: parallel_filesystem
+    mount_point: /work/nvme/bekn
+    total_capacity_tb: 0.5
+    per_job_capacity_tb: 0.5
+    persistence: persistent
+    shared_across_jobs: true
+    contention_model:
+      contention_type: unknown
+      qos_guarantees: false
+    notes: NVMe-backed work filesystem (~500 GB). Role - fast scratch for I/O-intensive intermediate data and large run outputs. Bandwidth class - very high (NVMe, faster than Lustre PFS). Bandwidth ceilings unknown (no IOR measurement).
+    benchmark_source: No empirical measurement; capacity from facility docs verified 2026-05-22.
+  - tier_id: tier:node_local
+    tier_type: node_local_ssd
+    mount_point: /tmp
+    persistence: volatile
+    shared_across_jobs: false
+    contention_model:
+      contention_type: none
+      qos_guarantees: false
+    notes: Node-local scratch at /tmp. Role - per-node temporary staging, fastest latency, no cross-node contention. Bandwidth class - highest (local device, dedicated per job). Cleared at job end. Capacity and bandwidth ceilings unknown (no IOR measurement).
+    benchmark_source: No empirical measurement; node-local /tmp presence verified 2026-05-22.
+
+scheduler:
+  scheduler_type: slurm
+  partitions:
+    - partition_id: cpu
+      description: Default CPU partition for batch workflows. Fits jobs up to 136 nodes including 125-node runs.
+      max_nodes: 136
+      max_walltime_hours: 48
+      node_classes_available:
+        - compute:cpu_node
+      charging_model: node_hours
+      exclusive_node_access: optional
+    - partition_id: cpu-interactive
+      description: Debug and interactive smoke tests (srun --pty).
+      max_nodes: 137
+      max_walltime_hours: 1
+      node_classes_available:
+        - compute:cpu_node
+      charging_model: node_hours
+      exclusive_node_access: optional
+    - partition_id: cpu-preempt
+      description: Preemptible overflow capacity; jobs can be killed.
+      max_nodes: 137
+      max_walltime_hours: 48
+      node_classes_available:
+        - compute:cpu_node
+      charging_model: node_hours
+      exclusive_node_access: optional
+      priority_notes: Preemptible - jobs may be terminated when higher-priority work arrives.
+    - partition_id: full
+      description: Use only when a single job needs more than 136 nodes.
+      max_nodes: 352
+      max_walltime_hours: 24
+      node_classes_available:
+        - compute:cpu_node
+      charging_model: node_hours
+      exclusive_node_access: optional
+  account_required: true
+  account_flag: --account
+  job_array_support: true
+  dependency_support: true
+  notes: Account bekn-delta-cpu required on every job (#SBATCH --account=bekn-delta-cpu). sacct/accounts accounting is enabled; verify placement with squeue/scontrol and post-hoc with sacct. Live idle node count is usually small (~10), so large jobs queue - expected, not a failure.
+
+empirical_benchmarks: []

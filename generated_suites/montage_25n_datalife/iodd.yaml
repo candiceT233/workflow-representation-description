@@ -1,0 +1,663 @@
+header:
+  iodd_id: iodd:deploy:montage_scale_a_25n:datalife
+  ddd_id: deploy:montage:scale_a_25n:functional_trace
+  hrd_id: hrd:delta_ncsa_cpu
+  wrd_lineage_id: wrd:montage
+  edd_lineage_id: edd:montage:scale_a_25tile
+  edd_instance_id: montage_scale_a_25tile_inst_001
+  wall_time_seconds: unknown
+  predictive: false
+  profiling_tools: ["DataLife"]
+  schema_version: iodd-7.0
+  description: >-
+    DataLife data-flow profile of the Montage Scale-A 25-node run, aggregated
+    across 83 per-process traces (one per Montage binary per node) using the
+    DataLife monitor block. Read/write byte totals reconcile exactly to the
+    known run aggregates (378,039,388 B read / 204,280,001 B written). The
+    pipeline is read-dominated by the difference stage (mDiffExec reads 270 MB
+    re-reading the projected FITS tiles) and write-dominated by the reproject
+    stage (mProjExec writes 107 MB of projected FITS + area tiles); all I/O is
+    4 KB-block STDIO on cfitsio FITS plus tiny-record POSIX .tbl tables on
+    tier:projects_lustre. DataLife is a data-flow / lifecycle profiler:
+    request-size histograms, sequential/random classification, file-system
+    module breakdowns, and wall-clock task/I-O timelines are not captured by
+    datalife, so all temporal-offset, bandwidth-vs-peak, and access-pattern
+    classification fields below are marked unknown / not captured by datalife.
+
+per_task_io_profile:
+  - task_id: task:imgtbl_raw
+    instance_count: 1
+    storage_tier_used: tier:projects_lustre
+    note_task_attribution: >-
+      DataLife aggregates by binary name; mImgtbl serves task:imgtbl_raw,
+      task:imgtbl_projected, and task:imgtbl_corrected. Only 3 mImgtbl process
+      traces were captured and they cannot be separated per WDD task, so the
+      mImgtbl byte/op totals (read=152746 B, write=1545 B, read_ops=106,
+      write_ops=21, open=115, close=115) are reported once on task:imgtbl_raw
+      and the other two mImgtbl tasks carry the per-task-attribution caveat.
+    bytes_read: 152746
+    bytes_written: 1545
+    read_ops: 106
+    write_ops: 21
+    open_ops: 115
+    close_ops: 115
+    posix_read_time_s: 0.002773
+    posix_write_time_s: 0.000162
+    posix_open_time_s: 2.728918
+    posix_close_time_s: 3.668703
+    observed_read_bandwidth_gbs: 0.0551
+    observed_write_bandwidth_gbs: 0.0095
+    access_pattern_observed: unknown
+    io_phase_observed: unknown
+    compute_to_io_ratio: unknown
+    field_confidence:
+      access_pattern_observed: "not captured by datalife (no sequential/random counters)"
+      io_phase_observed: "not captured by datalife (no per-op wall-clock timeline)"
+      compute_to_io_ratio: "not computable: task wall time not captured by datalife"
+      task_attribution: "mImgtbl totals span 3 WDD tasks; reported here in aggregate"
+    match_wrd_io_phase: unknown
+
+  - task_id: task:imgtbl_projected
+    instance_count: 1
+    storage_tier_used: tier:projects_lustre
+    bytes_read: unknown
+    bytes_written: unknown
+    read_ops: unknown
+    write_ops: unknown
+    open_ops: unknown
+    close_ops: unknown
+    access_pattern_observed: unknown
+    io_phase_observed: unknown
+    compute_to_io_ratio: unknown
+    field_confidence:
+      per_task_totals: "not separable by datalife: mImgtbl byte/op totals reported in aggregate on task:imgtbl_raw"
+      access_pattern_observed: "not captured by datalife"
+      io_phase_observed: "not captured by datalife"
+    match_wrd_io_phase: unknown
+
+  - task_id: task:project
+    instance_count: 25
+    storage_tier_used: tier:projects_lustre
+    bytes_read: 52859950
+    bytes_written: 106554240
+    read_ops: 18525
+    write_ops: 36998
+    open_ops: 525
+    close_ops: 475
+    posix_read_time_s: 0.083435
+    posix_write_time_s: 0.939420
+    posix_open_time_s: 1.745622
+    posix_close_time_s: 17.070667
+    observed_read_bandwidth_gbs: 0.6335
+    observed_write_bandwidth_gbs: 0.1134
+    access_pattern_observed: unknown
+    io_phase_observed: unknown
+    compute_to_io_ratio: unknown
+    field_confidence:
+      access_pattern_observed: "not captured by datalife (FITS pixel writes are 4 KB block-aligned per _stat histograms, but seq/random not classified)"
+      io_phase_observed: "not captured by datalife"
+      compute_to_io_ratio: "not computable: task wall time not captured by datalife"
+    match_wrd_io_phase: unknown
+
+  - task_id: task:overlaps
+    instance_count: 1
+    storage_tier_used: tier:projects_lustre
+    bytes_read: 0
+    bytes_written: 0
+    read_ops: 0
+    write_ops: 0
+    open_ops: 2
+    close_ops: 0
+    posix_open_time_s: 0.002583
+    access_pattern_observed: unknown
+    io_phase_observed: unknown
+    compute_to_io_ratio: unknown
+    field_confidence:
+      bytes: "mOverlaps monitor block recorded only opens (in_fopen/out_fopen) with zero byte volume; its pimages.tbl->diffs.tbl text I/O byte counts were not captured by datalife at the read/write byte level"
+      access_pattern_observed: "not captured by datalife"
+      io_phase_observed: "not captured by datalife"
+    match_wrd_io_phase: unknown
+
+  - task_id: task:diff
+    instance_count: 25
+    storage_tier_used: tier:projects_lustre
+    bytes_read: 270329324
+    bytes_written: 66965760
+    read_ops: 94626
+    write_ops: 23252
+    open_ops: 1947
+    close_ops: 1803
+    posix_read_time_s: 0.313523
+    posix_write_time_s: 1.802283
+    posix_open_time_s: 8.697344
+    posix_close_time_s: 61.952862
+    observed_read_bandwidth_gbs: 0.8622
+    observed_write_bandwidth_gbs: 0.0372
+    access_pattern_observed: unknown
+    io_phase_observed: unknown
+    compute_to_io_ratio: unknown
+    field_confidence:
+      access_pattern_observed: "not captured by datalife"
+      io_phase_observed: "not captured by datalife"
+      compute_to_io_ratio: "not computable: task wall time not captured by datalife"
+      note: "highest-volume reader: re-reads projected FITS pairs (270 MB), 1803 fopen events dominate open time (62 s cumulative close across 25 shards)"
+    match_wrd_io_phase: unknown
+
+  - task_id: task:fit
+    instance_count: 25
+    storage_tier_used: tier:projects_lustre
+    bytes_read: 33483024
+    bytes_written: 0
+    read_ops: 11698
+    write_ops: 0
+    open_ops: 169
+    close_ops: 144
+    posix_read_time_s: 0.030993
+    posix_write_time_s: 0.0
+    posix_open_time_s: 0.679818
+    posix_close_time_s: 5.522803
+    observed_read_bandwidth_gbs: 1.0803
+    observed_write_bandwidth_gbs: 0.0
+    access_pattern_observed: unknown
+    io_phase_observed: unknown
+    compute_to_io_ratio: unknown
+    field_confidence:
+      access_pattern_observed: "not captured by datalife"
+      io_phase_observed: "not captured by datalife"
+      compute_to_io_ratio: "not computable: task wall time not captured by datalife"
+      write_bytes: "mFitExec emits plane-fit coefficient rows; its per-shard fit-table writes carried zero byte volume in the monitor block (small fputs/fprintf not byte-attributed by datalife)"
+    match_wrd_io_phase: unknown
+
+  - task_id: task:bgmodel
+    instance_count: 1
+    storage_tier_used: tier:projects_lustre
+    bytes_read: 0
+    bytes_written: 56
+    read_ops: 0
+    write_ops: 1
+    open_ops: 3
+    close_ops: 1
+    posix_write_time_s: 0.000046
+    posix_open_time_s: 0.007655
+    posix_close_time_s: 0.029857
+    observed_write_bandwidth_gbs: 0.0012
+    access_pattern_observed: unknown
+    io_phase_observed: unknown
+    compute_to_io_ratio: unknown
+    field_confidence:
+      read_bytes: "mBgModel reads pimages.tbl + fits.tbl; those text reads carried zero byte volume in the monitor block (fgets-based, not byte-attributed by datalife)"
+      access_pattern_observed: "not captured by datalife"
+      io_phase_observed: "not captured by datalife"
+      compute_to_io_ratio: "not computable: task wall time not captured by datalife"
+    match_wrd_io_phase: unknown
+
+  - task_id: task:background
+    instance_count: 25
+    storage_tier_used: tier:projects_lustre
+    bytes_read: 8484496
+    bytes_written: 8455680
+    read_ops: 2954
+    write_ops: 2936
+    open_ops: 26
+    close_ops: 22
+    posix_read_time_s: 0.009319
+    posix_write_time_s: 0.084127
+    posix_open_time_s: 0.122260
+    posix_close_time_s: 0.999118
+    observed_read_bandwidth_gbs: 0.9105
+    observed_write_bandwidth_gbs: 0.1005
+    access_pattern_observed: unknown
+    io_phase_observed: unknown
+    compute_to_io_ratio: unknown
+    field_confidence:
+      instance_coverage: "DDD plans 25 mBgExec instances; only 2 mBgExec process traces were captured by datalife, so these totals undercount the background stage (other 23 shard traces absent)"
+      access_pattern_observed: "not captured by datalife"
+      io_phase_observed: "not captured by datalife"
+      compute_to_io_ratio: "not computable: task wall time not captured by datalife"
+    match_wrd_io_phase: unknown
+
+  - task_id: task:imgtbl_corrected
+    instance_count: 1
+    storage_tier_used: tier:projects_lustre
+    bytes_read: unknown
+    bytes_written: unknown
+    read_ops: unknown
+    write_ops: unknown
+    open_ops: unknown
+    close_ops: unknown
+    access_pattern_observed: unknown
+    io_phase_observed: unknown
+    compute_to_io_ratio: unknown
+    field_confidence:
+      per_task_totals: "not separable by datalife: mImgtbl byte/op totals reported in aggregate on task:imgtbl_raw"
+      access_pattern_observed: "not captured by datalife"
+      io_phase_observed: "not captured by datalife"
+    match_wrd_io_phase: unknown
+
+  - task_id: task:add
+    instance_count: 1
+    storage_tier_used: tier:projects_lustre
+    bytes_read: 12729848
+    bytes_written: 22302720
+    read_ops: 4428
+    write_ops: 7744
+    open_ops: 23
+    close_ops: 19
+    posix_read_time_s: 0.014062
+    posix_write_time_s: 0.126220
+    posix_open_time_s: 0.218097
+    posix_close_time_s: 0.848242
+    observed_read_bandwidth_gbs: 0.9052
+    observed_write_bandwidth_gbs: 0.1767
+    access_pattern_observed: unknown
+    io_phase_observed: unknown
+    compute_to_io_ratio: unknown
+    field_confidence:
+      access_pattern_observed: "not captured by datalife"
+      io_phase_observed: "not captured by datalife"
+      compute_to_io_ratio: "not computable: task wall time not captured by datalife"
+      note: "terminal gather: reads all corrected tiles (12.7 MB), writes mosaic.fits + mosaic_area.fits (22.3 MB combined, 4 KB-block writes)"
+    match_wrd_io_phase: unknown
+
+communication_channels:
+  - pc_edge_id: pc:imgtbl_raw->project:1_to_n
+    physical_path: shared_file_on_pfs
+    tier_id: tier:projects_lustre
+    data_volume_bytes: 152746
+    transfer_pattern: unknown
+    transfer_time_s: unknown
+    transfer_bandwidth_gbs: unknown
+    field_confidence:
+      data_volume_bytes: "images.tbl: bound to mImgtbl write total (1545 B written) / mProjExec table reads; reported as mImgtbl read-side aggregate, small-record .tbl"
+      transfer_time_s: "not captured by datalife (no producer-write-start to consumer-read-end timeline)"
+      transfer_pattern: "not captured by datalife"
+    match_ddd: true
+
+  - pc_edge_id: pc:project->imgtbl_projected:n_to_1
+    physical_path: shared_file_on_pfs
+    tier_id: tier:projects_lustre
+    data_volume_bytes: 106554240
+    transfer_pattern: unknown
+    transfer_time_s: unknown
+    transfer_bandwidth_gbs: unknown
+    field_confidence:
+      data_volume_bytes: "projected_fits written by mProjExec (106,554,240 B); imgtbl_projected reads headers only (not byte-attributed per-task by datalife)"
+      transfer_time_s: "not captured by datalife"
+      transfer_pattern: "not captured by datalife"
+    match_ddd: true
+
+  - pc_edge_id: pc:imgtbl_projected->overlaps:1_to_1
+    physical_path: shared_file_on_pfs
+    tier_id: tier:projects_lustre
+    data_volume_bytes: unknown
+    transfer_pattern: unknown
+    transfer_time_s: unknown
+    field_confidence:
+      data_volume_bytes: "pimages.tbl text read by mOverlaps carried zero byte volume in datalife monitor block (fgets-based, not byte-attributed)"
+      transfer_time_s: "not captured by datalife"
+      transfer_pattern: "not captured by datalife"
+    match_ddd: true
+
+  - pc_edge_id: pc:overlaps->diff:1_to_n
+    physical_path: shared_file_on_pfs
+    tier_id: tier:projects_lustre
+    data_volume_bytes: unknown
+    transfer_pattern: unknown
+    transfer_time_s: unknown
+    field_confidence:
+      data_volume_bytes: "diffs.tbl shard reads not byte-attributed by datalife (small-record .tbl, fgets)"
+      transfer_time_s: "not captured by datalife"
+      transfer_pattern: "not captured by datalife"
+    match_ddd: true
+
+  - pc_edge_id: pc:project->diff:n_to_n
+    physical_path: shared_file_on_pfs
+    tier_id: tier:projects_lustre
+    data_volume_bytes: 270329324
+    transfer_pattern: unknown
+    transfer_time_s: unknown
+    transfer_bandwidth_gbs: unknown
+    field_confidence:
+      data_volume_bytes: "bound to mDiffExec read total (270,329,324 B) reading projected FITS pairs from shared projected/; dominant data channel in the run"
+      transfer_time_s: "not captured by datalife"
+      transfer_pattern: "not captured by datalife"
+    match_ddd: true
+
+  - pc_edge_id: pc:overlaps->fit:1_to_n
+    physical_path: shared_file_on_pfs
+    tier_id: tier:projects_lustre
+    data_volume_bytes: unknown
+    transfer_pattern: unknown
+    transfer_time_s: unknown
+    field_confidence:
+      data_volume_bytes: "diffs.tbl fit-shard reads not byte-attributed by datalife"
+      transfer_time_s: "not captured by datalife"
+      transfer_pattern: "not captured by datalife"
+    match_ddd: true
+
+  - pc_edge_id: pc:diff->fit:n_to_n
+    physical_path: shared_file_on_pfs
+    tier_id: tier:projects_lustre
+    data_volume_bytes: 33483024
+    transfer_pattern: unknown
+    transfer_time_s: unknown
+    transfer_bandwidth_gbs: unknown
+    field_confidence:
+      data_volume_bytes: "bound to mFitExec read total (33,483,024 B) reading diff FITS images; cross-checked against mDiffExec diff write total (66,965,760 B), min used to avoid double-count"
+      transfer_time_s: "not captured by datalife"
+      transfer_pattern: "not captured by datalife"
+    match_ddd: true
+
+  - pc_edge_id: pc:imgtbl_projected->bgmodel:1_to_1
+    physical_path: shared_file_on_pfs
+    tier_id: tier:projects_lustre
+    data_volume_bytes: unknown
+    transfer_pattern: unknown
+    transfer_time_s: unknown
+    field_confidence:
+      data_volume_bytes: "pimages.tbl read by mBgModel carried zero byte volume in datalife monitor block"
+      transfer_time_s: "not captured by datalife"
+      transfer_pattern: "not captured by datalife"
+    match_ddd: true
+
+  - pc_edge_id: pc:fit->bgmodel:n_to_1
+    physical_path: shared_file_on_pfs
+    tier_id: tier:projects_lustre
+    data_volume_bytes: unknown
+    transfer_pattern: unknown
+    transfer_time_s: unknown
+    field_confidence:
+      data_volume_bytes: "gathered fits.tbl read by mBgModel not byte-attributed by datalife (text/fgets)"
+      transfer_time_s: "not captured by datalife"
+      transfer_pattern: "not captured by datalife"
+    match_ddd: true
+
+  - pc_edge_id: pc:imgtbl_projected->background:1_to_n
+    physical_path: shared_file_on_pfs
+    tier_id: tier:projects_lustre
+    data_volume_bytes: unknown
+    transfer_pattern: unknown
+    transfer_time_s: unknown
+    field_confidence:
+      data_volume_bytes: "pimages.tbl shard reads by mBgExec not byte-attributed by datalife"
+      transfer_time_s: "not captured by datalife"
+      transfer_pattern: "not captured by datalife"
+    match_ddd: true
+
+  - pc_edge_id: pc:bgmodel->background:1_to_n
+    physical_path: shared_file_on_pfs
+    tier_id: tier:projects_lustre
+    data_volume_bytes: 56
+    transfer_pattern: unknown
+    transfer_time_s: unknown
+    field_confidence:
+      data_volume_bytes: "corrections.tbl: bound to mBgModel write total (56 B); broadcast-read by 25 mBgExec shards (1_to_n)"
+      transfer_time_s: "not captured by datalife"
+      transfer_pattern: "not captured by datalife"
+    match_ddd: true
+
+  - pc_edge_id: pc:project->background:n_to_n
+    physical_path: shared_file_on_pfs
+    tier_id: tier:projects_lustre
+    data_volume_bytes: 8484496
+    transfer_pattern: unknown
+    transfer_time_s: unknown
+    transfer_bandwidth_gbs: unknown
+    field_confidence:
+      data_volume_bytes: "bound to mBgExec read total (8,484,496 B); UNDERCOUNT - only 2 of 25 mBgExec shard traces captured by datalife"
+      transfer_time_s: "not captured by datalife"
+      transfer_pattern: "not captured by datalife"
+    match_ddd: true
+
+  - pc_edge_id: pc:background->imgtbl_corrected:n_to_1
+    physical_path: shared_file_on_pfs
+    tier_id: tier:projects_lustre
+    data_volume_bytes: 8455680
+    transfer_pattern: unknown
+    transfer_time_s: unknown
+    transfer_bandwidth_gbs: unknown
+    field_confidence:
+      data_volume_bytes: "corrected_fits: bound to mBgExec write total (8,455,680 B, undercount: 2/25 shards); imgtbl_corrected reads headers only (not byte-attributed)"
+      transfer_time_s: "not captured by datalife"
+      transfer_pattern: "not captured by datalife"
+    match_ddd: true
+
+  - pc_edge_id: pc:imgtbl_corrected->add:1_to_1
+    physical_path: shared_file_on_pfs
+    tier_id: tier:projects_lustre
+    data_volume_bytes: unknown
+    transfer_pattern: unknown
+    transfer_time_s: unknown
+    field_confidence:
+      data_volume_bytes: "cimages.tbl read by mAdd not separable from mAdd aggregate; small-record .tbl"
+      transfer_time_s: "not captured by datalife"
+      transfer_pattern: "not captured by datalife"
+    match_ddd: true
+
+  - pc_edge_id: pc:background->add:n_to_1
+    physical_path: shared_file_on_pfs
+    tier_id: tier:projects_lustre
+    data_volume_bytes: 12729848
+    transfer_pattern: unknown
+    transfer_time_s: unknown
+    transfer_bandwidth_gbs: unknown
+    field_confidence:
+      data_volume_bytes: "bound to mAdd read total (12,729,848 B) streaming all corrected FITS tiles into the mosaic"
+      transfer_time_s: "not captured by datalife"
+      transfer_pattern: "not captured by datalife"
+    match_ddd: true
+
+data_format_observations:
+  - dataset_id: data:raw_fits_tiles
+    observed_container: plain_binary
+    observed_access_pattern: unknown
+    observed_request_size_kb: 4
+    match_wrd_format: true
+    match_wrd_layout: unknown
+    field_confidence:
+      observed_request_size_kb: "from datalife per-file _stat block histograms: dominant 4096 B access size (30225/30850 ops); plus 2 B header-parse ops"
+      observed_access_pattern: "not captured by datalife (no sequential/random classification)"
+      match_wrd_layout: "cannot confirm contiguous vs strided: not captured by datalife"
+
+  - dataset_id: data:region_hdr
+    observed_container: text
+    observed_access_pattern: unknown
+    observed_request_size_kb: 0.002
+    match_wrd_format: true
+    match_wrd_layout: unknown
+    field_confidence:
+      observed_request_size_kb: "datalife _stat: region.hdr read in 55390 ops of 2 B each (char-by-char WCS header parse)"
+      observed_access_pattern: "not captured by datalife"
+
+  - dataset_id: data:projected_fits
+    observed_container: plain_binary
+    observed_access_pattern: unknown
+    observed_request_size_kb: 4
+    match_wrd_format: true
+    match_wrd_layout: unknown
+    field_confidence:
+      observed_request_size_kb: "datalife _stat: dominant 4096 B access (187994 read ops, 67704 write ops); 4 KB block-aligned FITS pixel I/O"
+      observed_access_pattern: "not captured by datalife"
+
+  - dataset_id: data:diff_fits
+    observed_container: plain_binary
+    observed_access_pattern: unknown
+    observed_request_size_kb: 4
+    match_wrd_format: true
+    match_wrd_layout: unknown
+    field_confidence:
+      observed_request_size_kb: "datalife _stat: dominant 4096 B access (19628 read / 39256 write ops); plus 2880 B FITS-block tail writes"
+      observed_access_pattern: "not captured by datalife"
+
+  - dataset_id: data:images_tbl
+    observed_container: text
+    observed_access_pattern: unknown
+    observed_request_size_kb: 2.7
+    match_wrd_format: true
+    match_wrd_layout: unknown
+    field_confidence:
+      observed_request_size_kb: "datalife _stat: mixed 4096 B block reads and 20 B record ops (avg ~2.7 KB)"
+      observed_access_pattern: "not captured by datalife"
+
+  - dataset_id: data:pimages_tbl
+    observed_container: text
+    observed_access_pattern: unknown
+    observed_request_size_kb: 2.6
+    match_wrd_format: true
+    match_wrd_layout: unknown
+    field_confidence:
+      observed_request_size_kb: "datalife _stat: mixed 4096 B block reads and 20 B record ops (avg ~2.6 KB)"
+      observed_access_pattern: "not captured by datalife"
+
+  - dataset_id: data:corrections_tbl
+    observed_container: text
+    observed_access_pattern: unknown
+    observed_request_size_kb: 0.056
+    match_wrd_format: true
+    match_wrd_layout: unknown
+    field_confidence:
+      observed_request_size_kb: "datalife _stat: uniform 56 B record access (84 read ops broadcast across nodes)"
+      observed_access_pattern: "not captured by datalife"
+
+  - dataset_id: data:cimages_tbl
+    observed_container: text
+    observed_access_pattern: unknown
+    observed_request_size_kb: 0.02
+    match_wrd_format: true
+    match_wrd_layout: unknown
+    field_confidence:
+      observed_request_size_kb: "datalife _stat: uniform 20 B record access"
+      observed_access_pattern: "not captured by datalife"
+
+  - dataset_id: data:mosaic_fits
+    observed_container: plain_binary
+    observed_access_pattern: unknown
+    observed_request_size_kb: 4
+    match_wrd_format: true
+    match_wrd_layout: unknown
+    field_confidence:
+      observed_request_size_kb: "datalife _stat: 4096 B block writes (3631 ops) plus 2880 B FITS-block ops"
+      observed_access_pattern: "not captured by datalife"
+
+  - dataset_id: data:mosaic_area_fits
+    observed_container: plain_binary
+    observed_access_pattern: unknown
+    observed_request_size_kb: 4
+    match_wrd_format: true
+    match_wrd_layout: unknown
+    field_confidence:
+      observed_request_size_kb: "datalife _stat: 4096 B block writes (3631 ops) plus 2880 B FITS-block ops"
+      observed_access_pattern: "not captured by datalife"
+
+  - dataset_id: data:fits_tbl
+    observed_container: text
+    observed_access_pattern: unknown
+    observed_request_size_kb: unknown
+    match_wrd_format: true
+    match_wrd_layout: unknown
+    field_confidence:
+      observed_request_size_kb: "per-shard fit/projstats tables present in _stat names but write byte volume not attributed by datalife monitor block"
+      observed_access_pattern: "not captured by datalife"
+
+temporal_io_behavior:
+  workflow_wall_time_s: unknown
+  field_confidence:
+    workflow_wall_time_s: "not captured by datalife (no job-level wall-clock timeline); EDD/DDD note a verified run completes in ~20 s but datalife traces carry only cumulative per-op time, not absolute offsets"
+    per_task_timeline: "not captured by datalife: task_start_offset_s, io_start_offset_s, io_end_offset_s, io_active_duration_s, pipeline_overlap_observed are all unavailable - datalife records cumulative per-libc-call time, not wall-clock offsets"
+
+file_lifecycle_events:
+  field_confidence:
+    timeline: "not captured by datalife in this trace suite: per-file created_at/first_read_at/last_read_at/deleted_at wall-clock offsets are absent. DataLife _stat files provide per-file block-access frequency histograms and per-file read/write op decomposition (mapping each FITS/.tbl file to its data_id and confirming 4 KB-block access), but no lifecycle timestamps, so idle_time_s, lifetime_s, and match_wrd_retention cannot be computed."
+  observed_file_to_data_id_map:
+    - data_id: data:raw_fits_tiles
+      file_glob: "tile_RR_CC.fits"
+      file_count: 25
+      tier_id: tier:projects_lustre
+    - data_id: data:region_hdr
+      file_glob: "region.hdr"
+      file_count: 1
+      tier_id: tier:projects_lustre
+    - data_id: data:projected_fits
+      file_glob: "hdu0_tile_RR_CC.fits (+ _area)"
+      file_count: 50
+      tier_id: tier:projects_lustre
+    - data_id: data:diff_fits
+      file_glob: "diff.NNNNNN.NNNNNN.fits (+ _area)"
+      file_count: 144
+      tier_id: tier:projects_lustre
+    - data_id: data:images_tbl
+      file_glob: "images.tbl"
+      file_count: 1
+      tier_id: tier:projects_lustre
+    - data_id: data:pimages_tbl
+      file_glob: "pimages.tbl"
+      file_count: 1
+      tier_id: tier:projects_lustre
+    - data_id: data:cimages_tbl
+      file_glob: "cimages.tbl"
+      file_count: 1
+      tier_id: tier:projects_lustre
+    - data_id: data:corrections_tbl
+      file_glob: "corrections.tbl"
+      file_count: 1
+      tier_id: tier:projects_lustre
+    - data_id: data:fits_tbl
+      file_glob: "projstats.N.tbl"
+      file_count: 25
+      tier_id: tier:projects_lustre
+    - data_id: data:mosaic_fits
+      file_glob: "mosaic.fits"
+      file_count: 1
+      tier_id: tier:projects_lustre
+    - data_id: data:mosaic_area_fits
+      file_glob: "mosaic_area.fits"
+      file_count: 1
+      tier_id: tier:projects_lustre
+
+diagnosis_summary:
+  overall_io_pattern: cascading
+  pattern_match_wrd: false
+  pattern_match_note: >-
+    WDD primary_pattern is hybrid (scatter_gather embedded in a cascade); the
+    datalife data-flow view confirms the cascade plus the scatter fan-out / gather
+    structure but datalife alone classifies the realized flow as cascading and
+    cannot resolve the full hybrid label, so pattern_match_wrd is set false with
+    this caveat rather than asserting a confident mismatch.
+  bottleneck_summary:
+    - entity: task:diff
+      bottleneck_type: other
+      severity: medium
+      evidence: >-
+        mDiffExec is the dominant reader (270.3 MB, 71% of all read bytes) and
+        carries the largest cumulative open+close time (8.70 s open + 61.95 s
+        close summed across 25 shards, 1803 fopen events) re-reading projected
+        FITS pairs - a metadata/open-heavy and data-reuse hotspot. Note: whether
+        this is wall-time-significant cannot be confirmed because task wall time
+        and bandwidth-vs-tier-peak are not captured by datalife.
+    - entity: data:projected_fits
+      bottleneck_type: other
+      severity: medium
+      evidence: >-
+        projected_fits is produced once (107 MB write by mProjExec) and re-read
+        across diff (270 MB), background, and imgtbl_projected stages, confirming
+        the WDD hint:projected_fits_reuse data-reuse pattern.
+  optimization_opportunities:
+    - opportunity_type: prefetch_input_data
+      affected_entities: [task:diff, data:projected_fits]
+      estimated_impact: >-
+        Caching or node-local staging of projected FITS tiles before the diff
+        fan-out could cut the 270 MB re-read and the 1803 cross-node fopen events;
+        magnitude not quantifiable without wall-clock timeline (not captured by datalife).
+      evidence: "task:diff bytes_read=270329324; data:projected_fits reused by 3 consumer stages"
+      ddd_change_required: "storage_tier_assignments[data:projected_fits].caching_policy / assigned_tier (e.g. node-local stage-in)"
+  anomalies:
+    - anomaly_type: other
+      entity: task:background
+      expected: "25 mBgExec instances (DDD parallelism_instances=25)"
+      observed: "only 2 mBgExec process traces captured by datalife"
+      recommendation: "Investigate datalife instrumentation coverage of the background fan-out; mBgExec byte totals (8.48 MB read / 8.46 MB write) undercount the stage. Not a workflow defect - a profiling-coverage gap."
+    - anomaly_type: other
+      entity: task:imgtbl_raw
+      expected: "3 distinct mImgtbl tasks (imgtbl_raw, imgtbl_projected, imgtbl_corrected) with separate I/O totals"
+      observed: "datalife aggregates all mImgtbl invocations by binary name (3 traces, not per-WDD-task separable)"
+      recommendation: "Per-task attribution for repeated binaries is not captured by datalife; treat mImgtbl totals as stage-spanning."
