@@ -1,15 +1,7 @@
 # =============================================================================
 # WIDGET — Goal Document (GD) Agent Template
-# Schema: gd-8.0  |  Architecture Design: v8
+# Schema: gd-7.0  |  Architecture Design: v7
 # See WIDGET_conventions.md for ID namespace and field status codes.
-#
-# v8 CHANGELOG (motivated by the Montage 25-node deployment, run_report §6.0):
-#   - completion_criteria (NEW SECTION 5): semantic success conditions beyond
-#     artifact existence. The Montage GD treated "mosaic.fits exists" as proof of
-#     a correct run; execution produced the file from only 3 of 25 background-
-#     corrected tiles (mBgExec crashed on the other 22) — a FALSE POSITIVE.
-#     A deployment is now "successful" only when its completion_criteria pass,
-#     not merely when an output file is present. (improvement #8)
 #
 # PURPOSE
 # The GD captures the operator's performance objectives and constraints that
@@ -35,8 +27,7 @@
 #   [ ] conflict_resolution.priority_ordering lists all soft goals
 #   [ ] If two soft goals share the same priority rank, resolution_notes is non-null
 #   [ ] All hard_constraints have applies_to and rationale
-#   [ ] schema_version = "gd-8.0"
-#   [ ] completion_criteria has at least one entry (v8)
+#   [ ] schema_version = "gd-7.0"
 #
 # Field status codes: see WIDGET_conventions.md Section 3.
 # =============================================================================
@@ -65,7 +56,7 @@ header:
 
   created_at: null        # [auto_derived] ISO 8601
   last_modified_at: null  # [auto_derived] ISO 8601
-  schema_version: "gd-8.0"  # [auto_derived]
+  schema_version: "gd-7.0"  # [auto_derived]
 
   description: null
   # [required_operator]
@@ -223,64 +214,3 @@ hard_constraints:
     enforced_by: null
     # [optional_operator]
     # _allowed_values: [facility_policy, team_policy, scientific_requirement, other]
-
-
-# -----------------------------------------------------------------------------
-# SECTION 5: COMPLETION CRITERIA          [NEW in v8 — improvement #8]
-# Semantic conditions that define a CORRECT end-to-end run, distinct from the
-# numeric performance goals in Section 2. The deployment evaluator checks these
-# AFTER the run to decide success — file existence alone is NOT sufficient.
-#
-# Why this exists: the Montage GD effectively used "mosaic.fits is present" as
-# proof of a correct run. The optimized 25-node run produced mosaic.fits from
-# only 3 of 25 background-corrected tiles (mBgExec aborted on 22), yet the
-# existence check reported SUCCESS — a false positive that masked a real defect.
-# A criterion like `corrected_tiles == n_tiles` would have failed loudly.
-#
-# Agent prompts after hard_constraints are collected:
-# "Beyond producing the output file(s), what conditions must hold for this run
-# to count as correct? (e.g. 'all N input tiles contributed to the mosaic',
-# 'row count of the final table equals the number of inputs', 'no task exited
-# nonzero', 'output checksum matches a reference')."
-# -----------------------------------------------------------------------------
-completion_criteria:
-  # [required_operator] At least one entry. Each is a checkable predicate, not
-  # merely "the output file exists."
-
-  - criterion_id: "completion:<short_descriptor>"
-    # [required_operator] e.g. completion:all_tiles_coadded, completion:no_task_failed
-
-    description: null
-    # [required_operator] Plain language: what must be true for a correct run.
-
-    check:
-      # [required_operator] A machine-checkable predicate.
-      kind: null
-      # _allowed_values:
-      #   count_equals       — a counted quantity equals an expected value
-      #   count_at_least     — a counted quantity meets a floor
-      #   all_exit_zero      — every task/instance returned 0
-      #   checksum_matches   — output matches a reference digest
-      #   table_rows_equal   — a result table has the expected row count
-      #   custom             — free-form predicate in `expression`
-      subject: null
-      # What is measured, e.g. "corrected_tiles", "cimages.tbl rows",
-      # "mProjExec instances exited 0".
-      expected: null
-      # The required value/threshold, e.g. n_tiles (25), or a reference digest.
-      expression: null
-      # [required when kind=custom] free-text predicate.
-
-    artifact_existence_is_insufficient: true
-    # [auto_derived] Reminder flag: presence of the named output file does NOT by
-    # itself satisfy this criterion. Always true in v8.
-
-    severity: null
-    # [required_operator]
-    # blocking: run is INCORRECT if this fails (report as failure, not success)
-    # warning:  run is degraded but usable; record in diagnosis, do not hard-fail
-    # _allowed_values: [blocking, warning]
-
-    on_failure_recommendation: null
-    # [optional_operator] What to do if it fails — mirrors the run_report fix for
-    # Montage: "swap the mBgExec driver for a per-tile mBackground fan-out."

@@ -1,7 +1,6 @@
 # =============================================================================
 # WIDGET — Deployment Definition Document (DDD) Agent Template
-# Schema: ddd-8.0  |  Architecture Design: v8
-# v8: version-only bump for suite coherence — no DDD schema change in v8.
+# Schema: ddd-7.0  |  Architecture Design: v7
 # See WIDGET_conventions.md for ID namespace and field status codes.
 #
 # FORMAL RELATIONSHIP
@@ -89,7 +88,7 @@ header:
   hrd_id: null            # [required_agent] Copied from HRD header.hrd_id.
   hrd_version: null       # [required_agent] Copied from HRD header.version.
   gd_id: null             # [required_agent] Copied from GD header.gd_id.
-  schema_version: "ddd-8.0"  # [required_agent]
+  schema_version: "ddd-7.0"  # [required_agent]
 
   execution_profile:
     # [required_agent_ask]

@@ -1,8 +1,6 @@
 # =============================================================================
 # WIDGET — Experiment Definition Document (EDD) Agent Template
-# Schema: edd-3.0  |  Architecture Design: v8
-# v8: version-only bump for suite coherence — no EDD schema change in v8.
-#     (EDD keeps its own counter: edd-2.0 -> edd-3.0 under architecture v8.)
+# Schema: edd-2.0  |  Architecture Design: v7
 # See WIDGET_conventions.md for ID namespace and field status codes.
 #
 # PURPOSE
@@ -74,7 +72,7 @@ metadata:
     # [required_static] Copied from WDD metadata.version at EDD compile time.
     _value: null
 
-  schema_version: "edd-3.0"
+  schema_version: "edd-2.0"
   # [required_static]
 
   experiment_name:

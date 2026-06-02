@@ -1,25 +1,7 @@
 # =============================================================================
 # WIDGET — I/O Observation Document (IODD) Agent Template
-# Schema: iodd-8.0  |  Architecture Design: v8
+# Schema: iodd-7.0  |  Architecture Design: v7
 # See WIDGET_conventions.md for ID namespace and field status codes.
-#
-# v8 CHANGELOG (motivated by the Montage 25-node deployment, run_report §6.0):
-#   - profiler_capability_matrix (NEW SECTION 0): structured per-tool can/can't-measure
-#     map, so "field is null" is queryable as "tool cannot measure" vs "not yet filled,"
-#     and multi-profiler fusion is mechanical rather than prose. (improvement #4)
-#   - per_task_io_profile.coverage: {traces_captured, traces_expected, complete} — makes
-#     the "2 of 25 mBgExec traces" partial coverage a first-class signal. (improvement #2)
-#   - per_task_io_profile.attribution_scope: per_task | per_binary — disambiguates lumped
-#     repeated-binary tasks (e.g. mImgtbl x3). (improvement #3)
-#   - communication_channels.realized_transfer: first-class transfer-time/bandwidth block
-#     flagged as DFL/DaYu capability, so its absence is queryable not implicit. (improvement #5)
-#   - diagnosis_summary.pattern_match_wrd: scalar bool -> {matches, confirmable_dimensions,
-#     unconfirmable} so partial structural confirmation is expressible. (improvement #6)
-#   - optimization_opportunities[*].constraint_feasibility: links each opportunity to GD
-#     constraint IDs it must clear before it is actionable. (improvement #1)
-#   - anomalies[*].interpretation: {hypothesis, confidence, disambiguated_by} — a profiler-
-#     inferred cause is a FALSIFIABLE hypothesis, not ground truth. The mBgExec "profiling-
-#     coverage gap" label was wrong; only execution disambiguated it. (improvement #7)
 #
 # FORMAL RELATIONSHIP
 #   IODD = execution(WDD, EDD, DDD, HRD, GD)   — one record per run
@@ -95,59 +77,12 @@ header:
   # [required_agent] List of tools that contributed data. null in predictive mode.
   # E.g., ["DataLife 2.1", "DaYu 1.4", "Darshan 3.4.2"]
 
-  schema_version: "iodd-8.0"  # [required_agent]
+  schema_version: "iodd-7.0"  # [required_agent]
 
   description: null
   # [required_agent]
   # empirical:   2–3 sentences: overall I/O pattern, DDD plan match, top bottleneck.
   # predictive:  2–3 sentences: predicted I/O behavior and confidence level.
-
-
-# -----------------------------------------------------------------------------
-# SECTION 1b: PROFILER CAPABILITY MATRIX     [NEW in v8 — improvement #4]
-# Structured statement of what each contributing profiler can and cannot
-# measure, so a downstream agent can tell "this field is null because the tool
-# cannot measure it" from "null because not yet filled" — and can fuse multiple
-# profilers mechanically instead of parsing free-text field_confidence notes.
-#
-# Motivation: under the DataLife-only suite, the single optimization the IODD
-# named (node-local staging) was unquantifiable (no wall-clock) and the most
-# actionable lever (Lustre stripe) was invisible — both knowable only by reading
-# prose. This section makes profiler reach a first-class, queryable fact.
-# -----------------------------------------------------------------------------
-profiler_capability_matrix:
-  # [required_agent] One entry per tool listed in header.profiling_tools.
-  # In predictive mode: describe the tool intended to validate the run.
-
-  - tool: null
-    # [required_agent] e.g. "DataLife 2.1", "Darshan 3.4.6", "DaYu 1.4".
-
-    measures: []
-    # [required_agent] Capability dimensions this tool DOES provide. Draw from:
-    #   per_task_bytes_ops | request_size_histogram | file_lifecycle |
-    #   data_flow_attribution | wall_clock_timeline | per_task_time_offsets |
-    #   access_pattern_classification | compute_to_io_ratio | lustre_stripe_layout |
-    #   metadata_time_typing | repeated_binary_split | realized_transfer_time |
-    #   collective_io_aggregators
-    # _allowed_values: as above (extend per tool; keep names stable across suites).
-
-    cannot_measure: []
-    # [required_agent] Dimensions this tool CANNOT provide on this platform.
-    # Every field elsewhere set to `unknown` should trace to an entry here.
-    # Each item: {dimension, reason}
-    #   dimension: one of the names in `measures` vocabulary
-    #   reason: short cause, e.g. "datalife records data-flow, not wall-clock"
-
-    confidence: null
-    # [optional_agent] high | medium | low — overall trust in this tool's
-    # numbers for THIS run (e.g. lowered if the run crashed mid-flight).
-
-  # Fusion note [required_agent when >1 tool]:
-  fusion_note: null
-  # Plain text: which tool is authoritative for which dimension when they
-  # disagree or complement (e.g. "Darshan owns wall-clock + stripe; DataLife
-  # owns data-flow attribution + request-size structure; neither owns realized
-  # cross-task transfer time").
 
 
 # -----------------------------------------------------------------------------
@@ -167,34 +102,6 @@ per_task_io_profile:
     instance_count: null
     # [required_agent] Number of parallel instances that ran.
     # Source: DDD parallelism_instances (empirical or predictive).
-
-    coverage:
-      # [required_agent] NEW in v8 (improvement #2). Trace completeness for this
-      # task. A profiler emits records only for processes that ran to completion,
-      # so traces_captured < traces_expected can mean EITHER under-instrumentation
-      # OR crashed instances — the IODD must not silently pick one (the Montage
-      # mBgExec defect was a crash mislabeled as a coverage gap; see anomalies
-      # interpretation). Surface the shortfall; resolve the cause in anomalies.
-      traces_captured: null   # [required_profiler] Instances with usable traces.
-      traces_expected: null   # [required_agent] == instance_count (from DDD).
-      complete: null          # [required_agent] bool: traces_captured == traces_expected.
-      shortfall_cause: null
-      # [required_agent] Required when complete=false.
-      # _allowed_values: [under_instrumented, instance_crashed, unknown]
-      # Use "unknown" honestly when the IODD alone cannot tell — and raise an
-      # anomaly with interpretation.disambiguated_by = "execution".
-
-    attribution_scope: null
-    # [required_agent] NEW in v8 (improvement #3).
-    # per_task:   bytes/ops are attributed to THIS task_id alone.
-    # per_binary: this entry lumps multiple WDD tasks that share one binary
-    #             (e.g. the three mImgtbl calls) because the profiler keyed on
-    #             the executable, not the task. Names the merged task_ids in
-    #             attribution_note so a reader knows the numbers are pooled.
-    # _allowed_values: [per_task, per_binary]
-    attribution_note: null
-    # [required_agent] Required when attribution_scope=per_binary: list the
-    # merged task_ids and which profiler could have separated them.
 
     storage_tier_used: null
     # [required_profiler] tier_id where I/O actually occurred.
@@ -312,24 +219,12 @@ communication_channels:
     # Source: DataLife or Darshan (min of producer write / consumer read to avoid double-count).
     # predictive mode: EDD resolved_cardinalities[data_id].estimated_total_size.
 
-    realized_transfer:
-      # [required_agent] NEW in v8 (improvement #5). Realized cross-task transfer
-      # timing is its own capability: NEITHER DataLife NOR Darshan measured it in
-      # the Montage A/B (both left it blank). Making it a first-class block means
-      # its absence is QUERYABLE (measurable=false) rather than an implicit gap a
-      # reader infers from missing fields. Populated only by DFL/DaYu-class tools.
-      measurable: null
-      # [required_agent] bool: did any contributing profiler actually measure
-      # producer-write-to-consumer-read timing on this edge?
-      measured_by: null
-      # [required_agent] tool name if measurable=true, else null (name the
-      # capability gap in profiler_capability_matrix.cannot_measure).
-      transfer_time_s: null
-      # [required_profiler] Wall time from producer write start to consumer read
-      # end. Source: DataLife/DaYu timeline. null when measurable=false.
-      transfer_bandwidth_gbs: null
-      # [required_agent] COMPUTED: data_volume_bytes / transfer_time_s / 1e9.
-      # null when transfer_time_s is null.
+    transfer_bandwidth_gbs: null
+    # [required_agent] COMPUTED: data_volume_bytes / transfer_time_s / 1e9
+
+    transfer_time_s: null
+    # [required_profiler] Wall time from producer write start to consumer read end.
+    # Source: DataLife timeline.
 
     transfer_pattern: null
     # [required_agent]
@@ -449,22 +344,10 @@ diagnosis_summary:
   # [required_agent]
   # _allowed_values: [pipeline, scatter_gather, iterative, cascading, hybrid]
 
-  pattern_match_wrd:
-    # [required_agent] STRUCTURED in v8 (improvement #6). A byte/op profiler can
-    # confirm the *cascade* (task ordering, data flow) but generally cannot
-    # confirm the embedded *concurrency* (scatter/gather parallelism) — so a bare
-    # boolean over-claims. Split confirmable from unconfirmable dimensions.
-    matches: null
-    # bool: does the confirmable part of overall_io_pattern agree with WDD
-    # workflow_patterns.primary_pattern? null if nothing is confirmable.
-    confirmable_dimensions: []
-    # Dimensions this profiler COULD check, with verdict each.
-    # e.g. [{dimension: task_ordering, agrees: true},
-    #       {dimension: producer_consumer_dataflow, agrees: true}]
-    unconfirmable_dimensions: []
-    # Dimensions structurally claimed by WDD but NOT checkable from this profiler.
-    # e.g. [{dimension: scatter_concurrency, reason: "byte/op data cannot prove
-    #        25 instances ran simultaneously vs serially"}]
+  pattern_match_wrd: null
+  # [required_agent] boolean
+  # true if overall_io_pattern == WDD workflow_patterns.primary_pattern.
+  # false = observed execution pattern diverged from structural expectation.
 
   bottleneck_summary: []
   # [required_agent] List of identified bottlenecks.
@@ -501,64 +384,17 @@ diagnosis_summary:
   #   estimated_impact:  plain-language estimate of expected improvement
   #   evidence:          IODD fields supporting this recommendation
   #   ddd_change_required: specific DDD field(s) that would change to implement this
-  #   constraint_feasibility:    [NEW in v8 — improvement #1]
-  #     # Every named optimization MUST be checked against GD hard constraints
-  #     # BEFORE it is presented as actionable. The Montage suite named node-local
-  #     # staging as its #1 opportunity, but GD goal:outputs_on_projects_lustre
-  #     # forbids it outright — a conflict the agent had to discover by hand.
-  #     gd_constraints_checked: [list of GD constraint_id / goal_id]
-  #     status: feasible | blocked_by_constraint | conditionally_feasible
-  #     blocking_constraint: goal_id that blocks it (when blocked/conditional), else null
-  #     note: e.g. "blocked: outputs must stay on /projects Lustre; n_to_n edges
-  #           would also require an all-node broadcast"
-  #   quantifiable:              [NEW in v8] bool — can THIS suite's profiler size
-  #     # the benefit? false when e.g. DataLife has no wall-clock to estimate a
-  #     # staging speedup. An unquantifiable opportunity is reported, not claimed.
-  #   validation:                [NEW in v8 — improvement #9]
-  #     # Separates "recommended" from "proven." The Montage stripe-reduction was
-  #     # APPLIED but its benefit is UNVALIDATED: one run, no default-stripe
-  #     # baseline, and DataLife has no wall-clock — so no speedup may be claimed.
-  #     # A WIDGET evaluator MUST NOT report an improvement it did not measure.
-  #     status: recommended | applied_unvalidated | measured | unmeasurable
-  #       # recommended         — proposed, not yet applied
-  #       # applied_unvalidated — applied, but no baseline/metric to prove a delta
-  #       # measured            — applied AND a baseline A/B produced a real number
-  #       # unmeasurable        — cannot be measured with available profilers (see quantifiable)
-  #     baseline_ref: null
-  #       # IODD id (or run id) of the control run this was/should be compared against.
-  #       # null when no baseline exists yet — which itself blocks status=measured.
-  #     measured_delta: null
-  #       # The actual improvement when status=measured (e.g. "-18% diff-stage
-  #       # wall time"); null otherwise. NEVER fill from a single uncontrolled run.
-  #     how_to_validate: null
-  #       # Required when status in [applied_unvalidated, unmeasurable]: the A/B that
-  #       # would settle it (e.g. "same 25 nodes, default -c20 vs -c4/-c1, compare
-  #       # wall-clock on the corrected mBackground pipeline").
 
   anomalies: []
   # [required_agent] Fields where observed values diverged from WDD or DDD plans.
   # Entry schema:
   #   anomaly_type: io_phase_mismatch | communication_path_mismatch |
   #                 format_mismatch | retention_mismatch | pattern_mismatch |
-  #                 unexpected_contention | mpi_io_aggregator_mismatch |
-  #                 trace_coverage_shortfall | other
+  #                 unexpected_contention | mpi_io_aggregator_mismatch | other
   #   entity:       task_id, data_id, or tier_id
   #   expected:     value predicted by WDD or DDD
   #   observed:     value actually observed
   #   recommendation: update WDD (if reality changed) or fix DDD (if deployment error)
-  #   interpretation:            [NEW in v8 — improvement #7]
-  #     # A profiler-inferred CAUSE is a falsifiable hypothesis, not ground truth.
-  #     # The DataLife IODD asserted the 2/25 mBgExec shortfall was "not a workflow
-  #     # defect — a profiling-coverage gap." Execution disproved it: mBgExec
-  #     # deterministically crashes (free(): invalid size) on 23/25 shards. Record
-  #     # the cause as a claim that something must resolve, never as fact.
-  #     hypothesis: plain-language candidate cause
-  #     confidence: high | medium | low | speculative
-  #     disambiguated_by: what would settle it —
-  #       _allowed_values: [execution, cross_profiler, source_inspection,
-  #                         operator_input, already_confirmed]
-  #     resolved: bool (false until disambiguated)   # default false
-  #     resolution: null until resolved, then the confirmed cause + evidence
 
   predictive_confidence_records: null
   # [required_agent] Required when header.predictive = true.

@@ -1,7 +1,6 @@
 # =============================================================================
 # WIDGET — Hardware Resource Document (HRD) Agent Template
-# Schema: hrd-8.0  |  Architecture Design: v8
-# v8: version-only bump for suite coherence — no HRD schema change in v8.
+# Schema: hrd-7.0  |  Architecture Design: v7
 # See WIDGET_conventions.md for ID namespace and field status codes.
 #
 # PURPOSE
@@ -27,7 +26,7 @@
 #       max_walltime_per_queue)
 #   [ ] All required_benchmark fields have values (vendor spec acceptable as
 #       initial estimate, flagged accordingly)
-#   [ ] schema_version = "hrd-8.0"
+#   [ ] schema_version = "hrd-7.0"
 #
 # Field status codes: see WIDGET_conventions.md Section 3.
 # =============================================================================
@@ -59,7 +58,7 @@ header:
   # [required_sysadmin]
   _value: null
 
-  schema_version: "hrd-8.0"
+  schema_version: "hrd-7.0"
   # [auto_derived]
 
   created_at: null      # [auto_derived] ISO 8601
