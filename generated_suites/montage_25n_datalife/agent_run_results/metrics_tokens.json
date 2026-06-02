@@ -1,0 +1,74 @@
+{
+  "transcript": "/u/mtang9/.claude/projects/-u-mtang9-widget-eval/23ec28b9-969a-47e8-b90c-4441c42670d9.jsonl",
+  "session_id": "23ec28b9-969a-47e8-b90c-4441c42670d9",
+  "tokens_are_estimate": false,
+  "source": "claude_code_local_transcript",
+  "phases": {
+    "setup": {
+      "turns": 9,
+      "tool_calls": 3,
+      "input_tokens": 5892,
+      "output_tokens": 2673,
+      "cache_creation_input_tokens": 30628,
+      "cache_read_input_tokens": 184255,
+      "billed_input_tokens": 220775,
+      "total_tokens": 223448,
+      "wall_seconds": 21.6
+    },
+    "planning": {
+      "turns": 17,
+      "tool_calls": 9,
+      "input_tokens": 292,
+      "output_tokens": 52374,
+      "cache_creation_input_tokens": 170484,
+      "cache_read_input_tokens": 928614,
+      "billed_input_tokens": 1099390,
+      "total_tokens": 1151764,
+      "wall_seconds": 264.8
+    },
+    "running": {
+      "turns": 33,
+      "tool_calls": 12,
+      "input_tokens": 960,
+      "output_tokens": 44572,
+      "cache_creation_input_tokens": 50137,
+      "cache_read_input_tokens": 3702911,
+      "billed_input_tokens": 3754008,
+      "total_tokens": 3798580,
+      "wall_seconds": 10790.3
+    },
+    "between": {
+      "turns": 87,
+      "tool_calls": 29,
+      "input_tokens": 2340,
+      "output_tokens": 167023,
+      "cache_creation_input_tokens": 969002,
+      "cache_read_input_tokens": 12972205,
+      "billed_input_tokens": 13943547,
+      "total_tokens": 14110570,
+      "wall_seconds": 24548.1
+    },
+    "other": {
+      "turns": 0,
+      "tool_calls": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "billed_input_tokens": 0,
+      "total_tokens": 0,
+      "wall_seconds": null
+    }
+  },
+  "session_total": {
+    "turns": 146,
+    "tool_calls": 53,
+    "input_tokens": 9484,
+    "output_tokens": 266642,
+    "cache_creation_input_tokens": 1220251,
+    "cache_read_input_tokens": 17787985,
+    "billed_input_tokens": 19017720,
+    "total_tokens": 19284362,
+    "wall_seconds": 35641.6
+  }
+}

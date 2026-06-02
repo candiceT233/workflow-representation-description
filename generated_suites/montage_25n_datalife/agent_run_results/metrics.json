@@ -1,0 +1,42 @@
+{
+  "agent": "claude-code (Opus 4.8, 1M ctx) [claude-opus-4-8]",
+  "profiler_suite": "datalife",
+  "session_transcript_hint": "newest jsonl under the project -u-mtang9-widget-eval",
+  "context_ingestion": {
+    "yaml_files": [
+      {"file": "wdd.yaml",  "bytes": 54322, "est_tokens": 13581},
+      {"file": "edd.yaml",  "bytes": 7967,  "est_tokens": 1992},
+      {"file": "gd.yaml",   "bytes": 5198,  "est_tokens": 1300},
+      {"file": "hrd.yaml",  "bytes": 6069,  "est_tokens": 1518},
+      {"file": "ddd.yaml",  "bytes": 15559, "est_tokens": 3890},
+      {"file": "iodd.yaml", "bytes": 27760, "est_tokens": 6940}
+    ],
+    "total_bytes": 116875,
+    "total_est_tokens": 29219
+  },
+  "planning": {
+    "wall_seconds": 274,
+    "tool_calls": 8,
+    "files_read": [
+      {"path": "generated_suites/montage_25n_datalife/wdd.yaml",  "bytes": 54322},
+      {"path": "generated_suites/montage_25n_datalife/edd.yaml",  "bytes": 7967},
+      {"path": "generated_suites/montage_25n_datalife/gd.yaml",   "bytes": 5198},
+      {"path": "generated_suites/montage_25n_datalife/hrd.yaml",  "bytes": 6069},
+      {"path": "generated_suites/montage_25n_datalife/ddd.yaml",  "bytes": 15559},
+      {"path": "generated_suites/montage_25n_datalife/iodd.yaml", "bytes": 27760}
+    ]
+  },
+  "running": {
+    "wall_seconds": 35276,
+    "queue_wait_seconds": 34783,
+    "workflow_runtime_seconds": 13.112,
+    "job_elapsed_seconds_sacct": 23,
+    "tool_calls": 17,
+    "tool_calls_note": "run-relevant tool calls (substrate probe, stripe setup, script build, submit, poll, completion investigation, corrected-deploy verification). The running sentinel segment of the transcript also contains unrelated git-submodule + report-writing tool calls that measure_agent_cost.py will attribute to the running phase.",
+    "result": "partial_success",
+    "distinct_nodes": 25,
+    "mosaic_fits_bytes": 11151360,
+    "mosaic_fits_complete": false,
+    "background_stage_failure": "23/25 mBgExec aborted (free(): invalid size); fixed via per-tile mBackground -> full 25-tile mosaic 29401920 bytes"
+  }
+}
