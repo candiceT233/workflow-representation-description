@@ -44,6 +44,16 @@
 
 - `WIDGET_conventions.md` "Applies to" line and Key Design Principles updated; three v8 principles added (profiler-inference-is-hypothesis; profiler-reach-is-queryable; success-is-semantic).
 
+## v8.1 (2026-06-02, additive — `iodd-8.1`)
+
+| # | Field changed | What it fixes |
+|---|---|---|
+| 10 | `optimization_opportunities[*].validation.measured_delta` becomes a **structured record** `{value, adjusted_value, n_reps_per_arm, design, confounds, strength}` | The stripe A/B (job 18738834) measured **−11.1% raw / ~−8% net-of-warmup** wall-clock on the corrected pipeline — but `B/O/B/O` ordering means opt always followed base, partially conflating warmup with stripe (n=2/arm). A bare `measured_delta: "+11%"` would let that confounded estimate read as "proven" — exactly the overclaim `validation` exists to prevent. v8.1 forces a measured delta to carry `strength` (`definitive`/`suggestive`/`anecdotal`), its `design`, and known `confounds`; `how_to_validate` is now also required when `strength != definitive`. *(Surfaced by ingesting real A/B evidence in loop iteration 3.)* |
+
+> The Montage stripe optimization is therefore recorded as `status=measured`,
+> `strength=suggestive` (direction solid — worst-opt < best-base — but confounded
+> and low-n), with `how_to_validate` = a counterbalanced n≥3/arm re-run.
+
 ## Version-only bumps (no schema change)
 
 `WDD` (`wrd-8.0`), `HRD` (`hrd-8.0`), `DDD` (`ddd-8.0`), `EDD` (`edd-3.0`) were bumped

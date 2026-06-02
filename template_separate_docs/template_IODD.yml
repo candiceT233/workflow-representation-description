@@ -1,6 +1,12 @@
 # =============================================================================
 # WIDGET — I/O Observation Document (IODD) Agent Template
-# Schema: iodd-8.0  |  Architecture Design: v8
+# Schema: iodd-8.1  |  Architecture Design: v8
+#
+# v8.1 (additive): optimization_opportunities[*].validation.measured_delta is now
+#   a STRUCTURED record {value, adjusted_value, n_reps_per_arm, design, confounds,
+#   strength} — a measured improvement must carry its rigor, so a confounded n=2
+#   A/B (the Montage stripe result: ~11% raw / ~8% net, suggestive) cannot be
+#   stamped "proven." (improvement #10; see CHANGELOG-v8.md)
 # See WIDGET_conventions.md for ID namespace and field status codes.
 #
 # v8 CHANGELOG (motivated by the Montage 25-node deployment, run_report §6.0):
@@ -95,7 +101,7 @@ header:
   # [required_agent] List of tools that contributed data. null in predictive mode.
   # E.g., ["DataLife 2.1", "DaYu 1.4", "Darshan 3.4.2"]
 
-  schema_version: "iodd-8.0"  # [required_agent]
+  schema_version: "iodd-8.1"  # [required_agent]
 
   description: null
   # [required_agent]
@@ -527,13 +533,26 @@ diagnosis_summary:
   #     baseline_ref: null
   #       # IODD id (or run id) of the control run this was/should be compared against.
   #       # null when no baseline exists yet — which itself blocks status=measured.
-  #     measured_delta: null
-  #       # The actual improvement when status=measured (e.g. "-18% diff-stage
-  #       # wall time"); null otherwise. NEVER fill from a single uncontrolled run.
+  #     measured_delta:            [STRUCTURED in v8.1 — improvement #10]
+  #       # The measured improvement when status=measured — NOT a bare number.
+  #       # A bare "+11%" lets a confounded n=2 estimate masquerade as proven,
+  #       # the very overclaim `validation` exists to prevent. Record rigor:
+  #       value: null            # e.g. "-11.1% wall-clock (raw)"
+  #       adjusted_value: null   # after removing known confounds, e.g. "~-8% net of warmup"
+  #       n_reps_per_arm: null   # measurements per arm (1 = anecdote)
+  #       design: null           # e.g. "B/O/B/O interleaved, same allocation"
+  #       confounds: []          # known threats, e.g. ["opt always follows base
+  #                              #   -> warmup partially conflated with stripe"]
+  #       strength: null         # _allowed_values: [definitive, suggestive, anecdotal]
+  #                              #   definitive: counterbalanced, n>=3/arm, arms separate
+  #                              #   suggestive: direction clear but confounded or low-n
+  #                              #   anecdotal:  single uncontrolled observation
+  #       null otherwise (status != measured).
   #     how_to_validate: null
-  #       # Required when status in [applied_unvalidated, unmeasurable]: the A/B that
-  #       # would settle it (e.g. "same 25 nodes, default -c20 vs -c4/-c1, compare
-  #       # wall-clock on the corrected mBackground pipeline").
+  #       # Required when status in [applied_unvalidated, unmeasurable], and ALSO
+  #       # when strength != definitive: the A/B that would settle/strengthen it
+  #       # (e.g. "counterbalance order B/O/O/B, n>=3/arm, on the corrected
+  #       # mBackground pipeline; confirm worst-opt < best-base holds").
 
   anomalies: []
   # [required_agent] Fields where observed values diverged from WDD or DDD plans.
