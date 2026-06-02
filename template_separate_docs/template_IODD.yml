@@ -1,6 +1,13 @@
 # =============================================================================
 # WIDGET — I/O Observation Document (IODD) Agent Template
-# Schema: iodd-8.1  |  Architecture Design: v8
+# Schema: iodd-8.2  |  Architecture Design: v8
+#
+# v8.2 (additive): optimization_opportunities[*].validation.outcome (required when
+#   status=measured) records the DIRECTION of the result — confirmed_improvement /
+#   no_detectable_effect / regression / inconclusive — orthogonal to rigor. A
+#   counterbalanced n=4 A/B found the Montage stripe opt has NO detectable effect
+#   (1.23%, arms overlap), overturning an apparent 11% warmup artifact. Without
+#   `outcome`, a definitive null result reads as a confirmed win. (improvement #11)
 #
 # v8.1 (additive): optimization_opportunities[*].validation.measured_delta is now
 #   a STRUCTURED record {value, adjusted_value, n_reps_per_arm, design, confounds,
@@ -101,7 +108,7 @@ header:
   # [required_agent] List of tools that contributed data. null in predictive mode.
   # E.g., ["DataLife 2.1", "DaYu 1.4", "Darshan 3.4.2"]
 
-  schema_version: "iodd-8.1"  # [required_agent]
+  schema_version: "iodd-8.2"  # [required_agent]
 
   description: null
   # [required_agent]
@@ -530,6 +537,19 @@ diagnosis_summary:
   #       # applied_unvalidated — applied, but no baseline/metric to prove a delta
   #       # measured            — applied AND a baseline A/B produced a real number
   #       # unmeasurable        — cannot be measured with available profilers (see quantifiable)
+  #     outcome:                   [NEW in v8.2 — improvement #11]
+  #       # Required when status=measured. The DIRECTION of the measured result —
+  #       # orthogonal to its rigor (strength). A definitive measurement can show
+  #       # NO effect; without this field an agent reads status=measured + a small
+  #       # positive measured_delta as "a confirmed win" and deploys noise.
+  #       # The Montage stripe opt is the cautionary case: a counterbalanced n=4
+  #       # A/B found delta=1.23% with overlapping arms -> no_detectable_effect,
+  #       # overturning an apparent 11% that was a warmup artifact.
+  #       # _allowed_values:
+  #       #   confirmed_improvement  — delta favors opt AND exceeds run-to-run noise
+  #       #   no_detectable_effect   — delta within noise / arms overlap
+  #       #   regression             — opt is reliably WORSE
+  #       #   inconclusive           — measurement too weak to decide (see strength)
   #     baseline_ref: null
   #       # IODD id (or run id) of the control run this was/should be compared against.
   #       # null when no baseline exists yet — which itself blocks status=measured.

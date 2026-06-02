@@ -44,6 +44,18 @@
 
 - `WIDGET_conventions.md` "Applies to" line and Key Design Principles updated; three v8 principles added (profiler-inference-is-hypothesis; profiler-reach-is-queryable; success-is-semantic).
 
+## v8.2 (2026-06-02, additive — `iodd-8.2`)
+
+| # | Field added | What it fixes |
+|---|---|---|
+| 11 | `optimization_opportunities[*].validation.outcome` (required when `status=measured`): `confirmed_improvement` / `no_detectable_effect` / `regression` / `inconclusive` | A **counterbalanced n=4 A/B** (job 18746307, `ABBA-ABBA`) found the stripe optimization has **no detectable effect**: `delta=1.23%`, arms overlap (`base 10.52–11.77`, `opt 10.42–11.41`), within-arm spread ≫ between-arm gap. This **overturned** the iter-3 `suggestive` ~11% — which was a warmup artifact of `B/O/B/O` ordering. `outcome` is orthogonal to `strength`: a measurement can be *definitive* AND show *no effect*. Without it, `status=measured` + a small positive `measured_delta` reads as a confirmed win, and an agent deploys noise. |
+
+> The Montage stripe optimization is now `status=measured`, `strength=definitive`
+> (counterbalanced, n=4, position-balanced), **`outcome=no_detectable_effect`**.
+> The arc recommended → applied_unvalidated → suggestive → **measured/no-effect** is
+> the canonical cautionary tale for the paper: a theoretically-motivated, IODD-cited
+> optimization that rigorous measurement shows does nothing at this scale.
+
 ## v8.1 (2026-06-02, additive — `iodd-8.1`)
 
 | # | Field changed | What it fixes |

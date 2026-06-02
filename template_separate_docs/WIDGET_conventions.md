@@ -1,5 +1,5 @@
 # WIDGET Architecture Conventions
-## Applies to: All v8 documents (wrd-8.0, edd-3.0, ddd-8.0, gd-8.0, hrd-8.0, **iodd-8.1**)
+## Applies to: All v8 documents (wrd-8.0, edd-3.0, ddd-8.0, gd-8.0, hrd-8.0, **iodd-8.2**)
 <!-- v8 (2026-06-02): IODD + GD gained schema fields motivated by the Montage
      25-node deployment (see CHANGELOG-v8.md). WDD/HRD/DDD/EDD are version-only
      bumps for suite coherence. v7 templates preserved under archive/v7/. -->
@@ -132,3 +132,4 @@ The IODD cross-run comparison model is enabled by pinning all five input documen
 9. **(v8) Success is semantic, not file-presence**: GD `completion_criteria` define a correct run with checkable predicates (e.g. `corrected_tiles == n_tiles`). Producing an output file does NOT by itself constitute success. Optimizations in the IODD carry a `constraint_feasibility` check against GD hard constraints before they are presented as actionable.
 10. **(v8) Recommended ≠ proven**: an optimization carries a `validation.status` (`recommended` / `applied_unvalidated` / `measured` / `unmeasurable`). An improvement may be *claimed* only when `status=measured` against a recorded `baseline_ref`. Applying a change and observing a single uncontrolled run is `applied_unvalidated`, never a measured speedup.
 11. **(v8.1) Measured ≠ definitive**: a `measured_delta` carries its `strength` (`definitive`/`suggestive`/`anecdotal`), `design`, and `confounds`. A confounded or low-n A/B (e.g. the stripe result: ~11% raw / ~8% net, n=2, order-confounded) is recorded as `suggestive` with a `how_to_validate` plan — never reported as a proven number.
+12. **(v8.2) Definitive ≠ beneficial**: a `measured` optimization carries an `outcome` (`confirmed_improvement`/`no_detectable_effect`/`regression`/`inconclusive`) orthogonal to `strength`. The stripe opt is `strength=definitive, outcome=no_detectable_effect` — a rigorously-measured null. An IODD must be able to say "we measured it well and it does nothing"; a small positive delta within noise is **not** a win.
