@@ -1,0 +1,5 @@
+setup,stability_score,stability_percent,selected_deployments
+baseline_best_beegfs,0.667,67%,30/beegfs x2; 60/beegfs x1
+code_only,0.667,67%,120/tmpfs x2; 120/scratch x1
+wdd_only,0.667,67%,120/tmpfs x2; 120/scratch x1
+wdd_dpm,1.000,100%,120/tmpfs x3

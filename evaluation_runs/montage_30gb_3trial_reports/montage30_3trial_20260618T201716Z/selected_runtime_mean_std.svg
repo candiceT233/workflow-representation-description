@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="520" viewBox="0 0 900 520">
+<rect width="100%" height="100%" fill="white"/>
+<text x="450.0" y="30.0" font-size="18" text-anchor="middle" font-family="Arial, sans-serif">Montage 30GB: selected deployment runtime across 3 trials</text>
+<line x1="80" y1="430" x2="870" y2="430" stroke="#222"/>
+<line x1="80" y1="55" x2="80" y2="430" stroke="#222"/>
+<text transform="rotate(-90 18 242.5)" x="18.0" y="242.5" font-size="12" text-anchor="middle" font-family="Arial, sans-serif">Runtime s</text>
+<line x1="76" y1="430.0" x2="870" y2="430.0" stroke="#e5e7eb"/>
+<text x="72.0" y="434.0" font-size="11" text-anchor="end" font-family="Arial, sans-serif">0</text>
+<line x1="76" y1="355.0" x2="870" y2="355.0" stroke="#e5e7eb"/>
+<text x="72.0" y="359.0" font-size="11" text-anchor="end" font-family="Arial, sans-serif">5</text>
+<line x1="76" y1="280.0" x2="870" y2="280.0" stroke="#e5e7eb"/>
+<text x="72.0" y="284.0" font-size="11" text-anchor="end" font-family="Arial, sans-serif">10</text>
+<line x1="76" y1="205.0" x2="870" y2="205.0" stroke="#e5e7eb"/>
+<text x="72.0" y="209.0" font-size="11" text-anchor="end" font-family="Arial, sans-serif">15</text>
+<line x1="76" y1="130.0" x2="870" y2="130.0" stroke="#e5e7eb"/>
+<text x="72.0" y="134.0" font-size="11" text-anchor="end" font-family="Arial, sans-serif">20</text>
+<line x1="76" y1="55.0" x2="870" y2="55.0" stroke="#e5e7eb"/>
+<text x="72.0" y="59.0" font-size="11" text-anchor="end" font-family="Arial, sans-serif">25</text>
+<rect x="121.5" y="196.8" width="114.5" height="233.2" fill="#6b7280"/>
+<line x1="178.8" y1="103.9" x2="178.8" y2="289.7" stroke="#111"/>
+<line x1="170.8" y1="103.9" x2="186.8" y2="103.9" stroke="#111"/>
+<line x1="170.8" y1="289.7" x2="186.8" y2="289.7" stroke="#111"/>
+<text x="178.8" y="452.0" font-size="11" text-anchor="middle" font-family="Arial, sans-serif">baseline best BeeGFS</text>
+<text x="178.8" y="190.8" font-size="11" text-anchor="middle" font-family="Arial, sans-serif">15.3</text>
+<rect x="319.0" y="389.4" width="114.5" height="40.6" fill="#4c78a8"/>
+<line x1="376.2" y1="380.7" x2="376.2" y2="398.2" stroke="#111"/>
+<line x1="368.2" y1="380.7" x2="384.2" y2="380.7" stroke="#111"/>
+<line x1="368.2" y1="398.2" x2="384.2" y2="398.2" stroke="#111"/>
+<text x="376.2" y="452.0" font-size="11" text-anchor="middle" font-family="Arial, sans-serif">code only</text>
+<text x="376.2" y="383.4" font-size="11" text-anchor="middle" font-family="Arial, sans-serif">2.7</text>
+<rect x="516.5" y="384.4" width="114.5" height="45.6" fill="#f58518"/>
+<text x="573.8" y="452.0" font-size="11" text-anchor="middle" font-family="Arial, sans-serif">wdd only</text>
+<text x="573.8" y="378.4" font-size="11" text-anchor="middle" font-family="Arial, sans-serif">3.0</text>
+<rect x="714.0" y="384.4" width="114.5" height="45.6" fill="#54a24b"/>
+<text x="771.2" y="452.0" font-size="11" text-anchor="middle" font-family="Arial, sans-serif">wdd dpm</text>
+<text x="771.2" y="378.4" font-size="11" text-anchor="middle" font-family="Arial, sans-serif">3.0</text>
+</svg>

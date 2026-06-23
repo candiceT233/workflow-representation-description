@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="700" viewBox="0 0 1180 700">
+<rect width="100%" height="100%" fill="white"/>
+<text x="590.0" y="30.0" font-size="18" text-anchor="middle" font-family="Arial, sans-serif">Montage 30GB: selected runtime and choice stability</text>
+<line x1="90" y1="470" x2="1140" y2="470" stroke="#222"/>
+<line x1="90" y1="60" x2="90" y2="470" stroke="#222"/>
+<text transform="rotate(-90 18 265.0)" x="18.0" y="265.0" font-size="12" text-anchor="middle" font-family="Arial, sans-serif">Runtime s</text>
+<line x1="86" y1="470.0" x2="1140" y2="470.0" stroke="#e5e7eb"/>
+<text x="82.0" y="474.0" font-size="11" text-anchor="end" font-family="Arial, sans-serif">0</text>
+<line x1="86" y1="388.0" x2="1140" y2="388.0" stroke="#e5e7eb"/>
+<text x="82.0" y="392.0" font-size="11" text-anchor="end" font-family="Arial, sans-serif">6</text>
+<line x1="86" y1="306.0" x2="1140" y2="306.0" stroke="#e5e7eb"/>
+<text x="82.0" y="310.0" font-size="11" text-anchor="end" font-family="Arial, sans-serif">12</text>
+<line x1="86" y1="224.0" x2="1140" y2="224.0" stroke="#e5e7eb"/>
+<text x="82.0" y="228.0" font-size="11" text-anchor="end" font-family="Arial, sans-serif">18</text>
+<line x1="86" y1="142.0" x2="1140" y2="142.0" stroke="#e5e7eb"/>
+<text x="82.0" y="146.0" font-size="11" text-anchor="end" font-family="Arial, sans-serif">23</text>
+<line x1="86" y1="60.0" x2="1140" y2="60.0" stroke="#e5e7eb"/>
+<text x="82.0" y="64.0" font-size="11" text-anchor="end" font-family="Arial, sans-serif">29</text>
+<rect x="217.5" y="142.0" width="95.0" height="328.0" fill="#6b7280"/>
+<text x="265.0" y="120.0" font-size="11" text-anchor="middle" font-family="Arial, sans-serif">23.3s</text>
+<text x="265.0" y="135.0" font-size="11" text-anchor="middle" font-family="Arial, sans-serif">stability 33%</text>
+<text x="265.0" y="492.0" font-size="11" text-anchor="middle" font-family="Arial, sans-serif">baseline best BeeGFS</text>
+<text x="265.0" y="512.0" font-size="10" text-anchor="middle" font-family="Arial, sans-serif">best choices: 60/beegfs x1;</text>
+<text x="265.0" y="526.0" font-size="10" text-anchor="middle" font-family="Arial, sans-serif">30/beegfs x1; 120/beegfs x1; all</text>
+<text x="265.0" y="540.0" font-size="10" text-anchor="middle" font-family="Arial, sans-serif">baselines: 30node mean 263.7s,</text>
+<text x="265.0" y="554.0" font-size="10" text-anchor="middle" font-family="Arial, sans-serif">60node mean 61.0s, 120node mean</text>
+<text x="265.0" y="568.0" font-size="10" text-anchor="middle" font-family="Arial, sans-serif">43.3s</text>
+<rect x="567.5" y="352.9" width="95.0" height="117.1" fill="#4c78a8"/>
+<text x="615.0" y="330.9" font-size="11" text-anchor="middle" font-family="Arial, sans-serif">8.3s</text>
+<text x="615.0" y="345.9" font-size="11" text-anchor="middle" font-family="Arial, sans-serif">stability 33%</text>
+<text x="615.0" y="492.0" font-size="11" text-anchor="middle" font-family="Arial, sans-serif">wdd full only</text>
+<text x="615.0" y="512.0" font-size="10" text-anchor="middle" font-family="Arial, sans-serif">chosen: 120/tmpfs x1; 60/tmpfs x1;</text>
+<text x="615.0" y="526.0" font-size="10" text-anchor="middle" font-family="Arial, sans-serif">120/scratch x1</text>
+<rect x="917.5" y="282.6" width="95.0" height="187.4" fill="#f58518"/>
+<text x="965.0" y="260.6" font-size="11" text-anchor="middle" font-family="Arial, sans-serif">13.3s</text>
+<text x="965.0" y="275.6" font-size="11" text-anchor="middle" font-family="Arial, sans-serif">stability 33%</text>
+<text x="965.0" y="492.0" font-size="11" text-anchor="middle" font-family="Arial, sans-serif">wdd full dpm</text>
+<text x="965.0" y="512.0" font-size="10" text-anchor="middle" font-family="Arial, sans-serif">chosen: 120/scratch x1; 60/beegfs</text>
+<text x="965.0" y="526.0" font-size="10" text-anchor="middle" font-family="Arial, sans-serif">x1; 60/scratch x1</text>
+</svg>

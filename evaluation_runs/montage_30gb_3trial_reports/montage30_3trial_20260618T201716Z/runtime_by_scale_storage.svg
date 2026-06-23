@@ -1,0 +1,106 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="560" viewBox="0 0 980 560">
+<rect width="100%" height="100%" fill="white"/>
+<text x="490.0" y="30.0" font-size="18" text-anchor="middle" font-family="Arial, sans-serif">Montage 30GB: runtime by scale and storage</text>
+<line x1="80" y1="480" x2="800" y2="480" stroke="#222"/>
+<line x1="80" y1="55" x2="80" y2="480" stroke="#222"/>
+<line x1="76" y1="480.0" x2="800" y2="480.0" stroke="#e5e7eb"/>
+<text x="72.0" y="484.0" font-size="11" text-anchor="end" font-family="Arial, sans-serif">0</text>
+<line x1="76" y1="395.0" x2="800" y2="395.0" stroke="#e5e7eb"/>
+<text x="72.0" y="399.0" font-size="11" text-anchor="end" font-family="Arial, sans-serif">84</text>
+<line x1="76" y1="310.0" x2="800" y2="310.0" stroke="#e5e7eb"/>
+<text x="72.0" y="314.0" font-size="11" text-anchor="end" font-family="Arial, sans-serif">167</text>
+<line x1="76" y1="225.0" x2="800" y2="225.0" stroke="#e5e7eb"/>
+<text x="72.0" y="229.0" font-size="11" text-anchor="end" font-family="Arial, sans-serif">251</text>
+<line x1="76" y1="140.0" x2="800" y2="140.0" stroke="#e5e7eb"/>
+<text x="72.0" y="144.0" font-size="11" text-anchor="end" font-family="Arial, sans-serif">335</text>
+<line x1="76" y1="55.0" x2="800" y2="55.0" stroke="#e5e7eb"/>
+<text x="72.0" y="59.0" font-size="11" text-anchor="end" font-family="Arial, sans-serif">418</text>
+<text x="80.0" y="505.0" font-size="12" text-anchor="middle" font-family="Arial, sans-serif">30</text>
+<text x="440.0" y="505.0" font-size="12" text-anchor="middle" font-family="Arial, sans-serif">60</text>
+<text x="800.0" y="505.0" font-size="12" text-anchor="middle" font-family="Arial, sans-serif">120</text>
+<text x="440.0" y="540.0" font-size="12" text-anchor="middle" font-family="Arial, sans-serif">Node count</text>
+<polyline points="80.0,455.6 440.0,460.7 800.0,430.2" fill="none" stroke="#6b7280" stroke-width="2"/>
+<circle cx="80.0" cy="455.6" r="4" fill="#6b7280"/>
+<circle cx="440.0" cy="460.7" r="4" fill="#6b7280"/>
+<circle cx="800.0" cy="430.2" r="4" fill="#6b7280"/>
+<rect x="825" y="65" width="12" height="12" fill="#6b7280"/>
+<text x="843.0" y="75.0" font-size="11" text-anchor="start" font-family="Arial, sans-serif">baseline:beegfs</text>
+<polyline points="80.0,278.4 440.0,408.5 800.0,467.1" fill="none" stroke="#4c78a8" stroke-width="2"/>
+<circle cx="80.0" cy="278.4" r="4" fill="#4c78a8"/>
+<circle cx="440.0" cy="408.5" r="4" fill="#4c78a8"/>
+<circle cx="800.0" cy="467.1" r="4" fill="#4c78a8"/>
+<rect x="825" y="87" width="12" height="12" fill="#4c78a8"/>
+<text x="843.0" y="97.0" font-size="11" text-anchor="start" font-family="Arial, sans-serif">code_only:beegfs</text>
+<polyline points="80.0,470.9 440.0,474.2 800.0,476.3" fill="none" stroke="#72b7b2" stroke-width="2"/>
+<circle cx="80.0" cy="470.9" r="4" fill="#72b7b2"/>
+<circle cx="440.0" cy="474.2" r="4" fill="#72b7b2"/>
+<circle cx="800.0" cy="476.3" r="4" fill="#72b7b2"/>
+<rect x="825" y="109" width="12" height="12" fill="#72b7b2"/>
+<text x="843.0" y="119.0" font-size="11" text-anchor="start" font-family="Arial, sans-serif">code_only:scratch</text>
+<polyline points="80.0,473.2 440.0,475.9 800.0,477.3" fill="none" stroke="#eeca3b" stroke-width="2"/>
+<circle cx="80.0" cy="473.2" r="4" fill="#eeca3b"/>
+<circle cx="440.0" cy="475.9" r="4" fill="#eeca3b"/>
+<circle cx="800.0" cy="477.3" r="4" fill="#eeca3b"/>
+<rect x="825" y="131" width="12" height="12" fill="#eeca3b"/>
+<text x="843.0" y="141.0" font-size="11" text-anchor="start" font-family="Arial, sans-serif">code_only:tmpfs</text>
+<polyline points="80.0,340.4 440.0,468.1 800.0,445.1" fill="none" stroke="#f58518" stroke-width="2"/>
+<circle cx="80.0" cy="340.4" r="4" fill="#f58518"/>
+<circle cx="440.0" cy="468.1" r="4" fill="#f58518"/>
+<circle cx="800.0" cy="445.1" r="4" fill="#f58518"/>
+<rect x="825" y="153" width="12" height="12" fill="#f58518"/>
+<text x="843.0" y="163.0" font-size="11" text-anchor="start" font-family="Arial, sans-serif">wdd_only:beegfs</text>
+<polyline points="80.0,471.9 440.0,474.9 800.0,475.9" fill="none" stroke="#54a24b" stroke-width="2"/>
+<circle cx="80.0" cy="471.9" r="4" fill="#54a24b"/>
+<circle cx="440.0" cy="474.9" r="4" fill="#54a24b"/>
+<circle cx="800.0" cy="475.9" r="4" fill="#54a24b"/>
+<rect x="825" y="175" width="12" height="12" fill="#54a24b"/>
+<text x="843.0" y="185.0" font-size="11" text-anchor="start" font-family="Arial, sans-serif">wdd_only:scratch</text>
+<polyline points="80.0,473.2 440.0,470.5 800.0,476.6" fill="none" stroke="#6b7280" stroke-width="2"/>
+<circle cx="80.0" cy="473.2" r="4" fill="#6b7280"/>
+<circle cx="440.0" cy="470.5" r="4" fill="#6b7280"/>
+<circle cx="800.0" cy="476.6" r="4" fill="#6b7280"/>
+<rect x="825" y="197" width="12" height="12" fill="#6b7280"/>
+<text x="843.0" y="207.0" font-size="11" text-anchor="start" font-family="Arial, sans-serif">wdd_only:tmpfs</text>
+<polyline points="80.0,467.8 440.0,463.1 800.0,421.1" fill="none" stroke="#4c78a8" stroke-width="2"/>
+<circle cx="80.0" cy="467.8" r="4" fill="#4c78a8"/>
+<circle cx="440.0" cy="463.1" r="4" fill="#4c78a8"/>
+<circle cx="800.0" cy="421.1" r="4" fill="#4c78a8"/>
+<rect x="825" y="219" width="12" height="12" fill="#4c78a8"/>
+<text x="843.0" y="229.0" font-size="11" text-anchor="start" font-family="Arial, sans-serif">wdd_dpm:beegfs</text>
+<polyline points="80.0,472.5 440.0,474.9 800.0,475.6" fill="none" stroke="#72b7b2" stroke-width="2"/>
+<circle cx="80.0" cy="472.5" r="4" fill="#72b7b2"/>
+<circle cx="440.0" cy="474.9" r="4" fill="#72b7b2"/>
+<circle cx="800.0" cy="475.6" r="4" fill="#72b7b2"/>
+<rect x="825" y="241" width="12" height="12" fill="#72b7b2"/>
+<text x="843.0" y="251.0" font-size="11" text-anchor="start" font-family="Arial, sans-serif">wdd_dpm:scratch</text>
+<polyline points="80.0,471.9 440.0,476.3 800.0,477.0" fill="none" stroke="#eeca3b" stroke-width="2"/>
+<circle cx="80.0" cy="471.9" r="4" fill="#eeca3b"/>
+<circle cx="440.0" cy="476.3" r="4" fill="#eeca3b"/>
+<circle cx="800.0" cy="477.0" r="4" fill="#eeca3b"/>
+<rect x="825" y="263" width="12" height="12" fill="#eeca3b"/>
+<text x="843.0" y="273.0" font-size="11" text-anchor="start" font-family="Arial, sans-serif">wdd_dpm:tmpfs</text>
+<rect x="825" y="285" width="12" height="12" fill="#f58518"/>
+<text x="843.0" y="295.0" font-size="11" text-anchor="start" font-family="Arial, sans-serif">wdd_full_only:beegfs</text>
+<rect x="825" y="307" width="12" height="12" fill="#54a24b"/>
+<text x="843.0" y="317.0" font-size="11" text-anchor="start" font-family="Arial, sans-serif">wdd_full_only:scratch</text>
+<rect x="825" y="329" width="12" height="12" fill="#6b7280"/>
+<text x="843.0" y="339.0" font-size="11" text-anchor="start" font-family="Arial, sans-serif">wdd_full_only:tmpfs</text>
+<rect x="825" y="351" width="12" height="12" fill="#4c78a8"/>
+<text x="843.0" y="361.0" font-size="11" text-anchor="start" font-family="Arial, sans-serif">wdd_full_dpm:beegfs</text>
+<rect x="825" y="373" width="12" height="12" fill="#72b7b2"/>
+<text x="843.0" y="383.0" font-size="11" text-anchor="start" font-family="Arial, sans-serif">wdd_full_dpm:scratch</text>
+<rect x="825" y="395" width="12" height="12" fill="#eeca3b"/>
+<text x="843.0" y="405.0" font-size="11" text-anchor="start" font-family="Arial, sans-serif">wdd_full_dpm:tmpfs</text>
+<rect x="825" y="417" width="12" height="12" fill="#f58518"/>
+<text x="843.0" y="427.0" font-size="11" text-anchor="start" font-family="Arial, sans-serif">code_dpm:beegfs</text>
+<rect x="825" y="439" width="12" height="12" fill="#54a24b"/>
+<text x="843.0" y="449.0" font-size="11" text-anchor="start" font-family="Arial, sans-serif">code_dpm:scratch</text>
+<rect x="825" y="461" width="12" height="12" fill="#6b7280"/>
+<text x="843.0" y="471.0" font-size="11" text-anchor="start" font-family="Arial, sans-serif">code_dpm:tmpfs</text>
+<rect x="825" y="483" width="12" height="12" fill="#4c78a8"/>
+<text x="843.0" y="493.0" font-size="11" text-anchor="start" font-family="Arial, sans-serif">dpm_only:beegfs</text>
+<rect x="825" y="505" width="12" height="12" fill="#72b7b2"/>
+<text x="843.0" y="515.0" font-size="11" text-anchor="start" font-family="Arial, sans-serif">dpm_only:scratch</text>
+<rect x="825" y="527" width="12" height="12" fill="#eeca3b"/>
+<text x="843.0" y="537.0" font-size="11" text-anchor="start" font-family="Arial, sans-serif">dpm_only:tmpfs</text>
+</svg>
