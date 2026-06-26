@@ -1,0 +1,70 @@
+prompt_manifest:
+  version: 3
+  workflow_key: montage_30gb
+  workflow_display: 'Montage 30GB'
+  setup: 'wdd_full_dpm'
+  mode: decision_only_single_deployment
+  controlled_variable: information_input_regime
+  clean_input_bundle: 'agent_contexts/montage_30gb/wdd_full_dpm/allowed/'
+  agent_may_inspect_original_source_paths: false
+  candidate_node_counts: [30, 60, 120]
+  candidate_storage_tiers: ['beegfs', 'scratch', 'tmpfs']
+  storage_descriptions:
+    beegfs: 'shared parallel filesystem'
+    scratch: 'job-owned scratch filesystem or directory prepared by the neutral executor'
+    tmpfs: 'job-owned memory-backed filesystem or directory prepared by the neutral executor'
+  baseline_policy: 'BeeGFS-only at 30, 60, and 120 nodes.'
+  allowed_inputs:
+  - "Files in this setup's clean input bundle."
+  - 'Workflow repository files copied into the clean input bundle.'
+  - 'Run scripts copied into the clean input bundle.'
+  - 'Cluster site configuration copied into the clean input bundle.'
+  - 'Candidate node counts and storage tiers listed in this prompt.'
+  - 'Full WDD suite copied into the clean input bundle: WDD.yml, IODD.yml, HRD.yml, GD.yml, DDD.yml, EDD_*.yml.'
+  - 'Statically computed Widget DPM candidate-plan score table copied into the clean input bundle. The table must score every node-count/storage-tier candidate in this prompt, identify the deterministic lowest-DPM plan, and remain unchanged across all trials for this workflow/scale/setup.'
+  disallowed_inputs:
+  - 'Prior evaluation reports.'
+  - 'Chat-derived conclusions from other setups.'
+  allowed_tools:
+  - 'shell for read-only inspection of the clean input bundle'
+  - 'static DPM score files from clean input bundle'
+  tool_policy:
+    web_access: false
+    subagents: false
+    slurm_job_submission: false
+    workflow_execution: false
+    widget_mcp_live_calls: false
+  writable_outputs:
+    - 'agent decision report'
+    - 'local notes needed to produce the decision report'
+  clean_input_bundle_policy:
+    read_only: true
+    do_not_modify_inputs: true
+  dpm_score_table_requirements:
+    required: true
+    must_score_every_candidate_plan: true
+    candidate_plan_space: 'candidate_node_counts x candidate_storage_tiers'
+    must_include_dpm_argmin: true
+    must_preserve_raw_widget_output: true
+    must_not_include_prior_runtime_results: true
+  report_requirements:
+    - prompt_record_id
+    - prompt_version
+    - agent_provider
+    - model
+    - allowed_input_manifest
+    - prompt_sha256
+    - manifest_sha256
+    - input_bundle_sha256
+    - selected_node_count
+    - selected_storage_tier
+    - stage_in_policy
+    - workflow_storage_policy
+    - stage_out_policy
+    - confidence
+    - assumptions
+    - candidate_comparison
+    - dpm_evidence
+    - evidence_used
+    - files_inspected
+    - limitations
