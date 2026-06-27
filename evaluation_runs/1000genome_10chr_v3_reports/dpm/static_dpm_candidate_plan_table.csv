@@ -1,0 +1,10 @@
+node_count,storage_tier,widget_storage_tier,dpm_score_s,dpm_rank,is_dpm_best_all_candidates,is_dpm_best_staged_candidates,policy
+2,beegfs,beegfs,0.0,1,True,False,beegfs_only_no_explicit_staging
+2,scratch,ssd,49.53122660284555,8,False,False,stage_in_beegfs_to_ssd; workflow_on_ssd; stage_out_ssd_to_beegfs
+2,tmpfs,tmpfs,539.7841953909898,9,False,False,stage_in_beegfs_to_tmpfs; workflow_on_tmpfs; stage_out_tmpfs_to_beegfs
+5,beegfs,beegfs,0.0,2,False,False,beegfs_only_no_explicit_staging
+5,scratch,ssd,2.3729909710923187,4,False,True,stage_in_beegfs_to_ssd; workflow_on_ssd; stage_out_ssd_to_beegfs
+5,tmpfs,tmpfs,17.52754901507167,6,False,False,stage_in_beegfs_to_tmpfs; workflow_on_tmpfs; stage_out_tmpfs_to_beegfs
+10,beegfs,beegfs,0.0,3,False,False,beegfs_only_no_explicit_staging
+10,scratch,ssd,4.865882311465139,5,False,False,stage_in_beegfs_to_ssd; workflow_on_ssd; stage_out_ssd_to_beegfs
+10,tmpfs,tmpfs,41.24416366752084,7,False,False,stage_in_beegfs_to_tmpfs; workflow_on_tmpfs; stage_out_tmpfs_to_beegfs

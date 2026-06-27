@@ -1,0 +1,130 @@
+prompt_record_id: 1000Genome_10chr_wdd_pair_dpm_20260626T214856Z
+prompt_version: 3
+setup: wdd_pair_dpm
+workflow: 1000Genome 10 chromosomes
+agent_provider: OpenAI
+model: GPT-5 Codex
+temperature: unknown
+session_id: unknown
+allowed_input_manifest: /qfs/projects/datamesh/tang584/widget_evaluation/workflow_representation_experiments/1000Genome/agentic_runs_v3_10chr/agent_contexts/1000genome_10chr/wdd_pair_dpm/allowed_input_manifest.json
+prompt_sha256: 160c2590083897591a47e2c6d3dc7f7743f2c6e88fea92482179f9fac1ef374d
+manifest_sha256: 1fb643f6c170a851af4136cf315bc1dd3bba9868805a557971d552379c65a4f5
+input_bundle_sha256: 5f825950e9183ea6f4b0511c3ba8904f1b3607e23810e0f8266b196135a03ee7
+tool_policy:
+  web_access: false
+  subagents: false
+  slurm_job_submission: false
+  workflow_execution: false
+  widget_mcp_live_calls: false
+selected_node_count: 5
+selected_storage_tier: scratch
+stage_in_policy: Stage required 10-chromosome inputs from BeeGFS/project storage into the neutral executor's job-owned scratch working directories before workflow execution.
+workflow_storage_policy: Run chromosome-local work on job-owned scratch, preserving WDD chromosome affinity so intermediate chunk archives, merged chromosome archives, extracted directories, and temporary files stay node-local.
+stage_out_policy: Stage out final correctness outputs from scratch to BeeGFS/project output storage; do not retain scratch intermediates except logs/output artifacts required by the neutral executor.
+expected_improvement_reason: The WDD/IODD identify heavy chromosome-local archive materialization, extraction, recompression, and output fanout, especially in individuals, individuals_merge, mutation_overlap, and frequency. Running on scratch should reduce shared BeeGFS intermediate churn while preserving final output comparison. The static DPM table identifies 5-node scratch as the deterministic staged argmin with score 2.3729909710923187 s; lower staged DPM implies less modeled data-movement overhead than other non-baseline staged candidates.
+confidence: medium
+assumptions:
+  - The neutral executor implements job-owned scratch preparation, final-output copyback, cleanup, and validation as described in the allowed snapshot and site configuration.
+  - BeeGFS-only candidates are treated as baselines/reference plans; their DPM score is 0.0 because they have no explicit staging movement, not because they are the intended I/O-improved non-baseline deployment.
+  - The 10-chromosome input bundle size and 128G memory per node are sufficient for 5-node scratch operation; scratch free capacity is not reported in the allowed evidence.
+  - Candidate runtime ranking follows the static staged DPM evidence for storage movement plus WDD/IODD workflow-locality evidence; no prior runtime results were used.
+evidence_used:
+  - /qfs/projects/datamesh/tang584/widget_evaluation/workflow_representation_experiments/1000Genome/agentic_runs_v3_10chr/agent_contexts/1000genome_10chr/wdd_pair_dpm/allowed/prompt.md
+  - /qfs/projects/datamesh/tang584/widget_evaluation/workflow_representation_experiments/1000Genome/agentic_runs_v3_10chr/agent_contexts/1000genome_10chr/wdd_pair_dpm/allowed/dpm/static_dpm_candidate_plan_table.csv
+  - /qfs/projects/datamesh/tang584/widget_evaluation/workflow_representation_experiments/1000Genome/agentic_runs_v3_10chr/agent_contexts/1000genome_10chr/wdd_pair_dpm/allowed/dpm/static_dpm_candidate_plan_table.json
+  - /qfs/projects/datamesh/tang584/widget_evaluation/workflow_representation_experiments/1000Genome/agentic_runs_v3_10chr/agent_contexts/1000genome_10chr/wdd_pair_dpm/allowed/dpm/static_dpm_provenance.json
+  - /qfs/projects/datamesh/tang584/widget_evaluation/workflow_representation_experiments/1000Genome/agentic_runs_v3_10chr/agent_contexts/1000genome_10chr/wdd_pair_dpm/allowed/wdd_pair/WDD.yml
+  - /qfs/projects/datamesh/tang584/widget_evaluation/workflow_representation_experiments/1000Genome/agentic_runs_v3_10chr/agent_contexts/1000genome_10chr/wdd_pair_dpm/allowed/wdd_pair/IODD.yml
+  - /qfs/projects/datamesh/tang584/widget_evaluation/workflow_representation_experiments/1000Genome/agentic_runs_v3_10chr/agent_contexts/1000genome_10chr/wdd_pair_dpm/allowed/site_config.yml
+  - /qfs/projects/datamesh/tang584/widget_evaluation/workflow_representation_experiments/1000Genome/agentic_runs_v3_10chr/agent_contexts/1000genome_10chr/wdd_pair_dpm/allowed/workflow_repo/DATA_INVENTORY.json
+  - /qfs/projects/datamesh/tang584/widget_evaluation/workflow_representation_experiments/1000Genome/agentic_runs_v3_10chr/agent_contexts/1000genome_10chr/wdd_pair_dpm/allowed/neutral_executor_snapshot/run_mode.sbatch
+  - /qfs/projects/datamesh/tang584/widget_evaluation/workflow_representation_experiments/1000Genome/agentic_runs_v3_10chr/agent_contexts/1000genome_10chr/wdd_pair_dpm/allowed/neutral_executor_snapshot/run_partition.py
+files_inspected:
+  - prompt.md
+  - prompt_pack_manifest.yml
+  - dpm/static_dpm_candidate_plan_table.csv
+  - dpm/static_dpm_candidate_plan_table.json
+  - dpm/static_dpm_provenance.json
+  - site_config.yml
+  - wdd_pair/WDD.yml
+  - wdd_pair/IODD.yml
+  - workflow_repo/DATA_INVENTORY.json
+  - neutral_executor_snapshot/README.md
+  - neutral_executor_snapshot/submit_1000genome_3trials.sh
+  - neutral_executor_snapshot/run_mode.sbatch
+  - neutral_executor_snapshot/run_partition.py
+candidate_comparison:
+  - node_count: 2
+    storage_tier: beegfs
+    dpm_score: 0.0
+    is_dpm_best: true
+    expected_runtime_rank: unknown
+    reason_selected_or_rejected: Rejected because it is BeeGFS-only baseline/reference with no explicit staging; DPM score is zero for no movement, but it does not provide the requested non-baseline I/O-improved deployment.
+  - node_count: 2
+    storage_tier: scratch
+    dpm_score: 49.53122660284555
+    is_dpm_best: false
+    expected_runtime_rank: 6
+    reason_selected_or_rejected: Rejected because staged DPM is much higher than 5-node scratch and 10-node scratch.
+  - node_count: 2
+    storage_tier: tmpfs
+    dpm_score: 539.7841953909898
+    is_dpm_best: false
+    expected_runtime_rank: 9
+    reason_selected_or_rejected: Rejected because it has the worst staged DPM score and higher memory-backed capacity risk than scratch.
+  - node_count: 5
+    storage_tier: beegfs
+    dpm_score: 0.0
+    is_dpm_best: false
+    expected_runtime_rank: unknown
+    reason_selected_or_rejected: Rejected because it remains BeeGFS-only and does not reduce shared filesystem intermediate churn.
+  - node_count: 5
+    storage_tier: scratch
+    dpm_score: 2.3729909710923187
+    is_dpm_best: true
+    expected_runtime_rank: 1
+    reason_selected_or_rejected: Selected because it is the deterministic staged DPM argmin and matches the WDD/IODD evidence favoring chromosome-local scratch for intermediate archive churn.
+  - node_count: 5
+    storage_tier: tmpfs
+    dpm_score: 17.52754901507167
+    is_dpm_best: false
+    expected_runtime_rank: 4
+    reason_selected_or_rejected: Rejected because staged DPM is higher than scratch and tmpfs carries higher capacity pressure despite 128G per node.
+  - node_count: 10
+    storage_tier: beegfs
+    dpm_score: 0.0
+    is_dpm_best: false
+    expected_runtime_rank: unknown
+    reason_selected_or_rejected: Rejected because it remains BeeGFS-only and uses more nodes without storage-tier improvement.
+  - node_count: 10
+    storage_tier: scratch
+    dpm_score: 4.865882311465139
+    is_dpm_best: false
+    expected_runtime_rank: 2
+    reason_selected_or_rejected: Rejected because its staged DPM is higher than 5-node scratch; if node-count differences are otherwise close, the lower node count is preferred.
+  - node_count: 10
+    storage_tier: tmpfs
+    dpm_score: 41.24416366752084
+    is_dpm_best: false
+    expected_runtime_rank: 5
+    reason_selected_or_rejected: Rejected because staged DPM is higher than 5-node scratch and tmpfs has higher capacity risk.
+dpm_evidence:
+  dpm_table_path: /qfs/projects/datamesh/tang584/widget_evaluation/workflow_representation_experiments/1000Genome/agentic_runs_v3_10chr/agent_contexts/1000genome_10chr/wdd_pair_dpm/allowed/dpm/static_dpm_candidate_plan_table.csv
+  dpm_table_sha256: e600b910dcf1b2bd93dc4ef8fcaac2842f234d21dd31e403800e92f218d0e90e
+  dpm_provenance: DataLife-derived static Widget DPM artifact
+  datalife_profile_id_or_path: workflow_representation_experiments/1000Genome/datalife_code/docs (DataLife+code WDD suite used for workflow profile context); raw traces not copied into agent bundles
+  datalife_profile_sha256: not_applicable_directory_bundle_not_hashed_here
+  all_candidate_plans_scored: true
+  dpm_selected_node_count: 5
+  dpm_selected_storage_tier: scratch
+  agent_followed_dpm_argmin: true
+disallowed_inputs_avoided:
+  - Confirmed no web access, Slurm submission, workflow execution, Widget MCP/live DPM calls, subagents, HRD/GD/DDD/EDD files, prior evaluation reports, or chat-derived conclusions were used.
+executor_requirements:
+  validation_required: true
+  runtime_excludes_validation: true
+  cleanup_required: true
+limitations:
+  - Allowed evidence does not provide live scratch free capacity, live scheduler queue state, or measured runtime for this decision; feasibility is inferred from site_config.yml and the neutral executor snapshot.
+  - DPM scores model data-movement overhead, not full end-to-end runtime; compute skew and scheduler effects may change observed runtime.
+  - BeeGFS-only plans have zero DPM because no explicit staging is modeled, so the staged DPM argmin is used for the requested I/O-improved non-baseline selection.

@@ -1,0 +1,127 @@
+prompt_record_id: 1000Genome_10chromosomes_code_only_20260626T214854Z
+prompt_version: 3
+setup: code_only
+workflow: 1000Genome 10 chromosomes
+agent_provider: OpenAI
+model: GPT-5 Codex
+temperature: unknown
+session_id: unknown
+allowed_input_manifest: /qfs/projects/datamesh/tang584/widget_evaluation/workflow_representation_experiments/1000Genome/agentic_runs_v3_10chr/agent_contexts/1000genome_10chr/code_only/allowed_input_manifest.json
+prompt_sha256: 601f91b065a644580ed0e44b740d266de7119c991ad339eb0c8a67ca573fa53c
+manifest_sha256: 1ae00ac58510117e08ea9f6c80fe8576458aa2709371f334e44b5d85f73d9810
+input_bundle_sha256: 005e9d4fc18fdc9e48ddeba40b1e5d914ea7805b6c5f6794cf2d03dadd3b2e84
+tool_policy:
+  web_access: false
+  subagents: false
+  slurm_job_submission: false
+  workflow_execution: false
+  widget_mcp_live_calls: false
+selected_node_count: 10
+selected_storage_tier: tmpfs
+stage_in_policy: >-
+  Prepare each node's assigned chromosome input subset and copied workflow
+  scripts into that node's job-owned tmpfs work directory; do not pre-stage
+  unrelated chromosomes to a node.
+workflow_storage_policy: >-
+  Run all per-node workflow work directories, temporary per-individual files,
+  extracted tar contents, intermediate text/png outputs, and final archive
+  creation in the job-owned tmpfs directory.
+stage_out_policy: >-
+  Copy only final correctness archives from tmpfs to the shared output root,
+  then let the neutral executor remove the job-owned tmpfs directory during
+  cleanup.
+expected_improvement_reason: >-
+  The allowed executor partitions 10 chromosomes across nodes by modulo
+  assignment, so 10 nodes gives one chromosome per active node. The workflow
+  code performs many local filesystem operations, including per-individual
+  text-file creation, tar/gzip creation, tar extraction, population-level
+  reads, text and plot writes, and final tar archives. Using job-owned tmpfs
+  should reduce shared BeeGFS metadata and archive I/O during workflow
+  execution. In improved mode the executor also uses final-only output copying,
+  whereas the BeeGFS baseline copies all default text, png, and tar.gz outputs.
+confidence: medium
+assumptions:
+  - The neutral executor provides a job-owned tmpfs directory on every allocated node as described in site_config.yml and the prompt.
+  - Each node has approximately the configured 128G memory available, and the 6000-line, one-chromosome-per-node working set plus process memory fits within tmpfs and RAM.
+  - Final correctness validation needs only the final archives accepted by the executor's final output policy.
+  - Candidate node allocations of 2, 5, and 10 are all schedulable in principle on the configured account and partition; queue wait time is outside deployment_runtime_s.
+evidence_used:
+  - "allowed/prompt.md: candidate node counts, candidate storage tiers, baseline policy, runtime definition, and decision-only constraints."
+  - "allowed/site_config.yml: slurm account oddite, partition slurm, one task per node, 32 CPUs per task, 128G memory per node, and storage path/cleanup semantics."
+  - "allowed/neutral_executor_snapshot/run_mode.sbatch: chromosome-to-node modulo assignment, local work directory selection, baseline all-output policy, improved final-output policy, and cleanup behavior."
+  - "allowed/neutral_executor_snapshot/run_partition.py: workdir preparation, per-node chromosome execution, parallel task phases, output filtering, and expected final output count."
+  - "allowed/workflow_repo/DATA_INVENTORY.json: compressed source input sizes for 10 chromosomes and small population files."
+  - "allowed/workflow_repo/bin/individuals.py: per-individual file creation and tar.gz intermediate creation."
+  - "allowed/workflow_repo/bin/individuals_merge.py: tar extraction, merge writes, and merged tar.gz creation."
+  - "allowed/workflow_repo/bin/mutation_overlap.py: extracted chromosome data reads, population output writes, plots, and final tar.gz output."
+  - "allowed/workflow_repo/bin/frequency.py: extracted chromosome data reads, repeated text/png output generation, and final freq tar.gz output."
+  - "allowed/workflow_repo/README.md: workflow-stage descriptions and bundled execution/memory discussion showing individuals dominates compute and stage-in/out were comparatively small in that reference profile."
+  - "allowed/workflow_repo/analysis/pegasus-io-1000genome.csv: bundled size and memory observations for chromosome-scale tasks."
+files_inspected:
+  - prompt.md
+  - prompt_pack_manifest.yml
+  - site_config.yml
+  - neutral_executor_snapshot/run_mode.sbatch
+  - neutral_executor_snapshot/run_partition.py
+  - neutral_executor_snapshot/submit_1000genome_3trials.sh
+  - workflow_repo/DATA_INVENTORY.json
+  - workflow_repo/README.md
+  - workflow_repo/bin/individuals.py
+  - workflow_repo/bin/individuals_merge.py
+  - workflow_repo/bin/sifting.py
+  - workflow_repo/bin/mutation_overlap.py
+  - workflow_repo/bin/frequency.py
+  - workflow_repo/analysis/summary.csv
+  - workflow_repo/analysis/pegasus-io-1000genome.csv
+candidate_comparison:
+  - node_count: 2
+    storage_tier: beegfs
+    expected_runtime_rank: 9
+    reason_selected_or_rejected: Rejected because only two nodes process five chromosomes each and all workflow I/O remains on shared BeeGFS; baseline policy also copies all default outputs.
+  - node_count: 2
+    storage_tier: scratch
+    expected_runtime_rank: 8
+    reason_selected_or_rejected: Rejected because local scratch reduces shared filesystem pressure, but two nodes leave five chromosomes per node and less parallelism than 5 or 10 nodes.
+  - node_count: 2
+    storage_tier: tmpfs
+    expected_runtime_rank: 7
+    reason_selected_or_rejected: Rejected because tmpfs should improve local I/O, but two nodes leave five chromosomes per node, so node-level parallelism is the limiting factor.
+  - node_count: 5
+    storage_tier: beegfs
+    expected_runtime_rank: 6
+    reason_selected_or_rejected: Rejected because five nodes process two chromosomes each but still use shared BeeGFS for workflow storage.
+  - node_count: 5
+    storage_tier: scratch
+    expected_runtime_rank: 5
+    reason_selected_or_rejected: Rejected because scratch reduces shared I/O, but two chromosomes per node likely runs longer than the one-chromosome-per-node 10-node options.
+  - node_count: 5
+    storage_tier: tmpfs
+    expected_runtime_rank: 4
+    reason_selected_or_rejected: Rejected because tmpfs improves local I/O, but five nodes still assign two chromosomes per node.
+  - node_count: 10
+    storage_tier: beegfs
+    expected_runtime_rank: 3
+    reason_selected_or_rejected: Rejected because it has the best chromosome-level parallelism but keeps metadata-heavy intermediate workflow I/O on shared BeeGFS.
+  - node_count: 10
+    storage_tier: scratch
+    expected_runtime_rank: 2
+    reason_selected_or_rejected: Rejected as the lower-risk local-storage alternative; it should reduce BeeGFS pressure but is expected to be slower than tmpfs for the many small files and tar operations.
+  - node_count: 10
+    storage_tier: tmpfs
+    expected_runtime_rank: 1
+    reason_selected_or_rejected: Selected because it combines one chromosome per node with the fastest job-owned local storage for intermediate small-file, extraction, and archive I/O, while output copy is limited to final archives.
+disallowed_inputs_avoided:
+  - Did not use web access.
+  - Did not submit Slurm jobs.
+  - Did not execute the workflow.
+  - Did not call Widget MCP or live DPM tools.
+  - Did not inspect WDD-suite YAML files, DPM outputs, prior evaluation reports, chat-derived conclusions, or files outside the clean input bundle except the handoff, allowed manifest, and required decision report path.
+executor_requirements:
+  validation_required: true
+  runtime_excludes_validation: true
+  cleanup_required: true
+limitations:
+  - No measured runtime or live DPM information was available in this setup, so storage ranking is inferred from workflow code and run-script behavior only.
+  - The allowed inputs describe tmpfs availability and node memory but do not provide actual free tmpfs capacity at job start.
+  - The allowed inputs support basic scheduler feasibility from account, partition, and resource request, but not real-time queue availability.
+  - The run_partition.py snapshot references the workflow repository through WIDGET_EVAL_ROOT at execution time; this decision assumes the neutral executor supplies the same bounded dataset described by the allowed inventory and prompt.

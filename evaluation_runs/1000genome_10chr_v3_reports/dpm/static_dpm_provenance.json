@@ -1,0 +1,32 @@
+{
+  "created_utc": "2026-06-26T21:47:50.484226+00:00",
+  "workflow": "1000Genome",
+  "scale": "10 chromosomes",
+  "source_widget_dpm_json": "widget-v1/output/logs/results/prepare_and_dump_dpm_1000genome_2026-06-12T13-44-22-605212.json",
+  "source_widget_dpm_json_sha256": "3dc488a22f78fa6cd35208257c1813e6e00119fe78533b89e7dc3adadb465126",
+  "benchmark_profile": "widget-v1/input/updated_master_ior_df.csv",
+  "benchmark_profile_sha256": "78003e17469ed5aa737226c47f89e6eff6e4efe8bf9ab21e73f902c76fb45952",
+  "datalife_profile_id_or_path": "workflow_representation_experiments/1000Genome/datalife_code/docs (DataLife+code WDD suite used for workflow profile context); raw traces not copied into agent bundles",
+  "datalife_profile_sha256": "not_applicable_directory_bundle_not_hashed_here",
+  "dpm_table_csv": "workflow_representation_experiments/1000Genome/agentic_runs_v3_10chr/dpm/static_dpm_candidate_plan_table.csv",
+  "dpm_table_csv_sha256": "e600b910dcf1b2bd93dc4ef8fcaac2842f234d21dd31e403800e92f218d0e90e",
+  "dpm_table_json": "workflow_representation_experiments/1000Genome/agentic_runs_v3_10chr/dpm/static_dpm_candidate_plan_table.json",
+  "dpm_table_json_sha256": "8efdfeb609f6eb7ac24c06b047c0a27bd8a490f4fac513520a4504522cbfb35c",
+  "all_candidate_plans_scored": true,
+  "candidate_node_counts": [
+    2,
+    5,
+    10
+  ],
+  "candidate_storage_tiers": [
+    "beegfs",
+    "scratch",
+    "tmpfs"
+  ],
+  "storage_label_mapping": {
+    "beegfs": "beegfs",
+    "scratch": "widget ssd label",
+    "tmpfs": "tmpfs"
+  },
+  "note": "BeeGFS-only baseline is included as no-explicit-staging reference; DPM staged argmin should be used when choosing a non-baseline I/O-improved deployment."
+}

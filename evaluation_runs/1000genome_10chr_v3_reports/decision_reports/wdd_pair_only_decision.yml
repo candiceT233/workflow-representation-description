@@ -1,0 +1,159 @@
+prompt_record_id: 1000Genome_10chromosomes_wdd_pair_only_20260626T214856Z
+prompt_version: 3
+setup: wdd_pair_only
+workflow: 1000Genome 10 chromosomes
+agent_provider: OpenAI
+model: GPT-5 Codex
+temperature: unknown
+session_id: unknown
+allowed_input_manifest: /qfs/projects/datamesh/tang584/widget_evaluation/workflow_representation_experiments/1000Genome/agentic_runs_v3_10chr/agent_contexts/1000genome_10chr/wdd_pair_only/allowed_input_manifest.json
+prompt_sha256: 77adcf64da20961b11474220bbff5f2d129a0a4f819dc63ed3408e41783077ca
+manifest_sha256: da2980c61eb91935add4c6c4f501cb94b79763c7ccee0ae7667348d370e952
+input_bundle_sha256: 0a0a99cb45279efd773e4f7ecea69978028cdce517a5ef8be99631d721485a90
+tool_policy:
+  web_access: false
+  subagents: false
+  slurm_job_submission: false
+  workflow_execution: false
+  widget_mcp_live_calls: false
+selected_node_count: 10
+selected_storage_tier: scratch
+stage_in_policy: >
+  Let the neutral executor stage each assigned chromosome input subset, columns file,
+  population files, and task scripts into the job-owned scratch work directory for
+  that node before node-local execution. Keep stage-in limited to data required by
+  the chromosomes assigned to that node.
+workflow_storage_policy: >
+  Run all chromosome-local stages on job-owned scratch. Keep chunk archives, merged
+  chromosome archives, extracted chromosome directories, temporary SIFT files, and
+  analysis intermediates in the node-local scratch work directory so chromosome
+  internals do not churn on BeeGFS.
+stage_out_policy: >
+  Stage out only final correctness outputs and retained logs to shared output
+  storage after node-local processing completes. Require cleanup of the job-owned
+  scratch directory at job exit.
+expected_improvement_reason: >
+  The WDD and IODD identify chromosome-local archive materialization as the main
+  bottleneck hypothesis: individuals writes many per-individual files and chunk
+  archives, individuals_merge extracts and recompresses those archives, and both
+  analysis tasks consume the merged chromosome archive. The WDD locality rule says
+  all stages for a chromosome should remain on the assigned node, and the IODD
+  lists node-local scratch plus final-only stage-out as optimization opportunities.
+  Ten nodes gives one chromosome per node in the WDD profile, which best exposes
+  chromosome-level parallelism and minimizes per-node chromosome contention among
+  the allowed node counts.
+confidence: medium
+assumptions:
+  - >
+    The neutral executor's scratch directory is available and has enough capacity
+    for the prepared 6000-line-per-chromosome workload plus chromosome-local
+    intermediates.
+  - >
+    Runtime is dominated by the observed chromosome-local intermediate archive and
+    extraction behavior rather than by CPU-only computation.
+  - >
+    The final-output-only policy is sufficient because correctness is validated
+    against the BeeGFS baseline outputs by the neutral executor.
+evidence_used:
+  - allowed/prompt.md: candidate counts, storage tiers, baseline policy, output contract, and tool restrictions.
+  - allowed/site_config.yml: Slurm account/partition, 128G per node, storage path templates, cleanup rules, and runtime definition.
+  - allowed/wdd_pair/WDD.yml: task graph, task I/O dominance, 10-chromosome scale, 5-node and 10-node chromosome affinity profiles, and locality rule.
+  - allowed/wdd_pair/IODD.yml: observed successful 10-chromosome run, 460 task instances, 7041 output files, bottleneck hypothesis, and node-local scratch optimization opportunities.
+  - allowed/workflow_repo/DATA_INVENTORY.json: input VCF and population-file sizes for the copied 10-chromosome data inventory.
+  - allowed/neutral_executor_snapshot/run_mode.sbatch: executor storage roots, final-output policy for improved modes, cleanup behavior, and per-node chromosome assignment.
+  - allowed/neutral_executor_snapshot/run_partition.py: per-node work preparation, one-time merged archive extraction patch, final-output copy behavior, and expected output counts.
+files_inspected:
+  - allowed/prompt.md
+  - allowed/prompt_pack_manifest.yml
+  - allowed/site_config.yml
+  - allowed/wdd_pair/WDD.yml
+  - allowed/wdd_pair/IODD.yml
+  - allowed/workflow_repo/DATA_INVENTORY.json
+  - allowed/workflow_repo/README.md
+  - allowed/workflow_repo/data.csv
+  - allowed/neutral_executor_snapshot/README.md
+  - allowed/neutral_executor_snapshot/run_mode.sbatch
+  - allowed/neutral_executor_snapshot/run_partition.py
+  - allowed/neutral_executor_snapshot/submit_1000genome_3trials.sh
+  - allowed/neutral_executor_snapshot/summarize_run.py
+candidate_comparison:
+  - node_count: 10
+    storage_tier: scratch
+    expected_runtime_rank: 1
+    reason_selected_or_rejected: >
+      Selected. Best supported by allowed evidence: one chromosome per node from
+      the WDD 10-node profile, node-local scratch for intermediate archive churn,
+      and final-only stage-out.
+  - node_count: 10
+    storage_tier: tmpfs
+    expected_runtime_rank: 2
+    reason_selected_or_rejected: >
+      Rejected. It may be fast, but WDD/IODD specifically identify node-local
+      scratch as the optimization opportunity and provide no tmpfs benchmark or
+      memory-capacity evidence for all intermediates.
+  - node_count: 5
+    storage_tier: scratch
+    expected_runtime_rank: 3
+    reason_selected_or_rejected: >
+      Rejected. It uses the evidence-backed scratch tier, but the WDD profile
+      assigns two chromosomes per node, giving less chromosome-level parallelism
+      than 10 nodes.
+  - node_count: 5
+    storage_tier: tmpfs
+    expected_runtime_rank: 4
+    reason_selected_or_rejected: >
+      Rejected. It has the same two-chromosomes-per-node limitation as 5-node
+      scratch and has weaker allowed evidence because tmpfs capacity/performance
+      is not characterized.
+  - node_count: 10
+    storage_tier: beegfs
+    expected_runtime_rank: 5
+    reason_selected_or_rejected: >
+      Rejected. It benefits from one chromosome per node and final-only output
+      copying in improved mode, but leaves workflow intermediates on shared BeeGFS
+      rather than using the WDD/IODD node-local storage opportunity.
+  - node_count: 2
+    storage_tier: scratch
+    expected_runtime_rank: 6
+    reason_selected_or_rejected: >
+      Rejected. It uses node-local scratch but assigns five chromosomes per node
+      under the executor's modulo partitioning, reducing parallelism and increasing
+      per-node intermediate churn.
+  - node_count: 2
+    storage_tier: tmpfs
+    expected_runtime_rank: 7
+    reason_selected_or_rejected: >
+      Rejected. It combines low chromosome-level parallelism with uncharacterized
+      tmpfs capacity risk for intermediates.
+  - node_count: 5
+    storage_tier: beegfs
+    expected_runtime_rank: 8
+    reason_selected_or_rejected: >
+      Rejected. It has moderate chromosome parallelism but retains shared
+      filesystem intermediate churn that the WDD/IODD evidence recommends avoiding.
+  - node_count: 2
+    storage_tier: beegfs
+    expected_runtime_rank: 9
+    reason_selected_or_rejected: >
+      Rejected. This is closest to the simplest baseline style and has the least
+      chromosome-level parallelism among the candidates while retaining shared
+      BeeGFS intermediate I/O.
+disallowed_inputs_avoided:
+  - Confirmed: no HRD.yml, GD.yml, DDD.yml, EDD_*.yml, Widget DPM outputs, prior evaluation reports, chat-derived conclusions, web access, Slurm submission, workflow execution, live Widget MCP calls, or subagents were used.
+executor_requirements:
+  validation_required: true
+  runtime_excludes_validation: true
+  cleanup_required: true
+limitations:
+  - >
+    Allowed evidence does not include storage benchmark measurements or DPM scores,
+    so scratch is chosen from workflow I/O behavior and explicit WDD/IODD
+    optimization opportunities rather than measured tier bandwidth.
+  - >
+    WDD gives explicit chromosome assignment profiles for 5 and 10 nodes, but not
+    for 2 nodes; the 2-node assessment relies on the allowed executor snapshot's
+    modulo chromosome assignment.
+  - >
+    Per-task bytes read and written are marked unknown in IODD, so storage capacity
+    risk is estimated qualitatively from input inventory sizes, task behavior, and
+    the 128G-per-node site configuration.
