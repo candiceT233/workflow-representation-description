@@ -5,6 +5,25 @@
 - Baseline runs BeeGFS at 2, 5, and 10 nodes; the baseline bar uses the fastest successful BeeGFS node count within each trial.
 - Non-baseline bars use the exact node/storage deployment selected by each fresh decision agent.
 
+## DPM Artifact Correction
+
+The `code_dpm`, `dpm_only`, and `wdd_pair_dpm` results in this report should be
+interpreted with an important caveat: the static DPM table given to those agents
+was generated from Widget's `prepare_and_dump_dpm` movement-node export. That
+export records stage-in/inter-stage/stage-out movement-node `estimated_time`
+values, not the full Widget DPM candidate-plan score.
+
+Widget's full DPM implementation does estimate producer and consumer I/O time.
+The correct scoring path is `predict_dpm_space` / `analyze_workflow_dpm`, where
+candidate plans include `estT_prod`, `estT_cons`, `workflow_io_time`,
+`data_movement_time`, and final `dpm`. Therefore the DPM-enabled selections here
+reflect an incomplete movement-export artifact, not a valid full candidate-plan
+DPM table.
+
+Action item for rerun: regenerate the DPM bundle from the full Widget DPM path,
+validate that every candidate plan has producer/consumer I/O terms plus movement
+terms, then rerun DPM-enabled setups.
+
 ## Agentic Deployment Choices
 
 | setup | selected deployment | input regime |

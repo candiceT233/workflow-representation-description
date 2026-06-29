@@ -151,6 +151,13 @@ For every DPM-enabled setup (`code_dpm`, `dpm_only`, `wdd_pair_dpm`, and
 `wdd_full_dpm`), DPM must be used as a candidate-plan scoring function, not as a
 vague guidance label.
 
+The candidate-plan table must be generated from Widget's full DPM scoring path
+(`predict_dpm_space` or `analyze_workflow_dpm`). Do not use
+`prepare_and_dump_dpm` / `dpm_export.py` movement-node exports as the normalized
+candidate-plan table. Those exports estimate movement-node costs only; they may
+be kept as supporting provenance, but they do not include the full producer and
+consumer workflow I/O terms required for candidate-plan DPM.
+
 Before starting the decision agent, run Widget DPM over the full deployment
 candidate space:
 
@@ -178,9 +185,17 @@ The DPM bundle must contain:
 
 - the raw Widget DPM output,
 - a normalized candidate-plan score table,
+- per-plan `estT_prod`, `estT_cons`, `workflow_io_time`,
+  `data_movement_time`, and final `dpm`,
 - checksums for both files,
 - the deterministic DPM argmin deployment,
 - a note describing any candidate plan that could not be scored.
+
+Validation gate: before launching a DPM-enabled decision agent, inspect the
+normalized table and confirm every scored candidate has the required full-DPM
+fields. A zero `data_movement_time` is acceptable only when the plan genuinely
+requires no movement; `workflow_io_time` must still be present and must not be
+replaced by movement time.
 
 The DPM bundle must not contain measured runtime results, previous agent
 choices, report summaries, or chat-derived conclusions.

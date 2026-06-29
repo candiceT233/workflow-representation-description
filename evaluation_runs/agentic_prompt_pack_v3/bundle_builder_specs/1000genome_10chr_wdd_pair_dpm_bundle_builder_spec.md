@@ -30,7 +30,7 @@ Allowed inputs for this setup:
 - Candidate node counts and storage tiers listed in this prompt.
 - WDD.yml copied into the clean input bundle.
 - IODD.yml copied into the clean input bundle.
-- Statically computed Widget DPM candidate-plan score table copied into the clean input bundle. The table must score every node-count/storage-tier candidate in this prompt, identify the deterministic lowest-DPM plan, and remain unchanged across all trials for this workflow/scale/setup.
+- Statically computed Widget DPM candidate-plan score table copied into the clean input bundle. The table must score every node-count/storage-tier candidate in this prompt, include `estT_prod`, `estT_cons`, `workflow_io_time`, `data_movement_time`, and final `dpm` for each scored candidate, identify the deterministic lowest-DPM plan, and remain unchanged across all trials for this workflow/scale/setup. The normalized score table must be generated from Widget `predict_dpm_space` or `analyze_workflow_dpm`, not from `prepare_and_dump_dpm` movement-node exports alone.
 
 Disallowed inputs for this setup:
 - HRD.yml, GD.yml, DDD.yml, and EDD_*.yml.

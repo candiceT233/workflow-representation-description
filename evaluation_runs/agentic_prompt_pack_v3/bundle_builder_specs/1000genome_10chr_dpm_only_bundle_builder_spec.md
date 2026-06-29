@@ -25,7 +25,7 @@ agent_contexts/1000genome_10chr/dpm_only/allowed/
 Allowed inputs for this setup:
 - Files in this setup's clean input bundle.
 - Candidate node counts and storage tiers listed in this prompt.
-- Statically computed Widget DPM candidate-plan score table copied into the clean input bundle. The table must score every node-count/storage-tier candidate in this prompt, identify the deterministic lowest-DPM plan, and remain unchanged across all trials for this workflow/scale/setup.
+- Statically computed Widget DPM candidate-plan score table copied into the clean input bundle. The table must score every node-count/storage-tier candidate in this prompt, include `estT_prod`, `estT_cons`, `workflow_io_time`, `data_movement_time`, and final `dpm` for each scored candidate, identify the deterministic lowest-DPM plan, and remain unchanged across all trials for this workflow/scale/setup. The normalized score table must be generated from Widget `predict_dpm_space` or `analyze_workflow_dpm`, not from `prepare_and_dump_dpm` movement-node exports alone.
 - Minimal labels copied into the clean input bundle to map DPM scores to workflow edges, node counts, and storage choices.
 
 Disallowed inputs for this setup:

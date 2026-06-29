@@ -70,7 +70,7 @@ You may inspect only:
 - Cluster site configuration copied into the clean input bundle.
 - Candidate node counts and storage tiers listed in this prompt.
 - Full WDD suite copied into the clean input bundle: WDD.yml, IODD.yml, HRD.yml, GD.yml, DDD.yml, EDD_*.yml.
-- Statically computed Widget DPM candidate-plan score table copied into the clean input bundle. The table must score every node-count/storage-tier candidate in this prompt, identify the deterministic lowest-DPM plan, and remain unchanged across all trials for this workflow/scale/setup.
+- Statically computed Widget DPM candidate-plan score table copied into the clean input bundle. The table must score every node-count/storage-tier candidate in this prompt, include `estT_prod`, `estT_cons`, `workflow_io_time`, `data_movement_time`, and final `dpm` for each scored candidate, identify the deterministic lowest-DPM plan, and remain unchanged across all trials for this workflow/scale/setup. The normalized score table must be generated from Widget `predict_dpm_space` or `analyze_workflow_dpm`, not from `prepare_and_dump_dpm` movement-node exports alone.
 
 Clean input bundle:
 
@@ -108,7 +108,7 @@ Tool policy:
 - workflow_execution: false
 - widget_mcp_live_calls: false
 
-Use the statically computed DPM candidate-plan score table from the clean input bundle as decision evidence. The DPM table must contain one score for every candidate node-count/storage-tier plan in this prompt, must identify the deterministic lowest-DPM plan, must record that it was derived from the existing DataLife profile for this workflow/scale, and is reused unchanged across all trials for this workflow/scale/setup. Report whether your selected deployment follows or overrides that lowest-DPM plan. Do not make live Widget MCP calls in this decision-agent prompt.
+Use the statically computed DPM candidate-plan score table from the clean input bundle as decision evidence. The DPM table must contain one score for every candidate node-count/storage-tier plan in this prompt; each scored plan must include `estT_prod`, `estT_cons`, `workflow_io_time`, `data_movement_time`, and final `dpm`; the table must identify the deterministic lowest-DPM plan, must record that it was derived from the existing DataLife profile for this workflow/scale, and is reused unchanged across all trials for this workflow/scale/setup. It must not be derived from `prepare_and_dump_dpm` or other movement-node exports alone. Report whether your selected deployment follows or overrides that lowest-DPM plan. Do not make live Widget MCP calls in this decision-agent prompt.
 
 ## Required Procedure
 

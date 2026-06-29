@@ -100,6 +100,12 @@ For every active DPM-enabled setup (`code_dpm`, `dpm_only`, and
 The same requirement applies if deferred `wdd_full_dpm` is reactivated later.
 It is not sufficient to provide an informal DPM summary.
 
+The normalized DPM score table must come from Widget's full DPM scoring path
+(`predict_dpm_space` or `analyze_workflow_dpm`). It must not be derived from
+`prepare_and_dump_dpm` / `dpm_export.py` movement-node exports alone. Movement
+exports are allowed as supporting provenance, but they are not valid substitutes
+for full candidate-plan DPM scores.
+
 Before the decision agent starts, the orchestrator must use Widget DPM to score
 every deployment plan in:
 
@@ -112,9 +118,20 @@ The DPM artifact bundle must include:
 - raw Widget DPM output,
 - normalized candidate-plan score table,
 - one score per node-count/storage-tier plan,
+- per-plan producer I/O time (`estT_prod`) and consumer I/O time (`estT_cons`),
+- per-plan `workflow_io_time`,
+- per-plan `data_movement_time`,
+- per-plan final `dpm` score,
 - deterministic lowest-DPM plan,
 - checksums for DPM artifacts,
 - explicit notes for any candidate that could not be scored.
+
+Before any DPM-enabled decision agent starts, the orchestrator must validate the
+normalized table. Each scored candidate plan must have non-missing
+`estT_prod`, `estT_cons`, `workflow_io_time`, `data_movement_time`, and `dpm`
+fields. If a plan legitimately has zero movement cost, `data_movement_time` may
+be zero, but `workflow_io_time` must still represent producer plus consumer I/O.
+If this validation fails, the DPM-enabled setup is blocked and must not be run.
 
 The DPM artifact bundle must not include measured runtime results, previous
 agent choices, report summaries, or chat-derived conclusions.
